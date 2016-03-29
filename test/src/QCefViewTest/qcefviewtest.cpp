@@ -11,7 +11,7 @@ QCefViewTest::QCefViewTest(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	QCefView* cefview = new QCefView("www.google.com", this);
+	QCefView* cefview = new QCefView("http://www.qt.io/", this);
 	setCentralWidget(cefview);
 }
 

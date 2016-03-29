@@ -7,11 +7,6 @@
 #include "CCefManager.h"
 #include "CCefSetting.h"
 
-#define CEF_AIO_FOLDER_NAME		_T("cef")
-#define CEF_RENDER_PROCESS_NAME	_T("qtcefwing.exe")
-#define CEF_PAKRES_FOLDER_NAME	_T("resources")
-#define CEF_LOCALES_FOLDER_NAME	_T("locales")
-
 CCefManager::CCefManager()
 {
 	nBrowserRefCount_ = 0;
