@@ -5,6 +5,11 @@
 
 #include "CCefSetting.h"
 
+void CCefSetting::initializeInstance()
+{
+	static CCefSetting s_instance;
+}
+
 CefString CCefSetting::browser_sub_process_path;
 
 CefString CCefSetting::resource_directory_path;

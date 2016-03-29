@@ -37,45 +37,12 @@ void CCefManager::AddBrowserRefCount()
 {
 	if (++nBrowserRefCount_ == 1)
 	{
-		// get current process path
-		//TCHAR path[MAX_PATH];
-		//::ZeroMemory(path, sizeof(path));
-		//HMODULE hExeMod = ::GetModuleHandle(NULL);
-		//if (!hExeMod)
-		//{
-		//	__noop(_T("CefManager"),
-		//		_T("Failed to get handle of module .exe"));
-		//	return;
-		//}
-		//::GetModuleFileName(hExeMod, path, MAX_PATH);
-		//::PathRemoveFileSpec(path);
-
-		// folder path that contains gxx.dll
-		//CefString gxxModuleFolderPath = path;
-
-		// make full path to render process image 
-		//::ZeroMemory(path, sizeof(path));
-		//::PathCombine(path, gxxModuleFolderPath.c_str(), CEF_RENDER_PROCESS_NAME);
-
+		CCefSetting::initializeInstance();
 
 		CefString(&cef_settings_.browser_subprocess_path)
 			= CCefSetting::browser_sub_process_path;
-
-		// make full path to the cef AIO directory
-		//::ZeroMemory(path, sizeof(path));
-		//::PathCombine(path, gxxModuleFolderPath.c_str(), CEF_AIO_FOLDER_NAME);
-		//CefString cefAioPath = path;
-
-		// make full path to cef resources directory
-		//::ZeroMemory(path, sizeof(path));
-		//::PathCombine(path, cefAioPath.c_str(), CEF_PAKRES_FOLDER_NAME);
-
 		CefString(&cef_settings_.resources_dir_path) 
 			= CCefSetting::resource_directory_path;
-
-		// make full path to cef locals directory
-		//::ZeroMemory(path, sizeof(path));
-		//::PathCombine(path, cef_settings_.resources_dir_path.str, CEF_LOCALES_FOLDER_NAME);
 		CefString(&cef_settings_.locales_dir_path) 
 			= CCefSetting::locales_directory_path;
 

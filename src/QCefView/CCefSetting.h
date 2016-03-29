@@ -5,6 +5,8 @@
 class CCefSetting
 {
 public:
+	static void initializeInstance();
+public:
 	static CefString browser_sub_process_path;
 	static CefString resource_directory_path;
 	static CefString locales_directory_path;
