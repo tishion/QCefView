@@ -2,7 +2,7 @@
 
 2. build libcef_dll_wrapper.lib with your platform toolset, remember to use the [Multi-thread DLL(/MD)] & [Multi-thread DLL Debug (/MDd)] Runtime Library
 
-3. put the cef binary files, lib files, inlucde files and resource files in to the dep\cef\ folder
+3. put the cef binary files, lib files, inlucde files and resource files into the dep\cef\ folder
 
 4. install and configure Qt development environment
 
