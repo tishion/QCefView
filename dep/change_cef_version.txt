@@ -1,6 +1,0 @@
-if you want change the version of cef
-
-1. download the binary distributed files 
-2. put them into this folder
-
-remarks you must compile the libcef_dll_wrapper.dll
