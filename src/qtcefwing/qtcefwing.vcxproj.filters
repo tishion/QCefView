@@ -42,6 +42,9 @@
     <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientObject.h">
       <Filter>RenderApp\RenderDelegates</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -62,5 +65,15 @@
     <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientObject.cpp">
       <Filter>RenderApp\RenderDelegates</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="qtcefwing.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
