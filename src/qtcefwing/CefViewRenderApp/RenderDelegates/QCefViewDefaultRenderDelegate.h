@@ -38,7 +38,7 @@ namespace QCefViewDefaultRenderDelegate
 
 	private:
 		CefRefPtr<CefMessageRouterRendererSide> render_message_router_;
-		CefRefPtr<QCefClientObjectManager>	gxxclientobject_manager_;
+		CefRefPtr<QCefClientObjectManager>	qcefclientobject_manager_;
 
 	private:
 		IMPLEMENT_REFCOUNTING(RenderDelegate);

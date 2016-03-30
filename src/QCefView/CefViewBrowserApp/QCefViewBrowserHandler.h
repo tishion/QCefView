@@ -1,5 +1,5 @@
-#ifndef GXXCEFVIEWHANDLER_H_
-#define GXXCEFVIEWHANDLER_H_
+#ifndef QCEFVIEWHANDLER_H_
+#define QCEFVIEWHANDLER_H_
 #pragma once
 
 #include <list>

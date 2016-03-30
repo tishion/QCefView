@@ -1,6 +1,3 @@
-// gxxcefhost.cpp : Defines the entry point for the application.
-//
-
 #include "stdafx.h"
 
 #pragma region cef_headers

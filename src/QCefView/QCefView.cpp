@@ -199,7 +199,7 @@ bool QCefView::triggerEvent(const QString& name, const QVariantList& args)
 		else
 		{
 			arguments->SetNull(i + 1);
-			__noop(_T("GxxCefView"), _T("Unknow Type!"));
+			__noop(_T("QCefView"), _T("Unknow Type!"));
 		}
 	}
 

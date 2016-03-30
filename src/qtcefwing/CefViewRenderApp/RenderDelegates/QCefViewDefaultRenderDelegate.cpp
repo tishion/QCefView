@@ -19,10 +19,10 @@ namespace QCefViewDefaultRenderDelegate
 	void RenderDelegate::OnWebKitInitialized(CefRefPtr<QCefViewRenderApp> app)
 	{
 		CefMessageRouterConfig config;
-		config.js_query_function = QTCEF_QUERY_NAME;
-		config.js_cancel_function = QTCEF_QUERY_CANCEL_NAME;
+		config.js_query_function = QCEF_QUERY_NAME;
+		config.js_cancel_function = QCEF_QUERY_CANCEL_NAME;
 		render_message_router_ = CefMessageRouterRendererSide::Create(config);
-		gxxclientobject_manager_ = new QCefClientObjectManager;
+		qcefclientobject_manager_ = new QCefClientObjectManager;
 	}
 
 	void RenderDelegate::OnContextCreated(CefRefPtr<QCefViewRenderApp> app,
@@ -31,7 +31,7 @@ namespace QCefViewDefaultRenderDelegate
 		CefRefPtr<CefV8Context> context)
 	{
 		render_message_router_->OnContextCreated(browser, frame, context);
-		gxxclientobject_manager_->OnContextCreated(browser, frame, context);
+		qcefclientobject_manager_->OnContextCreated(browser, frame, context);
 	}
 
 	void RenderDelegate::OnContextReleased(CefRefPtr<QCefViewRenderApp> app,
@@ -40,7 +40,7 @@ namespace QCefViewDefaultRenderDelegate
 		CefRefPtr<CefV8Context> context)
 	{
 		render_message_router_->OnContextReleased(browser, frame, context);
-		gxxclientobject_manager_->OnContextReleased(browser, frame, context);
+		qcefclientobject_manager_->OnContextReleased(browser, frame, context);
 	}
 
 	bool RenderDelegate::OnProcessMessageReceived(CefRefPtr<QCefViewRenderApp> app,
@@ -53,7 +53,7 @@ namespace QCefViewDefaultRenderDelegate
 			return true;
 		}
 
-		if (gxxclientobject_manager_->OnProcessMessageReceived(browser, source_process, message))
+		if (qcefclientobject_manager_->OnProcessMessageReceived(browser, source_process, message))
 		{
 			return true;
 		}

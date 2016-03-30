@@ -77,8 +77,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CefViewRenderApp\QCefViewRenderApp.h" />
+    <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientAccessor.h" />
+    <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientV8Handler.h" />
     <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefViewDefaultRenderDelegate.h" />
-    <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientObject.h" />
     <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientObjectManager.h" />
     <ClInclude Include="qtcefwing.h" />
     <ClInclude Include="resource.h" />
@@ -87,8 +88,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CefViewRenderApp\QCefViewRenderApp.cpp" />
+    <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientAccessor.cpp" />
+    <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientV8Handler.cpp" />
     <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefViewDefaultRenderDelegate.cpp" />
-    <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientObject.cpp" />
     <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientObjectManager.cpp" />
     <ClCompile Include="qtcefwing.cpp" />
     <ClCompile Include="stdafx.cpp">

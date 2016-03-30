@@ -16,7 +16,7 @@
 	#pragma comment(lib, "QCefView.lib")
 #endif
 
-/** Outline of GxxCefView:
+/** Outline of QCefView:
  **
  **		+--------------------------------------------------------------+
  **		| QCefView(QWidget)                                          |
@@ -49,8 +49,8 @@ class QCEFVIEW_EXPORT QCefView
 
 protected slots:
 	//************************************
-	// Method:    processGxxUrlRequest
-	// FullName:  QCefView::processGxxUrlRequest
+	// Method:    processQCefUrlRequest
+	// FullName:  QCefView::processQCefUrlRequest
 	// Access:    virtual protected private 
 	// Returns:   void
 	// Qualifier:

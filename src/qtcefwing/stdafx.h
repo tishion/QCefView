@@ -18,10 +18,10 @@
 #include <tchar.h>
 
 
-#define OBJECT_NAME						"QtCefClient"
+#define OBJECT_NAME						"QCefClient"
 #define NOTIFY_REQUTEST_MESSAGE_NAME	"NotifyRequestMessage"
 #define TRIGGER_EVENT_MESSAGE_NAME		"TriggerEventMessage"
-#define QTCEF_QUERY_NAME				"QtCefQuery"
-#define QTCEF_QUERY_CANCEL_NAME			"QtCefQueryCancel"
+#define QCEF_QUERY_NAME					"QCefQuery"
+#define QCEF_QUERY_CANCEL_NAME			"QCefQueryCancel"
 
 // TODO: reference additional headers your program requires here

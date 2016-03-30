@@ -39,11 +39,14 @@
     <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientObjectManager.h">
       <Filter>RenderApp\RenderDelegates</Filter>
     </ClInclude>
-    <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientObject.h">
-      <Filter>RenderApp\RenderDelegates</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientAccessor.h">
+      <Filter>RenderApp\RenderDelegates</Filter>
+    </ClInclude>
+    <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClientV8Handler.h">
+      <Filter>RenderApp\RenderDelegates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -62,7 +65,10 @@
     <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientObjectManager.cpp">
       <Filter>RenderApp\RenderDelegates</Filter>
     </ClCompile>
-    <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientObject.cpp">
+    <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientAccessor.cpp">
+      <Filter>RenderApp\RenderDelegates</Filter>
+    </ClCompile>
+    <ClCompile Include="CefViewRenderApp\RenderDelegates\QCefClientV8Handler.cpp">
       <Filter>RenderApp\RenderDelegates</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,42 +2,36 @@
 
 #pragma region project_headser
 #include "QCefClientObjectManager.h"
+#include "QCefClientAccessor.h"
 #pragma endregion project_headser
 
 QCefClientObjectManager::QCefClientObjectManager()
 {
-	frame_map_.clear();
 }
 
 
 QCefClientObjectManager::~QCefClientObjectManager()
 {
-	frame_map_.clear();
 }
 
 void QCefClientObjectManager::OnContextCreated(CefRefPtr<CefBrowser> browser, 
 	CefRefPtr<CefFrame> frame, 
 	CefRefPtr<CefV8Context> context)
 {
-	CefRefPtr<QCefClient> objGxxClient = new QCefClient(
-		browser, frame);
-	// Add GxxClientObject to windows object
-	CefRefPtr<CefV8Value> objWindow = context->GetGlobal();
-	objGxxClient->attatchToObject(objWindow);
+	//CefRefPtr<QCefClientAccessor> accessor = new QCefClientAccessor();
+	//CefRefPtr<CefV8Value> objQCefClient = CefV8Value::CreateObject(accessor);
 
-	FrameGxxClient framGxxClient(frame, objGxxClient);
-	frame_map_[frame->GetIdentifier()] = framGxxClient;
+	//// Add methods and event handler for objQCefClient
+	//InitializeQCefClientObject(objQCefClient, browser, frame);
+
+	//CefRefPtr<CefV8Value> objWindow = context->GetGlobal();
+	//objWindow->SetValue(OBJECT_NAME, objQCefClient, V8_PROPERTY_ATTRIBUTE_READONLY);
 }
 
 void QCefClientObjectManager::OnContextReleased(CefRefPtr<CefBrowser> browser, 
 	CefRefPtr<CefFrame> frame, 
 	CefRefPtr<CefV8Context> context)
 {
-	FrameMap::iterator it = frame_map_.find(frame->GetIdentifier());
-	if (it != frame_map_.end())
-	{
-		frame_map_.erase(it);
-	}
 }
 
 bool QCefClientObjectManager::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
@@ -79,19 +73,51 @@ bool QCefClientObjectManager::OnProcessMessageReceived(CefRefPtr<CefBrowser> bro
 			}
 			else
 			{
-				__noop(_T("GxxCefView"), _T("Unknow Type!"));
+				__noop(_T("QCefView"), _T("Unknow Type!"));
 			}
 		}
 
-		for (auto it = frame_map_.begin(); it != frame_map_.end(); it++)
-		{
-			FrameGxxClient& frameClient = it->second;
-			CefRefPtr<CefFrame>& frame = frameClient.first;
-			CefRefPtr<QCefClient>& client = frameClient.second;
-			client->TriggerEvent(frame->GetV8Context(), funcName, arguments);
-		}
+		TriggerEventMessage(browser, funcName, arguments);
 		return true;
 	}
 
 	return false;
+}
+
+void QCefClientObjectManager::InitializeQCefClientObject(CefRefPtr<CefV8Value> obj,
+	CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame)
+{
+	// create property
+	CefRefPtr<CefV8Value> property = CefV8Value::CreateString("PROPERTY_VAL");
+	obj->SetValue("PROPERTY_NAME", property, V8_PROPERTY_ATTRIBUTE_READONLY);
+
+	// create function
+	CefRefPtr<QCefClientV8Handler> handler = new QCefClientV8Handler(browser, frame);
+	CefRefPtr<CefV8Value> funtion = CefV8Value::CreateFunction("METHOD_NAME", handler);
+	obj->SetValue("METHOD_NAME", funtion, V8_PROPERTY_ATTRIBUTE_READONLY);
+
+	// create event
+	CefRefPtr<CefV8Value> eventHandler = CefV8Value::CreateUndefined();
+	obj->SetValue("EVENT_NAME", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
+}
+
+void QCefClientObjectManager::TriggerEventMessage(CefRefPtr<CefBrowser> browser, 
+	const CefString& name,
+	const CefV8ValueList& arguments)
+{
+	std::vector<int64> idList;
+	browser->GetFrameIdentifiers(idList);
+	for (int64 id : idList)
+	{
+		CefRefPtr<CefFrame> frame = browser->GetFrame(id);
+		CefRefPtr<CefV8Context> context = frame->GetV8Context();
+		CefRefPtr<CefV8Value> window = context->GetGlobal();
+		CefRefPtr<CefV8Value> qcef = window->GetValue(OBJECT_NAME);
+		CefRefPtr<CefV8Value> handler = qcef->GetValue(name);
+		if (handler->IsFunction())
+		{
+			handler->ExecuteFunctionWithContext(context, qcef, arguments);
+		}
+	}
 }

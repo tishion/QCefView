@@ -13,7 +13,7 @@ class CefSchemeRegistrar;
 
 namespace QCefViewDefaultSchemeHandler
 {
-	static char* scheme_name = "qtcef";
+	static char* scheme_name = "qcef";
 
 	bool RegisterSchemeHandlerFactory();
 

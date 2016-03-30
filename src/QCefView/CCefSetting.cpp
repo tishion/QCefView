@@ -34,7 +34,7 @@ CCefSetting::CCefSetting()
 	locales_directory_path.FromString(
 		QDir::toNativeSeparators(ResPath.filePath(LOCALES_DIRECTORY_NAME)).toStdString());
 
-	user_agent.FromString(QTCEF_USER_AGENT);
+	user_agent.FromString(QCEF_USER_AGENT);
 }
 
 CCefSetting::~CCefSetting()

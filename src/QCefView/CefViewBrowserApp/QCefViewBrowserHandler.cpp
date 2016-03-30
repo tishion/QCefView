@@ -67,7 +67,7 @@ bool QCefViewBrowserHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
 	return false;
 }
 
-//bool GxxCefViewHandler::OnFileDialog(CefRefPtr<CefBrowser> browser, 
+//bool QCefViewHandler::OnFileDialog(CefRefPtr<CefBrowser> browser, 
 //	FileDialogMode mode, 
 //	const CefString& title, 
 //	const CefString& default_file_name, 
@@ -114,7 +114,7 @@ bool QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 	return false;
 }
 
-//void GxxCefViewHandler::OnBeforeDownload(CefRefPtr<CefBrowser> browser, 
+//void QCefViewHandler::OnBeforeDownload(CefRefPtr<CefBrowser> browser, 
 //	CefRefPtr<CefDownloadItem> download_item, 
 //	const CefString& suggested_name, 
 //	CefRefPtr<CefBeforeDownloadCallback> cal
@@ -124,7 +124,7 @@ bool QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 //
 //}
 
-//void GxxCefViewHandler::OnDownloadUpdated(CefRefPtr<CefBrowser> browser, 
+//void QCefViewHandler::OnDownloadUpdated(CefRefPtr<CefBrowser> browser, 
 //	CefRefPtr<CefDownloadItem> download_item, 
 //	CefRefPtr<CefDownloadItemCallback> callback)
 //{
@@ -141,7 +141,7 @@ bool QCefViewBrowserHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
 	return true;
 }
 
-//bool GxxCefViewHandler::OnRequestGeolocationPermission(CefRefPtr<CefBrowser> browser, 
+//bool QCefViewHandler::OnRequestGeolocationPermission(CefRefPtr<CefBrowser> browser, 
 //	const CefString& requesting_url, 
 //	int request_id, 
 //	CefRefPtr<CefGeolocationCallback> callback)
@@ -220,8 +220,8 @@ void QCefViewBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 	{
 		// Create the browser-side router for query handling.
 		CefMessageRouterConfig config;
-		config.js_query_function = QTCEF_QUERY_NAME;
-		config.js_cancel_function = QTCEF_QUERY_CANCEL_NAME;
+		config.js_query_function = QCEF_QUERY_NAME;
+		config.js_cancel_function = QCEF_QUERY_CANCEL_NAME;
 		message_router_ = CefMessageRouterBrowserSide::Create(config);
 
 		// Register handlers with the router.

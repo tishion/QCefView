@@ -40,7 +40,7 @@ namespace QCefViewDefaultSchemeHandler
 			QString url = QString::fromStdString(cefStrUrl.ToString());
 
 			QMetaObject::invokeMethod(host, 
-				"processGxxUrlRequest", 
+				"processQCefUrlRequest", 
 				Qt::QueuedConnection, 
 				Q_ARG(const QString&, url));
 		}
