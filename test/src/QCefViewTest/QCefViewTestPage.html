@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <script>
+            var click_count = 0;
+            function onFuncionClick() {
+                document.getElementById('display').value = 'Count:' + click_count;
+                click_count += 1;
+				alert('hello');
+            }
+        </script>
+    </head>
+    <body>
+	<div align="center">
+        <input type="text" value="" id="display">
+        <input type="button" value="Call Function" onclick="onFuncionClick()"/>
+    </div>
+	</body>
+</html>
