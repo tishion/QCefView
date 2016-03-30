@@ -18,14 +18,14 @@ void QCefClientObjectManager::OnContextCreated(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame, 
 	CefRefPtr<CefV8Context> context)
 {
-	//CefRefPtr<QCefClientAccessor> accessor = new QCefClientAccessor();
-	//CefRefPtr<CefV8Value> objQCefClient = CefV8Value::CreateObject(accessor);
+	CefRefPtr<QCefClientAccessor> accessor = new QCefClientAccessor();
+	CefRefPtr<CefV8Value> objQCefClient = CefV8Value::CreateObject(accessor);
 
 	//// Add methods and event handler for objQCefClient
 	//InitializeQCefClientObject(objQCefClient, browser, frame);
 
-	//CefRefPtr<CefV8Value> objWindow = context->GetGlobal();
-	//objWindow->SetValue(OBJECT_NAME, objQCefClient, V8_PROPERTY_ATTRIBUTE_READONLY);
+	CefRefPtr<CefV8Value> objWindow = context->GetGlobal();
+	objWindow->SetValue(OBJECT_NAME, objQCefClient, V8_PROPERTY_ATTRIBUTE_READONLY);
 }
 
 void QCefClientObjectManager::OnContextReleased(CefRefPtr<CefBrowser> browser, 

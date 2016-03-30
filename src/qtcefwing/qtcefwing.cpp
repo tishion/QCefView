@@ -9,8 +9,6 @@
 #include "qtcefwing.h"
 #pragma endregion project_heasers
 
-#define CEF_AIO_FOLDER_NAME	_T("cef")
-
 int APIENTRY _tWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,

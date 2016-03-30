@@ -66,6 +66,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy /r /y /e "$(SolutionDir)QCefViewSDK\bin\$(Configuration)\*" "$(OutDir)"
+xcopy /r /y /e "$(ProjectDir)QCefViewTestPage.html" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -86,6 +87,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy /r /y /e "$(SolutionDir)QCefViewSDK\bin\$(Configuration)\*" "$(OutDir)"
+xcopy /r /y /e "$(ProjectDir)QCefViewTestPage.html" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
