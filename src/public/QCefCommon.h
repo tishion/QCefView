@@ -9,8 +9,16 @@
 
 
 #define QCEF_OBJECT_NAME				"QCefClient"
+
+/*
+ * QCefClient.invokeMethod("method_name", ...)
+ */
 #define QCEF_INVOKEMETHOD				"invokeMethod"
-#define QCEF_EVENTLIST					"events"
+
+/*
+ * QCefClient.setEventHandler("event_name", function () {})
+ */
+#define QCEF_SETEVENTHANDLER			"setEventHandler"
 
 /*
  * this message is send from render process to browser process

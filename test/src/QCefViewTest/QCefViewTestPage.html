@@ -7,9 +7,23 @@
                 click_count += 1;
 				alert('hello');
             }
+			
+			function onLoad() {
+				alert('Function:onLoad()');
+				if (QCefClient == null) {
+					alert('QCefClient is null');
+					return;
+				}
+				
+				QCefClient.invokeMethod("HEHE", 1, 2, false);
+				
+				QCefClient.testEventHandler = function() {
+					alert('Function:testEventHandler()');
+				}
+			}
         </script>
     </head>
-    <body>
+    <body onload="onLoad()">
 	<div align="center">
         <input type="text" value="" id="display">
         <input type="button" value="Call Function" onclick="onFuncionClick()"/>

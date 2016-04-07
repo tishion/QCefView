@@ -3,12 +3,18 @@
 #include "QCefClient.h"
 #pragma endregion projet_headers
 
-bool QCefClient::Accessor::Get(const CefString& name, const CefRefPtr<CefV8Value> object, CefRefPtr<CefV8Value>& retval, CefString& exception)
+bool QCefClient::Accessor::Get(const CefString& name, 
+	const CefRefPtr<CefV8Value> object, 
+	CefRefPtr<CefV8Value>& retval, 
+	CefString& exception)
 {
 	return true;
 }
 
-bool QCefClient::Accessor::Set(const CefString& name, const CefRefPtr<CefV8Value> object, const CefRefPtr<CefV8Value> value, CefString& exception)
+bool QCefClient::Accessor::Set(const CefString& name,
+	const CefRefPtr<CefV8Value> object,
+	const CefRefPtr<CefV8Value> value, 
+	CefString& exception)
 {
 	if (value->IsFunction())
 	{
@@ -24,13 +30,40 @@ bool QCefClient::Accessor::Set(const CefString& name, const CefRefPtr<CefV8Value
 
 //////////////////////////////////////////////////////////////////////////
 
-QCefClient::V8Handler::V8Handler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame)
+QCefClient::V8Handler::V8Handler(CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame)
 	: browser_(browser), frame_(frame)
 {
 
 }
 
-bool QCefClient::V8Handler::Execute(const CefString& function, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception)
+bool QCefClient::V8Handler::Execute(const CefString& function, 
+	CefRefPtr<CefV8Value> object, 
+	const CefV8ValueList& arguments, 
+	CefRefPtr<CefV8Value>& retval, 
+	CefString& exception)
+{
+	if (function == QCEF_INVOKEMETHOD)
+	{
+		ExecuteInvokeMethod(function, object, arguments, retval, exception);
+	}
+	else if (function == QCEF_SETEVENTHANDLER)
+	{
+		ExecuteSetEventHandler(function, object, arguments, retval, exception);
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void QCefClient::V8Handler::ExecuteInvokeMethod(const CefString& function,
+	CefRefPtr<CefV8Value> object,
+	const CefV8ValueList& arguments, 
+	CefRefPtr<CefV8Value>& retval, 
+	CefString& exception)
 {
 	CefRefPtr<CefProcessMessage> msg
 		= CefProcessMessage::Create(INVOKEMETHOD_NOTIFY_MESSAGE);
@@ -70,17 +103,28 @@ bool QCefClient::V8Handler::Execute(const CefString& function, CefRefPtr<CefV8Va
 		}
 	}
 
+	bool bRet = false;
 	if (browser_)
-	{
-		return browser_->SendProcessMessage(PID_BROWSER, msg);
+	{	
+		bRet = browser_->SendProcessMessage(PID_BROWSER, msg);
 	}
+	retval = CefV8Value::CreateBool(bRet);
+}
 
-	return false;
+void QCefClient::V8Handler::ExecuteSetEventHandler(const CefString& function,
+	CefRefPtr<CefV8Value> object, 
+	const CefV8ValueList& arguments, 
+	CefRefPtr<CefV8Value>& retval, 
+	CefString& exception)
+{
+	bool bRet = false;
+	retval = CefV8Value::CreateBool(bRet);
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-QCefClient::QCefClient(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame)
+QCefClient::QCefClient(CefRefPtr<CefBrowser> browser, 
+	CefRefPtr<CefFrame> frame)
 	: object_(CefV8Value::CreateObject(new Accessor()))
 	, browser_(browser)
 	, frame_(frame)
@@ -97,8 +141,8 @@ QCefClient::QCefClient(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame)
 	//object_->SetValue(QCEF_EVENTLIST, events, V8_PROPERTY_ATTRIBUTE_NONE);
 }
 
-QCefClient::operator CefRefPtr<CefV8Value>()
+CefRefPtr<CefV8Value> QCefClient::GetObject()
 {
-	CefRefPtr<CefV8Value> p = object_;
-	return p;
+	return object_;
 }
+

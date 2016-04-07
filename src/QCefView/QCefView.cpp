@@ -55,6 +55,15 @@ void QCefView::processQCefQueryRequest(QCefQuery query)
 
 }
 
+void QCefView::onInvokeMethodNotify(
+	int browserId, 
+	int frameId, 
+	const QString method,
+	const QVariantList arguments)
+{
+
+}
+
 void QCefView::navigateToString(const QString& content, const QString& url)
 {
 	if (cefWindow_)

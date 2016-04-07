@@ -5,6 +5,7 @@
 #pragma region qt_headers
 #include <QtCore/qglobal.h>
 #include <QWidget>
+#include <QVariantList>
 #pragma endregion qt_headers
 
 #include "QCefQuery.h"
@@ -74,6 +75,12 @@ protected slots:
 	//************************************
 
 	virtual void processQCefQueryRequest(QCefQuery query);
+
+	virtual void onInvokeMethodNotify(
+		int browserId, 
+		int frameId,
+		const QString method, 
+		const QVariantList arguments);
 
 public:
 	QCefView(const QString& url, QWidget* parent = 0);

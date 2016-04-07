@@ -36,7 +36,7 @@ namespace QCefViewDefaultRenderDelegate
 		CefRefPtr<CefV8Value> objWindow = context->GetGlobal();
 		CefRefPtr<QCefClient> objClient = new QCefClient(browser, frame);
 		objWindow->SetValue(QCEF_OBJECT_NAME, 
-			objClient, V8_PROPERTY_ATTRIBUTE_READONLY);
+			objClient->GetObject(), V8_PROPERTY_ATTRIBUTE_READONLY);
 
 		int browserId = browser->GetIdentifier();
 		int64 frameId = frame->GetIdentifier();
@@ -73,6 +73,10 @@ namespace QCefViewDefaultRenderDelegate
 			if (itf != mapFrame.end())
 			{
 				mapFrame.erase(itf);
+			}
+			if (mapFrame.empty())
+			{
+				mapBrowser_.erase(itb);
 			}
 		}
 	}
@@ -132,8 +136,14 @@ namespace QCefViewDefaultRenderDelegate
 					arguments.push_back(
 						CefV8Value::CreateString(messageArguments->GetString(i)));
 				}
+				else if (messageArguments->GetType(i) == VTYPE_NULL)
+				{
+					arguments.push_back(
+						CefV8Value::CreateInt(0));
+				}
 				else
 				{
+					// do log
 					__noop(_T("QCefView"), _T("Unknow Type!"));
 				}
 			}
