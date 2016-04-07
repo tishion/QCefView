@@ -96,6 +96,7 @@ xcopy /r /y /e "$(SolutionDir)dep\cef\resources\*" "$(SolutionDir)QCefViewSDK\bi
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\QCefCommon.h" />
     <ClInclude Include="CCefSetting.h" />
     <ClInclude Include="inc\QCefSetting.h" />
     <ClInclude Include="stdafx.h" />

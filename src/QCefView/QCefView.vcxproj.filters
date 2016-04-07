@@ -77,6 +77,9 @@
     <ClInclude Include="inc\QCefSetting.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\QCefCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_QCefView.cpp">

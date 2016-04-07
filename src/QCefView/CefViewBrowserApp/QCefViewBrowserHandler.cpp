@@ -11,6 +11,7 @@
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
 
+#include <QVariant>
 #include "QCefViewBrowserHandler.h"
 #include "QCefQueryHandler.h"
 
@@ -506,6 +507,7 @@ bool QCefViewBrowserHandler::TriggerEvent(const CefRefPtr<CefProcessMessage> msg
 	{
 		return false;
 	}
+
 	CefRefPtr<CefBrowser> browser = GetBrowser();
 	if (browser == nullptr)
 	{
@@ -519,7 +521,7 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 	CefProcessId source_process, 
 	CefRefPtr<CefProcessMessage> message)
 {
-	if (hostWidget_ && message->GetName() == NOTIFY_REQUTEST_MESSAGE_NAME)
+	if (hostWidget_ && message->GetName() == INVOKEMETHOD_NOTIFY_MESSAGE)
 	{
 		CefRefPtr<CefListValue> messageArguments = message->GetArgumentList();
 		if (messageArguments == NULL
@@ -527,32 +529,73 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 		{
 			return false;
 		}
-		CefString funcName = messageArguments->GetString(0);
 
-		// Example
-		//if (0 == funcName.compare("no parameters"))
-		//{
-		//	QMetaObject::invokeMethod(hostWidget_,
-		//		"onOpenNotificationCenterNotify",
-		//		Qt::QueuedConnection);
-		//}
-		//else if (0 == funcName.compare("with parameters"))
-		//{
-		//	if (messageArguments->GetSize() == 5)
-		//	{
-		//		int left = messageArguments->GetInt(1);
-		//		int top = messageArguments->GetInt(2);
-		//		int width = messageArguments->GetInt(3);
-		//		int rightOffset = messageArguments->GetInt(4);
-		//		QMetaObject::invokeMethod(hostWidget_,
-		//			"onAdjustRecentContactWidget",
-		//			Qt::QueuedConnection,
-		//			Q_ARG(const int, left),
-		//			Q_ARG(const int, top),
-		//			Q_ARG(const int, width),
-		//			Q_ARG(const int, rightOffset));
-		//	}
-		//}
+		int frameId = 0;
+		CefString frameName;
+		CefString function;
+
+		int idx = 0;
+		if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
+		{
+			frameId = messageArguments->GetInt(idx);
+			frameName = browser->GetFrame(frameId)->GetName();
+		}
+		else
+		{
+			return false;
+		}
+		
+		idx++;
+
+		if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
+		{
+			function = messageArguments->GetString(idx);
+			if (function.empty())
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		QVariantList arguments;
+		for (idx; idx < messageArguments->GetSize(); idx++)
+		{
+			if (CefValueType::VTYPE_BOOL == messageArguments->GetType(idx))
+			{
+				arguments.push_back(QVariant::fromValue(
+					messageArguments->GetBool(idx)));
+			}
+			else if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
+			{
+				arguments.push_back(QVariant::fromValue(
+					messageArguments->GetInt(idx)));
+			}
+			else if (CefValueType::VTYPE_DOUBLE == messageArguments->GetType(idx))
+			{
+				arguments.push_back(QVariant::fromValue(
+					messageArguments->GetDouble(idx)));
+			}
+			else if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
+			{
+				CefString cefStr = messageArguments->GetString(idx);
+#if defined(CEF_STRING_TYPE_UTF16)
+				QString qStr = QString::fromWCharArray(cefStr.c_str());
+#elif defined(CEF_STRING_TYPE_UTF8)
+				QString qStr = QString::fromUtf8(cefStr.c_str());
+#elif defined(CEF_STRING_TYPE_WIDE)
+				QString qStr = QString::fromWCharArray(cefStr.c_str());
+#endif
+				arguments.push_back(qStr);
+			}
+		}
+
+		QMetaObject::invokeMethod(hostWidget_,
+			"OnInvokeMethodNotify",
+			Qt::QueuedConnection,
+			Q_ARG(const QVariant, arguments));
 
 		return true;
 	}

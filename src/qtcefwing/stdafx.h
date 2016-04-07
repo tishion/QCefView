@@ -17,11 +17,6 @@
 #include <memory.h>
 #include <tchar.h>
 
-
-#define OBJECT_NAME						"QCefClient"
-#define NOTIFY_REQUTEST_MESSAGE_NAME	"NotifyRequestMessage"
-#define TRIGGER_EVENT_MESSAGE_NAME		"TriggerEventMessage"
-#define QCEF_QUERY_NAME					"QCefQuery"
-#define QCEF_QUERY_CANCEL_NAME			"QCefQueryCancel"
+#include "../public/QCefCommon.h"
 
 // TODO: reference additional headers your program requires here

@@ -166,7 +166,7 @@ bool QCefView::triggerEvent(const QString& name, const QVariantList& args)
 	}
 
 	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(
-		TRIGGER_EVENT_MESSAGE_NAME);
+		TRIGGEREVENT_NOTIFY_MESSAGE);
 	CefRefPtr<CefListValue> arguments = msg->GetArgumentList();
 	CefString eventName;
 	eventName.FromString(name.toStdString());
