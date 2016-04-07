@@ -13,7 +13,7 @@ QCefViewTest::QCefViewTest(QWidget *parent)
 	ui.setupUi(this);
 
 	QDir dir = QCoreApplication::applicationDirPath();
-	QString uri = QDir::toNativeSeparators(dir.filePath("QCefViewTestPage.html"));
+	QString uri = QDir::toNativeSeparators(dir.filePath("web\\QCefViewTestPage.html"));
 	//QString uri = "http://www.qt.io";
 
 	QCefView* cefview = new QCefView(uri, this);

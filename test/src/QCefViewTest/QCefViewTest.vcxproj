@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{82F4086D-1013-4012-B55B-19BDC2CAB22F}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -37,16 +38,16 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)test\out\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)QCefViewSDK\bin\$(Configuration)\</OutDir>
     <IncludePath>$(SolutionDir)QCefViewSDK\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)QCefViewSDK\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)test\temp\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir>$(SolutionDir)temp\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)test\out\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)QCefViewSDK\bin\$(Configuration)\</OutDir>
     <IncludePath>$(SolutionDir)QCefViewSDK\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)QCefViewSDK\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)test\temp\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir>$(SolutionDir)temp\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -65,9 +66,7 @@
       <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /r /y /e "$(SolutionDir)QCefViewSDK\bin\$(Configuration)\*" "$(OutDir)"
-xcopy /r /y /e "$(ProjectDir)QCefViewTestPage.html" "$(OutDir)"
-</Command>
+      <Command>xcopy /r /y "$(ProjectDir)*.html" "$(SolutionDir)QCefViewSDK\bin\$(Configuration)\web\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -86,9 +85,7 @@ xcopy /r /y /e "$(ProjectDir)QCefViewTestPage.html" "$(OutDir)"
       <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /r /y /e "$(SolutionDir)QCefViewSDK\bin\$(Configuration)\*" "$(OutDir)"
-xcopy /r /y /e "$(ProjectDir)QCefViewTestPage.html" "$(OutDir)"
-</Command>
+      <Command>xcopy /r /y "$(ProjectDir)*.html" "$(SolutionDir)QCefViewSDK\bin\$(Configuration)\web\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
