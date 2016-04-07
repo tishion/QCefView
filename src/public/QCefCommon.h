@@ -16,9 +16,13 @@
 #define QCEF_INVOKEMETHOD				"invokeMethod"
 
 /*
- * QCefClient.setEventHandler("event_name", function () {})
+ * QCefClient.registerEventHandler("event_name", function () {})
  */
-#define QCEF_SETEVENTHANDLER			"setEventHandler"
+#define QCEF_REGISTEREVENTHANDLER		"registerEventHandler"
+/*
+ * QCefClient.unregisterEventHandler("event_name")
+ */
+#define QCEF_UNREGISTEREVENTHANDLER		"unregisterEventHandler"
 
 /*
  * this message is send from render process to browser process

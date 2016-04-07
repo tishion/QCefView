@@ -509,12 +509,12 @@ bool QCefViewBrowserHandler::TriggerEvent(const CefRefPtr<CefProcessMessage> msg
 	}
 
 	CefRefPtr<CefBrowser> browser = GetBrowser();
-	if (browser == nullptr)
+	if (browser)
 	{
-		return false;
+		return browser->SendProcessMessage(PID_RENDERER, msg);
 	}
 
-	return browser->SendProcessMessage(PID_RENDERER, msg);
+	return false;
 }
 
 bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser,
@@ -544,17 +544,17 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 					QString method;
 					if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
 					{
-						CefString cefStr = messageArguments->GetString(idx++);
 						#if defined(CEF_STRING_TYPE_UTF16)
-						method = QString::fromWCharArray(cefStr.c_str());
+						method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
 						#elif defined(CEF_STRING_TYPE_UTF8)
-						method = QString::fromUtf8(cefStr.c_str());
+						method = QString::fromUtf8(messageArguments->GetString(idx++).c_str());
 						#elif defined(CEF_STRING_TYPE_WIDE)
-						method = QString::fromWCharArray(cefStr.c_str());
+						method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
 						#endif
 					}
 
 					QVariantList arguments;
+					QString qStr;
 					for (idx; idx < messageArguments->GetSize(); idx++)
 					{
 						if (CefValueType::VTYPE_BOOL == messageArguments->GetType(idx))
@@ -574,13 +574,12 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 						}
 						else if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
 						{
-							CefString cefStr = messageArguments->GetString(idx);
 							#if defined(CEF_STRING_TYPE_UTF16)
-							QString qStr = QString::fromWCharArray(cefStr.c_str());
+							qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
 							#elif defined(CEF_STRING_TYPE_UTF8)
-							QString qStr = QString::fromUtf8(cefStr.c_str());
+							qStr = QString::fromUtf8(messageArguments->GetString(idx).c_str());
 							#elif defined(CEF_STRING_TYPE_WIDE)
-							QString qStr = QString::fromWCharArray(cefStr.c_str());
+							qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
 							#endif
 							arguments.push_back(qStr);
 						}

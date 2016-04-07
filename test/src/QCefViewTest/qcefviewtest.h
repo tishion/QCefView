@@ -12,6 +12,8 @@ public:
 	QCefViewTest(QWidget *parent = 0);
 	~QCefViewTest();
 
+protected slots:
+	void onBtnChangeColorClicked();
 private:
 	Ui::QCefViewTestClass ui;
 };

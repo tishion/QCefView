@@ -17,13 +17,14 @@
 				
 				QCefClient.invokeMethod("HEHE", 1, 2, false);
 				
-				QCefClient.testEventHandler = function() {
-					alert('Function:testEventHandler()');
-				}
+				QCefClient.registerEventHandler("onChangeColor", function(color) {
+					alert('event: onChangeColor(), color:' + color);
+				});
 			}
         </script>
     </head>
     <body onload="onLoad()">
+	<h1 align="center" style="font-size:12pt; font-family:MS Shell Dlg 2;">Web Area</h1>
 	<div align="center">
         <input type="text" value="" id="display">
         <input type="button" value="Call Function" onclick="onFuncionClick()"/>

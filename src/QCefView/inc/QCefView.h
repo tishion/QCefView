@@ -165,7 +165,7 @@ public:
 	void NotifyMoveOrResizeStarted();
 
 protected:
-	bool triggerEvent(const QString& name, const QVariantList& args);
+	bool triggerEvent(int frameId, const QString& name, const QVariantList& args);
 	void notifyRequest();
 
 private:

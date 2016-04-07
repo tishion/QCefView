@@ -16,23 +16,15 @@ bool QCefClient::Accessor::Set(const CefString& name,
 	const CefRefPtr<CefV8Value> value, 
 	CefString& exception)
 {
-	if (value->IsFunction())
-	{
-		object->SetValue(name, value, V8_PROPERTY_ATTRIBUTE_NONE);
-	}
-	else
-	{
-		exception = "Invalid arguments; expecting a single function";
-	}
-
-	return false;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
 QCefClient::V8Handler::V8Handler(CefRefPtr<CefBrowser> browser,
-	CefRefPtr<CefFrame> frame)
-	: browser_(browser), frame_(frame)
+	CefRefPtr<CefFrame> frame,
+	QCefClient::EventHandlerMap& eventHandlerMap)
+	: browser_(browser), frame_(frame), eventHandlerMap_(eventHandlerMap)
 {
 
 }
@@ -47,9 +39,13 @@ bool QCefClient::V8Handler::Execute(const CefString& function,
 	{
 		ExecuteInvokeMethod(function, object, arguments, retval, exception);
 	}
-	else if (function == QCEF_SETEVENTHANDLER)
+	else if (function == QCEF_REGISTEREVENTHANDLER)
 	{
-		ExecuteSetEventHandler(function, object, arguments, retval, exception);
+		ExecuteRegisterEventHandler(function, object, arguments, retval, exception);
+	}
+	else if (function == QCEF_UNREGISTEREVENTHANDLER)
+	{
+		ExecuteUnregisterEventHandler(function, object, arguments, retval, exception);
 	}
 	else
 	{
@@ -111,13 +107,73 @@ void QCefClient::V8Handler::ExecuteInvokeMethod(const CefString& function,
 	retval = CefV8Value::CreateBool(bRet);
 }
 
-void QCefClient::V8Handler::ExecuteSetEventHandler(const CefString& function,
+void QCefClient::V8Handler::ExecuteRegisterEventHandler(const CefString& function,
 	CefRefPtr<CefV8Value> object, 
 	const CefV8ValueList& arguments, 
 	CefRefPtr<CefV8Value>& retval, 
 	CefString& exception)
 {
 	bool bRet = false;
+
+	if (arguments.size() == 2)
+	{
+		if (arguments[0]->IsString())
+		{
+			if (arguments[1]->IsFunction())
+			{
+				CefString eventName = arguments[0]->GetStringValue();
+				CefRefPtr<CefV8Handler> eventHandler = arguments[1]->GetFunctionHandler();
+				eventHandlerMap_[eventName] = eventHandler;
+				bRet = true;
+			}
+			else
+			{
+				exception = "Invalid parameters; parameter 2 is expecting a function";
+			}
+		}
+		else
+		{
+			exception = "Invalid parameters; parameter 1 is expecting a string";
+		}
+	}
+	else
+	{
+		exception = "Invalid parameters; expecting 2 parameters";
+	}
+
+	retval = CefV8Value::CreateBool(bRet);
+}
+
+void QCefClient::V8Handler::ExecuteUnregisterEventHandler(const CefString& function,
+	CefRefPtr<CefV8Value> object,
+	const CefV8ValueList& arguments,
+	CefRefPtr<CefV8Value>& retval,
+	CefString& exception)
+{
+	bool bRet = false;
+
+	if (arguments.size() == 1)
+	{
+		if (arguments[0]->IsString())
+		{
+			CefString eventName = arguments[0]->GetStringValue();
+			auto it = eventHandlerMap_.find(eventName);
+			if (it != eventHandlerMap_.end())
+			{
+				eventHandlerMap_.erase(it);
+			}
+			bRet = true;
+		}
+		else
+		{
+			exception = "Invalid parameters; parameter 1 is expecting a string";
+		}
+	}
+	else
+	{
+		exception = "Invalid parameters; expecting 1 parameters";
+	}
+
 	retval = CefV8Value::CreateBool(bRet);
 }
 
@@ -130,15 +186,28 @@ QCefClient::QCefClient(CefRefPtr<CefBrowser> browser,
 	, frame_(frame)
 {
 	// create function handler
-	CefRefPtr<V8Handler> handler = new V8Handler(browser_, frame_);
-	// create function function
-	CefRefPtr<CefV8Value> function = CefV8Value::CreateFunction(QCEF_INVOKEMETHOD, handler);
-	// add this function to window object
-	object_->SetValue(QCEF_INVOKEMETHOD, function, V8_PROPERTY_ATTRIBUTE_READONLY);
+	CefRefPtr<V8Handler> handler = new V8Handler(browser_, frame_, eventHandlerMap_);
 
-	// create event list
-	//CefRefPtr<CefV8Value> events = CefV8Value::CreateArray(0);
-	//object_->SetValue(QCEF_EVENTLIST, events, V8_PROPERTY_ATTRIBUTE_NONE);
+	// create function function
+	CefRefPtr<CefV8Value> funcInvokeMethod = 
+		CefV8Value::CreateFunction(QCEF_INVOKEMETHOD, handler);
+	// add this function to window object
+	object_->SetValue(QCEF_INVOKEMETHOD, funcInvokeMethod, 
+		V8_PROPERTY_ATTRIBUTE_READONLY);
+
+	// create function function
+	CefRefPtr<CefV8Value> funcRegisterEventHandler = 
+		CefV8Value::CreateFunction(QCEF_REGISTEREVENTHANDLER, handler);
+	// add this function to window object
+	object_->SetValue(QCEF_REGISTEREVENTHANDLER, funcRegisterEventHandler,
+		V8_PROPERTY_ATTRIBUTE_READONLY);
+
+	// create function function
+	CefRefPtr<CefV8Value> funcUnregisterEventHandler =
+		CefV8Value::CreateFunction(QCEF_UNREGISTEREVENTHANDLER, handler);
+	// add this function to window object
+	object_->SetValue(QCEF_UNREGISTEREVENTHANDLER, funcUnregisterEventHandler,
+		V8_PROPERTY_ATTRIBUTE_READONLY);
 }
 
 CefRefPtr<CefV8Value> QCefClient::GetObject()
