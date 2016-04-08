@@ -11,7 +11,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 QCefQuery::QCefQuery()
-	: pcb_(nullptr)
+	: pCefQueryCallBack_(nullptr)
 {
 
 }
@@ -24,29 +24,29 @@ QCefQuery::QCefQuery(
 	if (cb)
 	{
 		cb->AddRef();
-		pcb_ = cb;
+		pCefQueryCallBack_ = cb;
 	}
 }
 
 QCefQuery::QCefQuery(const QCefQuery& other)
 	: reqeust_(other.reqeust_)
 {
-	if (other.pcb_)
+	if (other.pCefQueryCallBack_)
 	{
-		other.pcb_->AddRef();
-		pcb_ = other.pcb_;
+		other.pCefQueryCallBack_->AddRef();
+		pCefQueryCallBack_ = other.pCefQueryCallBack_;
 	}
 }
 
 QCefQuery& QCefQuery::operator=(const QCefQuery& other)
 {
-	if (other.pcb_)
+	if (other.pCefQueryCallBack_)
 	{
-		other.pcb_->AddRef();
+		other.pCefQueryCallBack_->AddRef();
 	}
 
-	CefBase* old_ptr = pcb_;
-	pcb_ = other.pcb_;
+	CefBase* old_ptr = pCefQueryCallBack_;
+	pCefQueryCallBack_ = other.pCefQueryCallBack_;
 	if (old_ptr)
 	{
 		old_ptr->Release();
@@ -56,9 +56,9 @@ QCefQuery& QCefQuery::operator=(const QCefQuery& other)
 
 QCefQuery::~QCefQuery()
 {
-	if (pcb_)
+	if (pCefQueryCallBack_)
 	{
-		pcb_->Release();
+		pCefQueryCallBack_->Release();
 	}
 }
 
@@ -67,22 +67,22 @@ const QString QCefQuery::reqeust() const
 	return reqeust_;
 }
 
-void QCefQuery::responseSuccess(QString response) const
+void QCefQuery::responseSuccess(const QString& response) const
 {
-	if (pcb_)
+	if (pCefQueryCallBack_)
 	{
 		CefString res;
 		res.FromString(response.toStdString());
-		((CefMessageRouterBrowserSide::Callback*)pcb_)->Success(res);
+		((CefMessageRouterBrowserSide::Callback*)pCefQueryCallBack_)->Success(res);
 	}
 }
 
-void QCefQuery::responseFailure(int ec, QString response) const
+void QCefQuery::responseFailure(int ec, const QString& response) const
 {
-	if (pcb_)
+	if (pCefQueryCallBack_)
 	{
 		CefString res;
 		res.FromString(response.toStdString());
-		((CefMessageRouterBrowserSide::Callback*)pcb_)->Failure(ec, res);
+		((CefMessageRouterBrowserSide::Callback*)pCefQueryCallBack_)->Failure(ec, res);
 	}
 }

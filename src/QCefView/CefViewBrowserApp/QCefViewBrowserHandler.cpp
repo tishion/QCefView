@@ -524,87 +524,84 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 	if (hostWidget_ && message->GetName() == INVOKEMETHOD_NOTIFY_MESSAGE)
 	{
 		CefRefPtr<CefListValue> messageArguments = message->GetArgumentList();
-		if (messageArguments == NULL
-			|| (messageArguments->GetSize() == 0))
+		if (messageArguments && (messageArguments->GetSize() >= 2))
 		{
-			return false;
-		}
-
-		int idx = 0;
-		if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
-		{
-			int browserId = browser->GetIdentifier();
-			int frameId = messageArguments->GetInt(idx++);
-
-			if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
+			int idx = 0;
+			if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
 			{
-				CefString functionName = messageArguments->GetString(idx++);
-				if (functionName == QCEF_INVOKEMETHOD)
-				{
-					QString method;
-					if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
-					{
-						#if defined(CEF_STRING_TYPE_UTF16)
-						method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
-						#elif defined(CEF_STRING_TYPE_UTF8)
-						method = QString::fromUtf8(messageArguments->GetString(idx++).c_str());
-						#elif defined(CEF_STRING_TYPE_WIDE)
-						method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
-						#endif
-					}
+				int browserId = browser->GetIdentifier();
+				int frameId = messageArguments->GetInt(idx++);
 
-					QVariantList arguments;
-					QString qStr;
-					for (idx; idx < messageArguments->GetSize(); idx++)
+				if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
+				{
+					CefString functionName = messageArguments->GetString(idx++);
+					if (functionName == QCEF_INVOKEMETHOD)
 					{
-						if (CefValueType::VTYPE_BOOL == messageArguments->GetType(idx))
-						{
-							arguments.push_back(QVariant::fromValue(
-								messageArguments->GetBool(idx)));
-						}
-						else if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
-						{
-							arguments.push_back(QVariant::fromValue(
-								messageArguments->GetInt(idx)));
-						}
-						else if (CefValueType::VTYPE_DOUBLE == messageArguments->GetType(idx))
-						{
-							arguments.push_back(QVariant::fromValue(
-								messageArguments->GetDouble(idx)));
-						}
-						else if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
+						QString method;
+						if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
 						{
 							#if defined(CEF_STRING_TYPE_UTF16)
-							qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
+							method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
 							#elif defined(CEF_STRING_TYPE_UTF8)
-							qStr = QString::fromUtf8(messageArguments->GetString(idx).c_str());
+							method = QString::fromUtf8(messageArguments->GetString(idx++).c_str());
 							#elif defined(CEF_STRING_TYPE_WIDE)
-							qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
+							method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
 							#endif
-							arguments.push_back(qStr);
 						}
-						else if (CefValueType::VTYPE_NULL == messageArguments->GetType(idx))
+
+						QVariantList arguments;
+						QString qStr;
+						for (idx; idx < messageArguments->GetSize(); idx++)
 						{
-							arguments.push_back(0);
+							if (CefValueType::VTYPE_BOOL == messageArguments->GetType(idx))
+							{
+								arguments.push_back(QVariant::fromValue(
+									messageArguments->GetBool(idx)));
+							}
+							else if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
+							{
+								arguments.push_back(QVariant::fromValue(
+									messageArguments->GetInt(idx)));
+							}
+							else if (CefValueType::VTYPE_DOUBLE == messageArguments->GetType(idx))
+							{
+								arguments.push_back(QVariant::fromValue(
+									messageArguments->GetDouble(idx)));
+							}
+							else if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
+							{
+								#if defined(CEF_STRING_TYPE_UTF16)
+								qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
+								#elif defined(CEF_STRING_TYPE_UTF8)
+								qStr = QString::fromUtf8(messageArguments->GetString(idx).c_str());
+								#elif defined(CEF_STRING_TYPE_WIDE)
+								qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
+								#endif
+								arguments.push_back(qStr);
+							}
+							else if (CefValueType::VTYPE_NULL == messageArguments->GetType(idx))
+							{
+								arguments.push_back(0);
+							}
+							else
+							{
+								// do log
+								__noop(_T("QCefView"), _T("Unknow Type!"));
+							}
 						}
-						else
-						{
-							// do log
-							__noop(_T("QCefView"), _T("Unknow Type!"));
+
+						QMetaObject::invokeMethod(hostWidget_,
+							"onInvokeMethodNotify",
+							Qt::QueuedConnection,
+							Q_ARG(int, browserId),
+							Q_ARG(int, frameId),
+							Q_ARG(const QString, method),
+							Q_ARG(const QVariantList, arguments));
+
+						return true;
 						}
 					}
-
-					QMetaObject::invokeMethod(hostWidget_,
-						"onInvokeMethodNotify",
-						Qt::QueuedConnection,
-						Q_ARG(int, browserId),
-						Q_ARG(int, frameId),
-						Q_ARG(const QString, method),
-						Q_ARG(const QVariantList, arguments));
-
-					return true;
 				}
-			}
 		}
 	}
 

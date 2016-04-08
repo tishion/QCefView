@@ -4,6 +4,7 @@
 #pragma once 
 #endif // _MSC_VER > 1000 
 
+#define QCEF_SCHEMA						"qcef"
 #define QCEF_QUERY_NAME					"QCefQuery"
 #define QCEF_QUERY_CANCEL_NAME			"QCefQueryCancel"
 
@@ -16,13 +17,13 @@
 #define QCEF_INVOKEMETHOD				"invokeMethod"
 
 /*
- * QCefClient.registerEventHandler("event_name", function () {})
+ * QCefClient.addEventListener(type, listener)
  */
-#define QCEF_REGISTEREVENTHANDLER		"registerEventHandler"
+#define QCEF_ADDEVENTLISTENER			"addEventListener"
 /*
- * QCefClient.unregisterEventHandler("event_name")
+ * QCefClient.removeEventListener(type, listener)
  */
-#define QCEF_UNREGISTEREVENTHANDLER		"unregisterEventHandler"
+#define QCEF_REMOVEEVENTLISTENER		"removeEventListener"
 
 /*
  * this message is send from render process to browser process

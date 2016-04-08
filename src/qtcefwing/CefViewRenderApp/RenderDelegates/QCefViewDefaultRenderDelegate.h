@@ -49,7 +49,8 @@ namespace QCefViewDefaultRenderDelegate
 			CefProcessId source_process,
 			CefRefPtr<CefProcessMessage> message);
 
-		void ExecuteEventHandler(CefRefPtr<CefBrowser> browser,
+		void ExecuteEventListener(CefRefPtr<CefBrowser> browser,
+			int frameId,
 			const CefString& name,
 			const CefV8ValueList& arguments);
 

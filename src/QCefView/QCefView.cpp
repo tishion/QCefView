@@ -145,6 +145,35 @@ void QCefView::browserStopLoad()
 	}
 }
 
+bool QCefView::triggerEvent(int frameId, const QString& name, const QVariantList& args)
+{
+	if (!name.isEmpty())
+	{
+		if (cefWindow_)
+		{
+			auto frame = cefWindow_->cefViewHandler()->GetBrowser()->GetFrame(frameId);
+			if (frame)
+			{
+				return sendEVentNotifyMessage(frameId, name, args);
+			}
+		}
+	}
+
+	return false;
+}
+
+bool QCefView::broadcastEvent(const QString& name, const QVariantList& args)
+{
+	if (!name.isEmpty())
+	{
+		if (cefWindow_)
+		{
+			return sendEVentNotifyMessage(0, name, args);
+		}
+	}
+	return false;
+}
+
 void QCefView::onLoadStateChange(bool isLoading)
 {
 
@@ -167,13 +196,28 @@ void QCefView::onLoadError(int errorCode,
 
 }
 
-bool QCefView::triggerEvent(int frameId, const QString& name, const QVariantList& args)
+void QCefView::NotifyMoveOrResizeStarted()
 {
-	if (name.isEmpty())
+	if (cefWindow_)
 	{
-		return false;
+		CefRefPtr<QCefViewBrowserHandler> handler = cefWindow_->cefViewHandler();
+		if (handler)
+		{
+			CefRefPtr<CefBrowser> browser = handler->GetBrowser();
+			if (browser)
+			{
+				CefRefPtr<CefBrowserHost> host = browser->GetHost();
+				if (host)
+				{
+					host->NotifyMoveOrResizeStarted();
+				}
+			}
+		}
 	}
+}
 
+bool QCefView::sendEVentNotifyMessage(int frameId, const QString& name, const QVariantList& args)
+{
 	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(
 		TRIGGEREVENT_NOTIFY_MESSAGE);
 	CefRefPtr<CefListValue> arguments = msg->GetArgumentList();
@@ -182,7 +226,7 @@ bool QCefView::triggerEvent(int frameId, const QString& name, const QVariantList
 	arguments->SetInt(idx++, frameId);
 
 	CefString eventName = name.toStdString();
-	arguments->SetString(idx, eventName);
+	arguments->SetString(idx++, eventName);
 
 	CefString cefStr;
 	for (int i = 0; i < args.size(); i++)
@@ -216,24 +260,4 @@ bool QCefView::triggerEvent(int frameId, const QString& name, const QVariantList
 	}
 
 	return cefWindow_->cefViewHandler()->TriggerEvent(msg);
-}
-
-void QCefView::NotifyMoveOrResizeStarted()
-{
-	if (cefWindow_)
-	{
-		CefRefPtr<QCefViewBrowserHandler> handler = cefWindow_->cefViewHandler();
-		if (handler)
-		{
-			CefRefPtr<CefBrowser> browser = handler->GetBrowser();
-			if (browser)
-			{
-				CefRefPtr<CefBrowserHost> host = browser->GetHost();
-				if (host)
-				{
-					host->NotifyMoveOrResizeStarted();
-				}
-			}
-		}
-	}
 }

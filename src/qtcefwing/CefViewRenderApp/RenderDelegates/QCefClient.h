@@ -46,12 +46,12 @@ class QCefClient
 			const CefV8ValueList& arguments, 
 			CefRefPtr<CefV8Value>& retval, 
 			CefString& exception);
-		void ExecuteRegisterEventHandler(const CefString& function,
+		void ExecuteAddEventListener(const CefString& function,
 			CefRefPtr<CefV8Value> object, 
 			const CefV8ValueList& arguments, 
 			CefRefPtr<CefV8Value>& retval, 
 			CefString& exception);
-		void ExecuteUnregisterEventHandler(const CefString& function,
+		void ExecuteRemoveEventListener(const CefString& function,
 			CefRefPtr<CefV8Value> object,
 			const CefV8ValueList& arguments,
 			CefRefPtr<CefV8Value>& retval,
@@ -60,7 +60,7 @@ class QCefClient
 	private:
 		CefRefPtr<CefBrowser>	browser_;
 		CefRefPtr<CefFrame>		frame_;
-		QCefClient::EventHandlerMap& eventHandlerMap_;
+		QCefClient::EventHandlerMap& eventListenerMap_;
 
 	private:
 		IMPLEMENT_REFCOUNTING(V8Handler);

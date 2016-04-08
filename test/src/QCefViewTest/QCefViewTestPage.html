@@ -1,33 +1,56 @@
 <html>
     <head>
         <script>
-            var click_count = 0;
-            function onFuncionClick() {
-                document.getElementById('display').value = 'Count:' + click_count;
-                click_count += 1;
-				alert('hello');
-            }
-			
 			function onLoad() {
-				alert('Function:onLoad()');
-				if (QCefClient == null) {
+				if (QCefClient == undefined) {
 					alert('QCefClient is null');
 					return;
 				}
-				
-				QCefClient.invokeMethod("HEHE", 1, 2, false);
-				
-				QCefClient.registerEventHandler("onChangeColor", function(color) {
-					alert('event: onChangeColor(), color:' + color);
+
+				QCefClient.addEventListener("colorChanged", function(color) {
+					alert('event: colorChanged(), color:' + color);
 				});
 			}
+			
+			function onInvokeMethodClicked() {
+				QCefClient.invokeMethod("TestMethod", 1, false, "arg3");
+            }
+			
+			function onQCefQueryClicked() {
+                var query = {
+                    request: document.getElementById("message").value,
+                    onSuccess: function(response) {
+                        alert(response);
+                    },
+                    onFailure: function(error_code, error_message) {
+                        alert(error_message);
+                    }
+                }
+                window.QCefQuery(query);
+			}
+
         </script>
     </head>
     <body onload="onLoad()">
 	<h1 align="center" style="font-size:12pt; font-family:MS Shell Dlg 2;">Web Area</h1>
 	<div align="center">
-        <input type="text" value="" id="display">
-        <input type="button" value="Call Function" onclick="onFuncionClick()"/>
+		<label> Test Case for InvokeMethod </label>
+		<br />
+        <input type="button" value="Invoke Method" onclick="onInvokeMethodClicked()"/>
+		<br />
+		<br />
+		
+		<label> Test Case for QCefQuery </label>
+		<br />
+		<textarea id="message" style="width:320px; height:120px;">this message will be processed by native code.</textarea>
+		<br />
+		<input type="button" value="Query" onclick="onQCefQueryClicked()"/>
+		<br />
+		<br />
+		
+		<label>Test Case for QCefUrlQuery</label>
+		<br />
+		<a href="qcef://test/a/b">qcef://test/a/b</a>
     </div>
 	</body>
 </html>

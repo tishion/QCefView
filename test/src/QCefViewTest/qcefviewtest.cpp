@@ -6,9 +6,6 @@
 #include <QCoreApplication>
 #include <QHBoxLayout>
 
-#include <include/QCefView.h>
-#include <include/QCefSetting.h>
-#include <include/QCefQuery.h>
 
 QCefViewTest::QCefViewTest(QWidget *parent)
 	: QMainWindow(parent)
@@ -24,7 +21,7 @@ QCefViewTest::QCefViewTest(QWidget *parent)
 
 	QDir dir = QCoreApplication::applicationDirPath();
 	QString uri = QDir::toNativeSeparators(dir.filePath("web\\QCefViewTestPage.html"));
-	QCefView* cefview = new QCefView(uri, this);
+	cefview = new QCefView(uri, this);
 	ui.cefContainer->layout()->addWidget(cefview);
 	layout->addWidget(ui.cefContainer);
 
@@ -40,5 +37,7 @@ void QCefViewTest::onBtnChangeColorClicked()
 {
 	::MessageBoxA(NULL, "HEHE", "HAHA", MB_OK);
 
-
+	QVariantList args;
+	args.append(QVariant::fromValue(QString("red")));
+	cefview->broadcastEvent("colorChanged", args);
 }

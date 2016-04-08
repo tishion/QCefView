@@ -30,15 +30,14 @@ public:
 
 	const QString reqeust() const;
 
-	void responseSuccess(QString response) const;
+	void responseSuccess(const QString& response) const;
 
-	void responseFailure(int ec, QString response) const;
-
-protected:
-	CefBase* pcb_;
+	void responseFailure(int ec, const QString& response) const;
 
 private:
 	QString reqeust_;
+private:
+	CefBase* pCefQueryCallBack_;
 };
 
 Q_DECLARE_METATYPE(QCefQuery);

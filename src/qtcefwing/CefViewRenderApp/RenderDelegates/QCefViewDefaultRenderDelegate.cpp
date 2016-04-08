@@ -106,73 +106,103 @@ namespace QCefViewDefaultRenderDelegate
 		if (message->GetName() == TRIGGEREVENT_NOTIFY_MESSAGE)
 		{
 			CefRefPtr<CefListValue> messageArguments = message->GetArgumentList();
-			if (messageArguments == NULL
-				|| (messageArguments->GetSize() == 0))
+			if (messageArguments && (messageArguments->GetSize() >= 2))
 			{
-				return false;
-			}
-			CefString funcName = messageArguments->GetString(0);
+				int idx = 0;
+				if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
+				{
+					int frameId = messageArguments->GetInt(idx++);
 
-			CefV8ValueList arguments;
-			for (std::size_t i = 1; i < messageArguments->GetSize(); ++i)
-			{
-				if (messageArguments->GetType(i) == VTYPE_BOOL)
-				{
-					arguments.push_back(
-						CefV8Value::CreateBool(messageArguments->GetBool(i)));
-				}
-				else if (messageArguments->GetType(i) == VTYPE_INT)
-				{
-					arguments.push_back(
-						CefV8Value::CreateInt(messageArguments->GetInt(i)));
-				}
-				else if (messageArguments->GetType(i) == VTYPE_DOUBLE)
-				{
-					arguments.push_back(
-						CefV8Value::CreateDouble(messageArguments->GetDouble(i)));
-				}
-				else if (messageArguments->GetType(i) == VTYPE_STRING)
-				{
-					arguments.push_back(
-						CefV8Value::CreateString(messageArguments->GetString(i)));
-				}
-				else if (messageArguments->GetType(i) == VTYPE_NULL)
-				{
-					arguments.push_back(
-						CefV8Value::CreateInt(0));
-				}
-				else
-				{
-					// do log
-					__noop(_T("QCefView"), _T("Unknow Type!"));
+					if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
+					{
+						CefString eventName = messageArguments->GetString(idx++);
+
+						CefV8ValueList arguments;
+						for (std::size_t i = 1; i < messageArguments->GetSize(); ++i)
+						{
+							if (messageArguments->GetType(i) == VTYPE_BOOL)
+							{
+								arguments.push_back(
+									CefV8Value::CreateBool(messageArguments->GetBool(i)));
+							}
+							else if (messageArguments->GetType(i) == VTYPE_INT)
+							{
+								arguments.push_back(
+									CefV8Value::CreateInt(messageArguments->GetInt(i)));
+							}
+							else if (messageArguments->GetType(i) == VTYPE_DOUBLE)
+							{
+								arguments.push_back(
+									CefV8Value::CreateDouble(messageArguments->GetDouble(i)));
+							}
+							else if (messageArguments->GetType(i) == VTYPE_STRING)
+							{
+								arguments.push_back(
+									CefV8Value::CreateString(messageArguments->GetString(i)));
+							}
+							else if (messageArguments->GetType(i) == VTYPE_NULL)
+							{
+								arguments.push_back(
+									CefV8Value::CreateInt(0));
+							}
+							else
+							{
+								// do log
+								__noop(_T("QCefView"), _T("Unknow Type!"));
+							}
+						}
+
+						ExecuteEventListener(browser, frameId, eventName, arguments);
+						return true;
+					}
 				}
 			}
-
-			ExecuteEventHandler(browser, funcName, arguments);
-			return true;
 		}
 
 		return false;
 	}
 
-	void RenderDelegate::ExecuteEventHandler(CefRefPtr<CefBrowser> browser, 
-		const CefString& name, 
+	void RenderDelegate::ExecuteEventListener(CefRefPtr<CefBrowser> browser, 
+		int frameId,
+		const CefString& name,
 		const CefV8ValueList& arguments)
 	{
 		std::vector<int64> idList;
-		browser->GetFrameIdentifiers(idList);
+		if (frameId)
+		{
+			idList.push_back(frameId);
+		}
+		else
+		{
+			// broadcast
+			browser->GetFrameIdentifiers(idList);
+		}
+
 		for (int64 id : idList)
 		{
 			CefRefPtr<CefFrame> frame = browser->GetFrame(id);
-			CefRefPtr<CefV8Context> context = frame->GetV8Context();
-			CefRefPtr<CefV8Value> window = context->GetGlobal();
-			CefRefPtr<CefV8Value> qcef = window->GetValue(QCEF_OBJECT_NAME);
-			CefRefPtr<CefV8Value> handler = qcef->GetValue(name);
-			if (handler->IsFunction())
+			if (frame)
 			{
-				handler->ExecuteFunctionWithContext(context, qcef, arguments);
+				CefRefPtr<CefV8Context> context = frame->GetV8Context();
+				if (context)
+				{
+					CefRefPtr<CefV8Value> window = context->GetGlobal();
+					if (window)
+					{
+						CefRefPtr<CefV8Value> qcef = window->GetValue(QCEF_OBJECT_NAME);
+						if (qcef)
+						{
+							CefRefPtr<CefV8Value> handler = qcef->GetValue(name);
+							if (handler->IsFunction())
+							{
+								handler->ExecuteFunctionWithContext(context, qcef, arguments);
+							}
+						}
+					}
+				}
 			}
 		}
+
 	}
 
 }

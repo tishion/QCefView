@@ -137,6 +137,10 @@ public:
 	 **/
 	void browserStopLoad();
 
+	bool triggerEvent(int frameId, const QString& name, const QVariantList& args);
+
+	bool broadcastEvent(const QString& name, const QVariantList& args);
+
 	/**called when the browser loading state changed
 	 **	isLoading:
 	 **		if isLoading is true, means that the browser 
@@ -165,7 +169,7 @@ public:
 	void NotifyMoveOrResizeStarted();
 
 protected:
-	bool triggerEvent(int frameId, const QString& name, const QVariantList& args);
+	bool sendEVentNotifyMessage(int frameId, const QString& name, const QVariantList& args);
 	void notifyRequest();
 
 private:
