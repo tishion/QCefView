@@ -83,6 +83,205 @@
 
 <p><img src="https://raw.githubusercontent.com/tishion/QCefView/gh-pages/images/Test.jpg" alt=""></p>
 
+<hr>
+
+<h2>
+<a id="document" class="anchor" href="#document" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Document</h2>
+
+<h2>
+<a id="--qt-side" class="anchor" href="#--qt-side" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>- Qt Side:</h2>
+
+<hr>
+
+<ul>
+<li>
+<p>QCefView Class</p>
+
+<p>Consturtors: </p>
+
+<blockquote>
+<p>QCefView(const QString url, QWidget* parent = 0)</p>
+
+<p>url:</p>
+
+<p>parent:</p>
+</blockquote>
+
+<p>Methods:</p>
+
+<blockquote>
+<p>void navigateToString(const QString&amp; content, const QString&amp; url)</p>
+
+<p>void navigateToUrl(const QString&amp; url)</p>
+
+<p>bool browserCanGoBack()</p>
+
+<p>bool browserCanGoForward()</p>
+
+<p>void browserGoBack()</p>
+
+<p>void browserGoForward()</p>
+
+<p>bool browserIsLoading()</p>
+
+<p>void browserReload()</p>
+
+<p>void browserStopLoad()</p>
+
+<p>bool triggerEvent(int frameId, const QString&amp; name, const QCefEvent&amp; event)</p>
+
+<p>bool broadcastEvent(const QString&amp; name, const QCefEvent&amp; event)</p>
+
+<p>virtual void onLoadStateChange(bool isLoading)</p>
+
+<p>virtual void onLoadStart()</p>
+
+<p>virtual void onLoadEnd(int httpStatusCode)</p>
+
+<p>virtual void onLoadError(int errorCode, const QString&amp; errorMsg, const QString&amp; failedUrl)</p>
+
+<p>WId getCefWinId()</p>
+</blockquote>
+
+<p>Slots:</p>
+
+<blockquote>
+<p>virtual void processQCefUrlRequest(const QString&amp; url);</p>
+
+<p>virtual void processQCefQueryRequest(QCefQuery query);</p>
+
+<p>virtual void onInvokeMethodNotify(int browserId, int frameId,const QString method, const QVariantList arguments);</p>
+</blockquote>
+
+<p>QCefSettings Class</p>
+
+<blockquote>
+<p>void setBrowserSubProcessPath(const QString&amp; path)
+const QString browserSubProcessPath()</p>
+
+<p>void setResourceDirectoryPath(const QString&amp; path)
+const QString resourceDirectoryPath()</p>
+
+<p>void setLocalesDirectoryPath(const QString&amp; path)
+const QString localesDirectoryPath()</p>
+
+<p>void setUserAgent(const QString&amp; agent)
+const QString userAgent()</p>
+</blockquote>
+</li>
+</ul>
+
+<hr>
+
+<ul>
+<li>
+<p>QCefQuery Class</p>
+
+<p>Constructors</p>
+
+<blockquote>
+<p>QCefQuery();</p>
+
+<p>QCefQuery(QString req, vCefBase* cb)</p>
+
+<p>QCefQuery(const QCefQuery&amp; other);</p>
+</blockquote>
+
+<p>Methods: </p>
+
+<blockquote>
+<p>const QString reqeust() const</p>
+
+<p>void responseSuccess(const QString&amp; response) const</p>
+
+<p>void responseFailure(int ec, const QString&amp; response) const</p>
+
+<p>QCefQuery&amp; operator=(const QCefQuery&amp; other)</p>
+</blockquote>
+</li>
+</ul>
+
+<hr>
+
+<ul>
+<li>
+<p>QCefEvent Class</p>
+
+<p>Constuctors:</p>
+
+<blockquote>
+<p>QCefEvent();</p>
+
+<p>QCefEvent(const char* name);</p>
+
+<p>Methods:
+void setEventName(const char* name);</p>
+
+<p>void setIntProperty(const char* key, int value);</p>
+
+<p>void setDoubleProperty(const char*  key, double value);</p>
+
+<p>void setStringProperty(const char*  key, QString value);</p>
+
+<p>void setBoolProperty(const char*  key, bool value);</p>
+</blockquote>
+</li>
+</ul>
+
+<hr>
+
+<h2>
+<a id="web-side" class="anchor" href="#web-side" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Web Side:</h2>
+
+<hr>
+
+<ul>
+<li>
+<p>QCefClient Object</p>
+
+<p>Methods:</p>
+
+<blockquote>
+<p>invokeMethod(name, args, ...)</p>
+
+<p>addEventListener(name, listener)</p>
+
+<p>removeEventListener(name, listener)</p>
+</blockquote>
+</li>
+</ul>
+
+<hr>
+
+<ul>
+<li>
+<p>QCef Query</p>
+
+<p>Functions:</p>
+
+<blockquote>
+<p>QCefQuery</p>
+
+<p>QCefQueryCancel</p>
+</blockquote>
+</li>
+</ul>
+
+<hr>
+
+<ul>
+<li>
+<p>QCef Url Request</p>
+
+<p>Protocol:</p>
+
+<blockquote>
+<h2>
+<a id="qcefxxxxxx" class="anchor" href="#qcefxxxxxx" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>qcef://xxxxxx</h2>
+</blockquote>
+</li>
+</ul>
+
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/tishion/QCefView">Qcefview</a> is maintained by <a href="https://github.com/tishion">tishion</a>.</span>
 
