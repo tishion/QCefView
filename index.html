@@ -27,9 +27,9 @@
 <h2>
 <a id="why-use-qcefview" class="anchor" href="#why-use-qcefview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why use QCefView</h2>
 
-<p>There are some UI frameworks developed with CEF, such as Electron and others. But Electron is over-encapsulated with CEF, you can only develop your application with it by by writing javascript code. If you need to use native code in your application while CEF is also neededm, Electron is not the good choose in this situation. You can do the integration by youself totally, of cause you need to do much work about the communication between web code and native code. And most time this is repetitive work.</p>
+<p>There are some UI frameworks developed with CEF, such as Electron and others. But Electron is over-encapsulated with CEF, you can only develop your application with it by writing javascript code. If you need to use native code in your application while CEF is also needed, Electron is not the good choose in this situation. You can do the integration by youself totally, of cause you need to do much work about the communication between web code and native code. And most time this is repetitive work.</p>
 
-<p>Now you can try to use QCefView to develope your application. Just use it like any other QWidgets. QCefWidget provides several methods do communication between native C++ code and web javascript code. You don't need to write the communicating business logical. </p>
+<p>Now you can try to use QCefView to develop your application. Just use it like any other QWidgets. QCefWidget provides several methods to do communication between native C++ code and web javascript code. You don't need to write the communicating business logical. </p>
 
 <hr>
 
@@ -41,12 +41,12 @@
 <li>
 <p>Deploy Qt SDK</p>
 
-<p>Because there are different versions Qt and Visual studio, you need to determine the version of Qt and Visual Studio you want to use in your development. As you know, one you have settled down with specific version of Visual Studio, you must use the corresponding version of Qt SDK. Here we use Visual Studio 2015. </p>
+<p>Because there are different versions of Qt and Visual studio, you need to determine the version of Qt and Visual Studio you want to use in your development. As you know, once you have settled down with specified version of Visual Studio, you must use the corresponding version of Qt SDK. Here we use Visual Studio 2015. </p>
 </li>
 <li>
 <p>Download CEF binary distribution files</p>
 
-<p>After that you need to choose the version of CEF. For CEF, we use the binary distribution version, you can get them from here</p>
+<p>We use the binary distribution version, you can get them from here</p>
 
 <blockquote>
 <p><a href="https://cefbuilds.com/">https://cefbuilds.com/</a></p>
@@ -75,7 +75,7 @@
 <li>
 <p>Build QCefSDK &amp; Test Demo</p>
 
-<p>Open the QCefView solution file and and build all the solution. Make sure to build the Test project last. After you build the QCefView you will get the QCefViewSdk folder, this includes all the files QCefView needed. You can deploy this SDK into your develop environment and develop Qt+CEF applications with it.</p>
+<p>Open the QCefView solution file and and build all the projects. Make sure to build the Test project last. After you build the QCefView you will get the QCefViewSdk folder, this includes all the files QCefView needed. You can deploy this SDK into your development environment and develop Qt+CEF applications with it.</p>
 </li>
 </ul>
 
