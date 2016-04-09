@@ -3,10 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_qcefviewtest.h"
-
-#include <include/QCefView.h>
-#include <include/QCefSetting.h>
-#include <include/QCefQuery.h>
+#include "customcefview.h"
 
 class QCefViewTest : public QMainWindow
 {
@@ -20,7 +17,7 @@ protected slots:
 	void onBtnChangeColorClicked();
 private:
 	Ui::QCefViewTestClass ui;
-	QCefView* cefview;
+	CustomCefView* cefview;
 };
 
 #endif // QCEFVIEWTEST_H

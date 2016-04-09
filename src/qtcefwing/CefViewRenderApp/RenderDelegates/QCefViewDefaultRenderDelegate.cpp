@@ -26,8 +26,8 @@ namespace QCefViewDefaultRenderDelegate
 	}
 
 	void RenderDelegate::OnContextCreated(CefRefPtr<QCefViewRenderApp> app,
-		CefRefPtr<CefBrowser> browser, 
-		CefRefPtr<CefFrame> frame, 
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
 		CefRefPtr<CefV8Context> context)
 	{
 		render_message_router_->OnContextCreated(browser, frame, context);
@@ -35,7 +35,7 @@ namespace QCefViewDefaultRenderDelegate
 		// insert the QCefClient Object into this frame.window object
 		CefRefPtr<CefV8Value> objWindow = context->GetGlobal();
 		CefRefPtr<QCefClient> objClient = new QCefClient(browser, frame);
-		objWindow->SetValue(QCEF_OBJECT_NAME, 
+		objWindow->SetValue(QCEF_OBJECT_NAME,
 			objClient->GetObject(), V8_PROPERTY_ATTRIBUTE_READONLY);
 
 		int browserId = browser->GetIdentifier();
@@ -56,8 +56,8 @@ namespace QCefViewDefaultRenderDelegate
 	}
 
 	void RenderDelegate::OnContextReleased(CefRefPtr<QCefViewRenderApp> app,
-		CefRefPtr<CefBrowser> browser, 
-		CefRefPtr<CefFrame> frame, 
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
 		CefRefPtr<CefV8Context> context)
 	{
 		render_message_router_->OnContextReleased(browser, frame, context);
@@ -82,8 +82,8 @@ namespace QCefViewDefaultRenderDelegate
 	}
 
 	bool RenderDelegate::OnProcessMessageReceived(CefRefPtr<QCefViewRenderApp> app,
-		CefRefPtr<CefBrowser> browser, 
-		CefProcessId source_process, 
+		CefRefPtr<CefBrowser> browser,
+		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message)
 	{
 		if (render_message_router_->OnProcessMessageReceived(browser, source_process, message))
@@ -100,60 +100,43 @@ namespace QCefViewDefaultRenderDelegate
 	}
 
 	bool RenderDelegate::OnTriggerEventNotifyMessage(CefRefPtr<CefBrowser> browser,
-		CefProcessId source_process, 
+		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message)
 	{
-		if (message->GetName() == TRIGGEREVENT_NOTIFY_MESSAGE)
+		auto it = mapBrowser_.find(browser->GetIdentifier());
+		if (it != mapBrowser_.end())
 		{
-			CefRefPtr<CefListValue> messageArguments = message->GetArgumentList();
-			if (messageArguments && (messageArguments->GetSize() >= 2))
+			if (message->GetName() == TRIGGEREVENT_NOTIFY_MESSAGE)
 			{
-				int idx = 0;
-				if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
+				CefRefPtr<CefListValue> messageArguments = message->GetArgumentList();
+				if (messageArguments && (messageArguments->GetSize() >= 2))
 				{
-					int frameId = messageArguments->GetInt(idx++);
-
-					if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
+					int idx = 0;
+					if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
 					{
-						CefString eventName = messageArguments->GetString(idx++);
+						int frameId = messageArguments->GetInt(idx++);
 
-						CefV8ValueList arguments;
-						for (std::size_t i = 1; i < messageArguments->GetSize(); ++i)
+						if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
 						{
-							if (messageArguments->GetType(i) == VTYPE_BOOL)
+							CefString eventName = messageArguments->GetString(idx++);
+
+							if (CefValueType::VTYPE_DICTIONARY == messageArguments->GetType(idx))
 							{
-								arguments.push_back(
-									CefV8Value::CreateBool(messageArguments->GetBool(i)));
-							}
-							else if (messageArguments->GetType(i) == VTYPE_INT)
-							{
-								arguments.push_back(
-									CefV8Value::CreateInt(messageArguments->GetInt(i)));
-							}
-							else if (messageArguments->GetType(i) == VTYPE_DOUBLE)
-							{
-								arguments.push_back(
-									CefV8Value::CreateDouble(messageArguments->GetDouble(i)));
-							}
-							else if (messageArguments->GetType(i) == VTYPE_STRING)
-							{
-								arguments.push_back(
-									CefV8Value::CreateString(messageArguments->GetString(i)));
-							}
-							else if (messageArguments->GetType(i) == VTYPE_NULL)
-							{
-								arguments.push_back(
-									CefV8Value::CreateInt(0));
-							}
-							else
-							{
-								// do log
-								__noop(_T("QCefView"), _T("Unknow Type!"));
+								CefRefPtr<CefDictionaryValue> dict = messageArguments->GetDictionary(idx++);
+								std::vector<int64> frameIdList;
+								if (frameId)
+								{
+									frameIdList.push_back(frameId);
+								}
+								else
+								{
+									// broadcast
+									browser->GetFrameIdentifiers(frameIdList);
+								}
+								ExecuteEventListener(browser, frameIdList, eventName, dict);
+								return true;
 							}
 						}
-
-						ExecuteEventListener(browser, frameId, eventName, arguments);
-						return true;
 					}
 				}
 			}
@@ -162,47 +145,30 @@ namespace QCefViewDefaultRenderDelegate
 		return false;
 	}
 
-	void RenderDelegate::ExecuteEventListener(CefRefPtr<CefBrowser> browser, 
-		int frameId,
+	void RenderDelegate::ExecuteEventListener(CefRefPtr<CefBrowser> browser,
+		std::vector<int64> frameIdList,
 		const CefString& name,
-		const CefV8ValueList& arguments)
+		CefRefPtr<CefDictionaryValue> dict)
 	{
-		std::vector<int64> idList;
-		if (frameId)
+		auto itb = mapBrowser_.find(browser->GetIdentifier());
+		if (itb != mapBrowser_.end())
 		{
-			idList.push_back(frameId);
-		}
-		else
-		{
-			// broadcast
-			browser->GetFrameIdentifiers(idList);
-		}
+			FrameID2QCefClientMap& frameMap = itb->second;
 
-		for (int64 id : idList)
-		{
-			CefRefPtr<CefFrame> frame = browser->GetFrame(id);
-			if (frame)
+			for (int64 frameId : frameIdList)
 			{
-				CefRefPtr<CefV8Context> context = frame->GetV8Context();
-				if (context)
+				CefRefPtr<CefFrame> frame = browser->GetFrame(frameId);
+				if (frame)
 				{
-					CefRefPtr<CefV8Value> window = context->GetGlobal();
-					if (window)
+					auto itf = frameMap.find(frameId);
+					if (itf != frameMap.end())
 					{
-						CefRefPtr<CefV8Value> qcef = window->GetValue(QCEF_OBJECT_NAME);
-						if (qcef)
-						{
-							CefRefPtr<CefV8Value> handler = qcef->GetValue(name);
-							if (handler->IsFunction())
-							{
-								handler->ExecuteFunctionWithContext(context, qcef, arguments);
-							}
-						}
+						const CefRefPtr<QCefClient>& objClient = itf->second;
+						objClient->ExecuteEventListener(name, dict);
 					}
 				}
 			}
 		}
-
 	}
 
 }

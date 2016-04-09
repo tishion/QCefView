@@ -21,7 +21,7 @@ QCefViewTest::QCefViewTest(QWidget *parent)
 
 	QDir dir = QCoreApplication::applicationDirPath();
 	QString uri = QDir::toNativeSeparators(dir.filePath("web\\QCefViewTestPage.html"));
-	cefview = new QCefView(uri, this);
+	cefview = new CustomCefView(uri, this);
 	ui.cefContainer->layout()->addWidget(cefview);
 	layout->addWidget(ui.cefContainer);
 
@@ -35,9 +35,5 @@ QCefViewTest::~QCefViewTest()
 
 void QCefViewTest::onBtnChangeColorClicked()
 {
-	::MessageBoxA(NULL, "HEHE", "HAHA", MB_OK);
-
-	QVariantList args;
-	args.append(QVariant::fromValue(QString("red")));
-	cefview->broadcastEvent("colorChanged", args);
+	cefview->changeColor();
 }

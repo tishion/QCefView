@@ -50,16 +50,28 @@
     <ClCompile Include="GeneratedFiles\qrc_qcefviewtest.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="customcefview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_customcefview.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_customcefview.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="qcefviewtest.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="qcefviewtest.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="qcefviewtest.qrc">
       <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="customcefview.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qcefviewtest.h">
+      <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

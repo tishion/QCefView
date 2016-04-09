@@ -139,6 +139,15 @@
     <ClCompile Include="CCefManager.cpp">
       <Filter>Source Files\Private</Filter>
     </ClCompile>
+    <ClCompile Include="QCefEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_QCefEvent.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_QCefEvent.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="inc\QCefView.h">
@@ -149,6 +158,9 @@
     </CustomBuild>
     <CustomBuild Include="CCefManager.h">
       <Filter>Source Files\Private</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\QCefEvent.h">
+      <Filter>include</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

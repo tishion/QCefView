@@ -9,6 +9,7 @@
 #pragma endregion qt_headers
 
 #include "QCefQuery.h"
+#include "QCefEvent.h"
 
 #ifdef QCEFVIEW_LIB
 	#define QCEFVIEW_EXPORT Q_DECL_EXPORT
@@ -83,7 +84,7 @@ protected slots:
 		const QVariantList arguments);
 
 public:
-	QCefView(const QString& url, QWidget* parent = 0);
+	QCefView(const QString url, QWidget* parent = 0);
 	~QCefView();
 
 	/**navigate to the content
@@ -137,9 +138,9 @@ public:
 	 **/
 	void browserStopLoad();
 
-	bool triggerEvent(int frameId, const QString& name, const QVariantList& args);
+	bool triggerEvent(int frameId, const QString& name, const QCefEvent& event);
 
-	bool broadcastEvent(const QString& name, const QVariantList& args);
+	bool broadcastEvent(const QString& name, const QCefEvent& event);
 
 	/**called when the browser loading state changed
 	 **	isLoading:
@@ -166,11 +167,14 @@ public:
 		const QString& errorMsg, 
 		const QString& failedUrl);
 
-	void NotifyMoveOrResizeStarted();
+	WId getCefWinId();
 
 protected:
-	bool sendEVentNotifyMessage(int frameId, const QString& name, const QVariantList& args);
-	void notifyRequest();
+	void notifyMoveOrResizeStarted();
+
+	bool sendEVentNotifyMessage(int frameId, 
+		const QString& name, 
+		const QCefEvent& event);
 
 private:
 	CCefWindow* cefWindow_;

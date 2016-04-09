@@ -15,11 +15,12 @@
 
 #include "inc/QCefQuery.h"
 #include "inc/QCefView.h"
+#include "inc/QCefEvent.h"
 #include "CCefManager.h"
 #include "CCefWindow.h"
 
 //////////////////////////////////////////////////////////////////////////
-QCefView::QCefView(const QString& url, QWidget* parent /*= 0*/)
+QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 	: QWidget(parent)
 	, cefWindow_(NULL)
 {
@@ -145,7 +146,7 @@ void QCefView::browserStopLoad()
 	}
 }
 
-bool QCefView::triggerEvent(int frameId, const QString& name, const QVariantList& args)
+bool QCefView::triggerEvent(int frameId, const QString& name, const QCefEvent& event)
 {
 	if (!name.isEmpty())
 	{
@@ -154,7 +155,7 @@ bool QCefView::triggerEvent(int frameId, const QString& name, const QVariantList
 			auto frame = cefWindow_->cefViewHandler()->GetBrowser()->GetFrame(frameId);
 			if (frame)
 			{
-				return sendEVentNotifyMessage(frameId, name, args);
+				return sendEVentNotifyMessage(frameId, name, event);
 			}
 		}
 	}
@@ -162,13 +163,13 @@ bool QCefView::triggerEvent(int frameId, const QString& name, const QVariantList
 	return false;
 }
 
-bool QCefView::broadcastEvent(const QString& name, const QVariantList& args)
+bool QCefView::broadcastEvent(const QString& name, const QCefEvent& event)
 {
 	if (!name.isEmpty())
 	{
 		if (cefWindow_)
 		{
-			return sendEVentNotifyMessage(0, name, args);
+			return sendEVentNotifyMessage(0, name, event);
 		}
 	}
 	return false;
@@ -196,7 +197,12 @@ void QCefView::onLoadError(int errorCode,
 
 }
 
-void QCefView::NotifyMoveOrResizeStarted()
+WId QCefView::getCefWinId()
+{
+	return (WId)(HWND)(*cefWindow_);
+}
+
+void QCefView::notifyMoveOrResizeStarted()
 {
 	if (cefWindow_)
 	{
@@ -216,7 +222,7 @@ void QCefView::NotifyMoveOrResizeStarted()
 	}
 }
 
-bool QCefView::sendEVentNotifyMessage(int frameId, const QString& name, const QVariantList& args)
+bool QCefView::sendEVentNotifyMessage(int frameId, const QString& name, const QCefEvent& event)
 {
 	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(
 		TRIGGEREVENT_NOTIFY_MESSAGE);
@@ -228,36 +234,40 @@ bool QCefView::sendEVentNotifyMessage(int frameId, const QString& name, const QV
 	CefString eventName = name.toStdString();
 	arguments->SetString(idx++, eventName);
 
+	CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
+
 	CefString cefStr;
-	for (int i = 0; i < args.size(); i++)
+	cefStr.FromWString(event.objectName().toStdWString());
+	dict->SetString("name", cefStr);
+
+	QList<QByteArray> keys = event.dynamicPropertyNames();
+	for (QByteArray key : keys)
 	{
-		if (args[i].type() == QMetaType::Bool)
+		QVariant value = event.property(key.data());
+		if (value.type() == QMetaType::Bool)
 		{
-			arguments->SetBool(idx++,
-				args[i].value<bool>());
+			dict->SetBool(key.data(), value.toBool());
 		}
-		else if (args[i].type() == QMetaType::Int || args[i].type() == QMetaType::UInt)
+		else if (value.type() == QMetaType::Int || value.type() == QMetaType::UInt)
 		{
-			arguments->SetInt(idx++,
-				args[i].value<int>());
+			dict->SetInt(key.data(), value.toInt());
 		}
-		else if (args[i].type() == QMetaType::Double)
+		else if (value.type() == QMetaType::Double)
 		{
-			arguments->SetDouble(idx++,
-				args[i].value<double>());
+			dict->SetDouble(key.data(), value.toDouble());
 		}
-		else if (args[i].type() == QMetaType::QString)
+		else if (value.type() == QMetaType::QString)
 		{
-			QString val = args[i].value<QString>();
-			cefStr.FromString(val.toStdString());
-			arguments->SetString(idx++, cefStr);
+			cefStr.FromWString(value.toString().toStdWString());
+			dict->SetString(key.data(), cefStr);
 		}
 		else
 		{
-			arguments->SetNull(idx++);
 			__noop(_T("QCefView"), _T("Unknow Type!"));
 		}
 	}
+
+	arguments->SetDictionary(idx++, dict);
 
 	return cefWindow_->cefViewHandler()->TriggerEvent(msg);
 }

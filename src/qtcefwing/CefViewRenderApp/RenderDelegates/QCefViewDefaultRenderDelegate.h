@@ -10,6 +10,7 @@
 
 #pragma region project_headers
 #include "../QCefViewRenderApp.h"
+#include "QCefClient.h"
 #pragma endregion project_headers
 
 
@@ -20,7 +21,7 @@ namespace QCefViewDefaultRenderDelegate
 	class RenderDelegate
 		: public QCefViewRenderApp::RenderDelegate
 	{
-		typedef std::unordered_map<int64, CefRefPtr<CefBase>> FrameID2QCefClientMap;
+		typedef std::unordered_map<int64, CefRefPtr<QCefClient>> FrameID2QCefClientMap;
 		typedef std::unordered_map<int, FrameID2QCefClientMap> BrowserID2FramesMap;
 	public:
 		RenderDelegate();
@@ -50,9 +51,9 @@ namespace QCefViewDefaultRenderDelegate
 			CefRefPtr<CefProcessMessage> message);
 
 		void ExecuteEventListener(CefRefPtr<CefBrowser> browser,
-			int frameId,
+			std::vector<int64> frameIdList,
 			const CefString& name,
-			const CefV8ValueList& arguments);
+			CefRefPtr<CefDictionaryValue> dict);
 
 	private:
 		CefRefPtr<CefMessageRouterRendererSide> render_message_router_;
