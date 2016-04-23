@@ -1,7 +1,7 @@
 Quick Start with Qt+Cef
 ======
 
-checkout the repo and build the solution, you will get QCefView SDK, and then you can deploy it into your development enviroment.
+checkout the repo and build the solution, you will get QCefView SDK, and then you can deploy it into your development environment.
 
 
 How to change the CEF version
