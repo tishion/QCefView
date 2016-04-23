@@ -37,8 +37,12 @@ namespace QCefViewDefaultSchemeHandler
 			int& bytes_read, 
 			CefRefPtr<CefCallback> callback);
 
+		virtual bool CanGetCookie(const CefCookie& cookie);
+
+		virtual bool CanSetCookie(const CefCookie& cookie);
+
 		virtual void Cancel();
-				
+
 	private:
 		HWND hWnd_;
 		std::string data_;

@@ -84,10 +84,21 @@ namespace QCefViewDefaultSchemeHandler
 		return has_data;
 	}
 
+	bool SchemeHandler::CanGetCookie(const CefCookie& cookie)
+	{
+		CEF_REQUIRE_IO_THREAD();
+		return true;
+	}
+
+	bool SchemeHandler::CanSetCookie(const CefCookie& cookie)
+	{
+		CEF_REQUIRE_IO_THREAD();
+		return true;
+	}
+
 	void SchemeHandler::Cancel()
 	{
 		CEF_REQUIRE_IO_THREAD();
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////
