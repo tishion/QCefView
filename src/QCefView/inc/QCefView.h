@@ -12,10 +12,10 @@
 #include "QCefEvent.h"
 
 #ifdef QCEFVIEW_LIB
-	#define QCEFVIEW_EXPORT Q_DECL_EXPORT
+#define QCEFVIEW_EXPORT Q_DECL_EXPORT
 #else
-	#define QCEFVIEW_EXPORT Q_DECL_IMPORT
-	#pragma comment(lib, "QCefView.lib")
+#define QCEFVIEW_EXPORT Q_DECL_IMPORT
+#pragma comment(lib, "QCefView.lib")
 #endif
 
 /** Outline of QCefView:
@@ -36,14 +36,14 @@
  **		|    +----------------------------------------------------+    |
  **		|                                                              |
  **		+--------------------------------------------------------------+
- **		
- **	Remarks: 
- **		The WindowWrapper and CefWindow are transparent 
+ **
+ **	Remarks:
+ **		The WindowWrapper and CefWindow are transparent
  **		to upper layer user.
- **			
+ **
  **/
-class CCefWindow;
 
+class CCefWindow;
 class QCEFVIEW_EXPORT QCefView
 	: public QWidget
 {
@@ -62,7 +62,7 @@ protected slots:
 	//		this method is always called in the Qt Main UI Thread 
 	//************************************
 	virtual void processQCefUrlRequest(const QString& url);
-	
+
 	//************************************
 	// Method:    processQCefQueryRequest
 	// FullName:  QCefView::processQCefQueryRequest
@@ -74,13 +74,23 @@ protected slots:
 	// Remarks:
 	//		this method is always called in the Qt Main UI thread.(event loop)
 	//************************************
+	virtual void processQCefQueryRequest(const QCefQuery& query);
 
-	virtual void processQCefQueryRequest(QCefQuery query);
-
+	//************************************
+	// Method:    onInvokeMethodNotify
+	// FullName:  QCefView::onInvokeMethodNotify
+	// Access:    virtual protected private 
+	// Returns:   void
+	// Qualifier:
+	// Parameter: int browserId
+	// Parameter: int frameId
+	// Parameter: const QString method
+	// Parameter: const QVariantList arguments
+	//************************************
 	virtual void onInvokeMethodNotify(
-		int browserId, 
+		int browserId,
 		int frameId,
-		const QString method, 
+		const QString method,
 		const QVariantList arguments);
 
 public:
@@ -123,7 +133,7 @@ public:
 	 **/
 	void browserGoForward();
 
-	/**is browser busy loading content 
+	/**is browser busy loading content
 	 **
 	 **/
 	bool browserIsLoading();
@@ -133,7 +143,7 @@ public:
 	 **/
 	void browserReload();
 
-	/**stop current loading 
+	/**stop current loading
 	 **
 	 **/
 	void browserStopLoad();
@@ -144,27 +154,27 @@ public:
 
 	/**called when the browser loading state changed
 	 **	isLoading:
-	 **		if isLoading is true, means that the browser 
-	 **		is going to load contents, else means loading 
+	 **		if isLoading is true, means that the browser
+	 **		is going to load contents, else means loading
 	 **		operation is going to be done
 	 **/
 	virtual void onLoadStateChange(bool isLoading);
-	
+
 	/**called when the loading operation is started
 	 **
 	 **/
 	virtual void onLoadStart();
-	
+
 	/**called when the loading operation is done successfully
 	 **
 	 **/
 	virtual void onLoadEnd(int httpStatusCode);
-	
+
 	/**called when the loading operation is failed
 	 **
 	 **/
-	virtual void onLoadError(int errorCode, 
-		const QString& errorMsg, 
+	virtual void onLoadError(int errorCode,
+		const QString& errorMsg,
 		const QString& failedUrl);
 
 	WId getCefWinId();
@@ -172,12 +182,17 @@ public:
 protected:
 	void notifyMoveOrResizeStarted();
 
-	bool sendEVentNotifyMessage(int frameId, 
-		const QString& name, 
+	bool sendEVentNotifyMessage(int frameId,
+		const QString& name,
 		const QCefEvent& event);
 
 private:
-	CCefWindow* cefWindow_;
+	friend class QCefQuery;
+	bool responseQCefQuery(int64_t query, 
+		bool success, const QString& response, int error);
+
+private:
+	QPointer<CCefWindow> pCefWindow_;
 };
 
 #endif // QCEFVIEW_H

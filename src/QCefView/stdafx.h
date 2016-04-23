@@ -3,6 +3,13 @@
 
 #include "../public/QCefCommon.h"
 
+#if defined(_DEBUG) || defined(DEBUG)
+#include <QDebug>
+#define QLOG	qDebug
+#else
+#define QLOG	__noop
+#endif
+
 //#define QCEF_QUERY_NAME						"QCefQuery"
 //#define QCEF_QUERY_CANCEL_NAME				"QCefQueryCancel"
 //#define QCEF_OBJECT_NAME					"QCefClient"

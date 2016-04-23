@@ -33,7 +33,7 @@ void CustomCefView::processQCefUrlRequest(const QString& url)
 	QMessageBox::information(this->window(), title, text);
 }
 
-void CustomCefView::processQCefQueryRequest(QCefQuery query)
+void CustomCefView::processQCefQueryRequest(const QCefQuery& query)
 {
 	QString title("QCef Query Request");
 	QString text = QString(
@@ -41,6 +41,9 @@ void CustomCefView::processQCefQueryRequest(QCefQuery query)
 		"Query: %1").arg(query.reqeust());
 
 	QMessageBox::information(this->window(), title, text);
+
+	QString response = query.reqeust().toUpper();
+	query.responseSuccess(response);
 }
 
 void CustomCefView::onInvokeMethodNotify(int browserId, 

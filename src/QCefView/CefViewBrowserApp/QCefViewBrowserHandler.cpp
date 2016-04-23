@@ -517,6 +517,16 @@ bool QCefViewBrowserHandler::TriggerEvent(const CefRefPtr<CefProcessMessage> msg
 	return false;
 }
 
+bool QCefViewBrowserHandler::ResponseQuery(int64_t query, 
+	bool success, const CefString& response, int error)
+{
+	if (cefquery_handler_)
+	{
+		return cefquery_handler_->Response(query, success, response, error);
+	}
+	return false;
+}
+
 bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser,
 	CefProcessId source_process,
 	CefRefPtr<CefProcessMessage> message)

@@ -12,15 +12,30 @@ class CCefWindow :
 	public QWindow
 {
 	Q_OBJECT
+#pragma region CEFHWND2QTWIDGET
+private:
+	typedef std::map<HWND, QPointer<QCefView>> HostWidgetInstanceMap;
+	static HostWidgetInstanceMap instance_map_;
+
+public:
+	/** Get host Qt widget from native cef browser window handle
+	*
+	*/
+	static QPointer<QCefView> GetHostWidget(HWND h);
+#pragma endregion CEFHWND2QTWIDGET
+
 public:
 	explicit CCefWindow(const QString& url, QCefView* host, QWindow *parent = 0);
 	~CCefWindow();
 
-	static QPointer<QCefView> GetHostWidget(HWND h);
-
+public:
+	/** Get cef view handler associated with current CCefWindow
+	 *
+	 */
 	const CefRefPtr<QCefViewBrowserHandler>& cefViewHandler() const;
 
 protected:
+	void updateCefBrowserWindow();
 	virtual void exposeEvent(QExposeEvent *e);
 	virtual void resizeEvent(QResizeEvent *e);
 
@@ -28,12 +43,8 @@ public:
 	operator HWND();
 
 private:
-	QPointer<QCefView> host_;
-
-	HWND hwndCefBrowser_;
-	CefRefPtr<QCefViewBrowserHandler> handler_;
-
-	typedef std::map<HWND, QPointer<QCefView>> HostWidgetInstanceMap;
-	static HostWidgetInstanceMap instance_map_;
+	HWND								hwndCefBrowser_;
+	QPointer<QCefView>					pQCefViewWidget_;
+	CefRefPtr<QCefViewBrowserHandler>	pQCefViewHandler;
 };
 

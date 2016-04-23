@@ -17,7 +17,7 @@ public:
 protected:
 	virtual void processQCefUrlRequest(const QString& url) override;
 
-	virtual void processQCefQueryRequest(QCefQuery query) override;
+	virtual void processQCefQueryRequest(const QCefQuery& query) override;
 
 	virtual void onInvokeMethodNotify(int browserId, int frameId, 
 		const QString method, 

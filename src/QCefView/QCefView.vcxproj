@@ -145,7 +145,20 @@ xcopy /r /y /e "$(SolutionDir)dep\cef\resources\*" "$(SolutionDir)QCefViewSDK\bi
     <ClInclude Include="CefViewBrowserApp\QCefViewBrowserHandler.h" />
     <ClInclude Include="CefViewBrowserApp\QCefQueryHandler.h" />
     <ClInclude Include="CefViewBrowserApp\SchemeHandlers\QCefViewDefaultSchemeHandler.h" />
-    <ClInclude Include="inc\QCefQuery.h" />
+    <CustomBuild Include="inc\QCefQuery.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Command>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CCefManager.cpp" />

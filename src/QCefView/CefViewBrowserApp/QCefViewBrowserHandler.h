@@ -255,6 +255,9 @@ public:
 
 	bool TriggerEvent(const CefRefPtr<CefProcessMessage> msg);
 
+	bool ResponseQuery(int64_t query,
+		bool success, const CefString& response, int error);
+
 	bool DispatchNotifyRequest(CefRefPtr<CefBrowser> browser,
 		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message);

@@ -8,58 +8,40 @@
 #pragma endregion cef_headers
 
 #include "inc/QCefQuery.h"
+#include "inc/QCefView.h"
+
+int QCefQuery::TYPEID = qRegisterMetaType<QCefQuery>("QCefQuery");
 
 //////////////////////////////////////////////////////////////////////////
-QCefQuery::QCefQuery()
-	: pCefQueryCallBack_(nullptr)
+QCefQuery::QCefQuery(QPointer<QCefView> cefView, QString req, int64_t query)
+	: pCefView_(cefView), reqeust_(req), query_id_(query)
 {
-
 }
 
-QCefQuery::QCefQuery(
-	QString req,
-	CefBase* cb)
-	: reqeust_(req)
+QCefQuery::QCefQuery()
+	: pCefView_(NULL), query_id_(-1)
 {
-	if (cb)
-	{
-		cb->AddRef();
-		pCefQueryCallBack_ = cb;
-	}
+
 }
 
 QCefQuery::QCefQuery(const QCefQuery& other)
-	: reqeust_(other.reqeust_)
 {
-	if (other.pCefQueryCallBack_)
-	{
-		other.pCefQueryCallBack_->AddRef();
-		pCefQueryCallBack_ = other.pCefQueryCallBack_;
-	}
+	pCefView_ = other.pCefView_;
+	reqeust_ = other.reqeust_;
+	query_id_ = other.query_id_;
 }
 
 QCefQuery& QCefQuery::operator=(const QCefQuery& other)
 {
-	if (other.pCefQueryCallBack_)
-	{
-		other.pCefQueryCallBack_->AddRef();
-	}
-
-	CefBase* old_ptr = pCefQueryCallBack_;
-	pCefQueryCallBack_ = other.pCefQueryCallBack_;
-	if (old_ptr)
-	{
-		old_ptr->Release();
-	}
+	pCefView_ = other.pCefView_;
+	reqeust_ = other.reqeust_;
+	query_id_ = other.query_id_;
 	return *this;
 }
 
 QCefQuery::~QCefQuery()
 {
-	if (pCefQueryCallBack_)
-	{
-		pCefQueryCallBack_->Release();
-	}
+
 }
 
 const QString QCefQuery::reqeust() const
@@ -67,22 +49,20 @@ const QString QCefQuery::reqeust() const
 	return reqeust_;
 }
 
-void QCefQuery::responseSuccess(const QString& response) const
+bool QCefQuery::responseSuccess(const QString& response) const
 {
-	if (pCefQueryCallBack_)
+	if (pCefView_)
 	{
-		CefString res;
-		res.FromString(response.toStdString());
-		((CefMessageRouterBrowserSide::Callback*)pCefQueryCallBack_)->Success(res);
+		return pCefView_->responseQCefQuery(query_id_, true, response, 0);
 	}
+	return false;
 }
 
-void QCefQuery::responseFailure(int ec, const QString& response) const
+bool QCefQuery::responseFailure(int ec, const QString& response) const
 {
-	if (pCefQueryCallBack_)
+	if (pCefView_)
 	{
-		CefString res;
-		res.FromString(response.toStdString());
-		((CefMessageRouterBrowserSide::Callback*)pCefQueryCallBack_)->Failure(ec, res);
+		return pCefView_->responseQCefQuery(query_id_, false, response, ec);
 	}
+	return false;
 }

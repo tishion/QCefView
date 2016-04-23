@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////////////
 QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 	: QWidget(parent)
-	, cefWindow_(NULL)
+	, pCefWindow_(NULL)
 {
 	QGridLayout* layout = new QGridLayout;
 	layout->setContentsMargins(0, 0, 0, 0);
@@ -31,8 +31,8 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 	 * Here we must create a QWidget as a wrapper 
 	 * to encapsulate the QWindow
 	 */
-	cefWindow_ = new CCefWindow(url, this, window()->windowHandle());
-	QWidget* windowContainer = createWindowContainer(cefWindow_, this);
+	pCefWindow_ = new CCefWindow(url, this, window()->windowHandle());
+	QWidget* windowContainer = createWindowContainer(pCefWindow_, this);
 	if (windowContainer)
 	{
 		layout->addWidget(windowContainer);
@@ -51,7 +51,7 @@ void QCefView::processQCefUrlRequest(const QString& url)
 
 }
 
-void QCefView::processQCefQueryRequest(QCefQuery query)
+void QCefView::processQCefQueryRequest(const QCefQuery& query)
 {
 
 }
@@ -67,82 +67,82 @@ void QCefView::onInvokeMethodNotify(
 
 void QCefView::navigateToString(const QString& content, const QString& url)
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
 		CefString strContent;
 		strContent.FromString(content.toStdString());
 		CefString strUrl;
 		strUrl.FromString(url.toStdString());
-		cefWindow_->cefViewHandler()->GetBrowser()->GetMainFrame()->LoadString(strContent, strUrl);
+		pCefWindow_->cefViewHandler()->GetBrowser()->GetMainFrame()->LoadString(strContent, strUrl);
 	}
 }
 
 void QCefView::navigateToUrl(const QString& url)
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
 		CefString strUrl;
 		strUrl.FromString(url.toStdString());
-		cefWindow_->cefViewHandler()->GetBrowser()->GetMainFrame()->LoadURL(strUrl);
+		pCefWindow_->cefViewHandler()->GetBrowser()->GetMainFrame()->LoadURL(strUrl);
 	}
 }
 
 bool QCefView::browserCanGoBack()
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
-		return cefWindow_->cefViewHandler()->GetBrowser()->CanGoBack();
+		return pCefWindow_->cefViewHandler()->GetBrowser()->CanGoBack();
 	}
 	return false;
 }
 
 bool QCefView::browserCanGoForward()
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
-		return cefWindow_->cefViewHandler()->GetBrowser()->CanGoForward();
+		return pCefWindow_->cefViewHandler()->GetBrowser()->CanGoForward();
 	}
 	return false;
 }
 
 void QCefView::browserGoBack()
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
-		cefWindow_->cefViewHandler()->GetBrowser()->GoBack();
+		pCefWindow_->cefViewHandler()->GetBrowser()->GoBack();
 	}
 }
 
 void QCefView::browserGoForward()
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
-		cefWindow_->cefViewHandler()->GetBrowser()->CanGoForward();
+		pCefWindow_->cefViewHandler()->GetBrowser()->CanGoForward();
 	}
 }
 
 bool QCefView::browserIsLoading()
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
-		return cefWindow_->cefViewHandler()->GetBrowser()->IsLoading();
+		return pCefWindow_->cefViewHandler()->GetBrowser()->IsLoading();
 	}
 	return false;
 }
 
 void QCefView::browserReload()
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
-		cefWindow_->cefViewHandler()->GetBrowser()->Reload();
+		pCefWindow_->cefViewHandler()->GetBrowser()->Reload();
 	}
 }
 
 void QCefView::browserStopLoad()
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
-		cefWindow_->cefViewHandler()->GetBrowser()->StopLoad();
+		pCefWindow_->cefViewHandler()->GetBrowser()->StopLoad();
 	}
 }
 
@@ -150,9 +150,9 @@ bool QCefView::triggerEvent(int frameId, const QString& name, const QCefEvent& e
 {
 	if (!name.isEmpty())
 	{
-		if (cefWindow_)
+		if (pCefWindow_)
 		{
-			auto frame = cefWindow_->cefViewHandler()->GetBrowser()->GetFrame(frameId);
+			auto frame = pCefWindow_->cefViewHandler()->GetBrowser()->GetFrame(frameId);
 			if (frame)
 			{
 				return sendEVentNotifyMessage(frameId, name, event);
@@ -167,7 +167,7 @@ bool QCefView::broadcastEvent(const QString& name, const QCefEvent& event)
 {
 	if (!name.isEmpty())
 	{
-		if (cefWindow_)
+		if (pCefWindow_)
 		{
 			return sendEVentNotifyMessage(0, name, event);
 		}
@@ -199,14 +199,14 @@ void QCefView::onLoadError(int errorCode,
 
 WId QCefView::getCefWinId()
 {
-	return (WId)(HWND)(*cefWindow_);
+	return (WId)(HWND)(*pCefWindow_);
 }
 
 void QCefView::notifyMoveOrResizeStarted()
 {
-	if (cefWindow_)
+	if (pCefWindow_)
 	{
-		CefRefPtr<QCefViewBrowserHandler> handler = cefWindow_->cefViewHandler();
+		CefRefPtr<QCefViewBrowserHandler> handler = pCefWindow_->cefViewHandler();
 		if (handler)
 		{
 			CefRefPtr<CefBrowser> browser = handler->GetBrowser();
@@ -269,5 +269,18 @@ bool QCefView::sendEVentNotifyMessage(int frameId, const QString& name, const QC
 
 	arguments->SetDictionary(idx++, dict);
 
-	return cefWindow_->cefViewHandler()->TriggerEvent(msg);
+	return pCefWindow_->cefViewHandler()->TriggerEvent(msg);
+}
+
+bool QCefView::responseQCefQuery(int64_t query, 
+	bool success, const QString& response, int error)
+{
+	if (pCefWindow_)
+	{
+		CefString res;
+		res.FromString(response.toStdString());
+		return pCefWindow_->cefViewHandler()->ResponseQuery(
+			query, success, res, error);
+	}
+	return false;
 }

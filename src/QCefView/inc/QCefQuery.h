@@ -4,6 +4,7 @@
 #pragma region qt_headers
 #include <QtCore/qglobal.h>
 #include <QString>
+#include <QPointer>
 #include <QMetaType>
 #pragma endregion qt_headers
 
@@ -14,32 +15,31 @@
 	#pragma comment(lib, "QCefView.lib")
 #endif
 
-class CefBase;
+class QCefView;
 class QCEFVIEW_EXPORT QCefQuery
 {
 public:
 	QCefQuery();
 
-	QCefQuery(QString req,
-		CefBase* cb);
-
+	QCefQuery(QPointer<QCefView> cefView, QString req, int64_t query);
+	
 	QCefQuery(const QCefQuery& other);
 
 	QCefQuery& operator=(const QCefQuery& other);
+	
 	~QCefQuery();
 
 	const QString reqeust() const;
 
-	void responseSuccess(const QString& response) const;
+	bool responseSuccess(const QString& response) const;
 
-	void responseFailure(int ec, const QString& response) const;
+	bool responseFailure(int ec, const QString& response) const;
 
 private:
-	QString reqeust_;
-private:
-	CefBase* pCefQueryCallBack_;
+	QPointer<QCefView>	pCefView_;
+	int64_t				query_id_;
+	QString				reqeust_;
+	static int			TYPEID;
 };
-
 Q_DECLARE_METATYPE(QCefQuery);
-
 #endif	//QCEFQUERY_H

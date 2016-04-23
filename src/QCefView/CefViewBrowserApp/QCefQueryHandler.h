@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 
 #pragma region cef_headers
 #include <include/wrapper/cef_stream_resource_handler.h>
@@ -22,7 +23,18 @@ public:
 		bool persistent,
 		CefRefPtr<Callback> callback) OVERRIDE;
 
+
+	virtual void OnQueryCanceled(CefRefPtr<CefBrowser> browser, 
+		CefRefPtr<CefFrame> frame, 
+		int64 query_id) override;
+
+	bool Response(int64_t query,
+		bool success, const CefString& response, int error);
+
 private:
+	typedef std::map<int64, CefRefPtr<Callback>> CallbackMap;
+	CallbackMap	mapCallback_;
+	std::mutex	mtxCallbackMap_;
 	QPointer<QCefView> hostWidget_;
 };
 

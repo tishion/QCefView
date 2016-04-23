@@ -12,12 +12,21 @@
 #define CEF_BROWSER_WINDOW_CLASS_NAME_A "CefBrowserWindow"
 
 CCefWindow::HostWidgetInstanceMap CCefWindow::instance_map_;
+QPointer<QCefView> CCefWindow::GetHostWidget(HWND h)
+{
+	auto it = instance_map_.find(h);
+	if (it != instance_map_.end())
+	{
+		return it->second;
+	}
+	return QPointer<QCefView>();
+}
 
 CCefWindow::CCefWindow(const QString& url, QCefView* host, QWindow *parent /*= 0*/)
 	: QWindow(parent)
-	, host_(host)
+	, pQCefViewWidget_(host)
 	, hwndCefBrowser_(NULL)
-	, handler_(new QCefViewBrowserHandler(host))
+	, pQCefViewHandler(NULL)
 {
 	CCefManager::getInstance().AddBrowserRefCount();
 
@@ -25,8 +34,6 @@ CCefWindow::CCefWindow(const QString& url, QCefView* host, QWindow *parent /*= 0
 	
 	// Create native window
 	create();
-
-	instance_map_[(HWND)winId()] = host_;
 
 	// Set window info
 	CefWindowInfo window_info;
@@ -36,21 +43,24 @@ CCefWindow::CCefWindow(const QString& url, QCefView* host, QWindow *parent /*= 0
 	CefBrowserSettings browserSettings;
 	browserSettings.plugins = STATE_DISABLED;	// disable all plugins
 
+	pQCefViewHandler = new QCefViewBrowserHandler(host);
+	instance_map_[(HWND)winId()] = pQCefViewWidget_;
+
 	// Create the main browser window.
-	if (CefBrowserHost::CreateBrowser(
+	if (!CefBrowserHost::CreateBrowser(
 		window_info,			// window info
-		handler_.get(),			// handler
+		pQCefViewHandler.get(),	// handler
 		url.toStdString(),		// url
 		browserSettings,		// settings
 		NULL))
 	{
-
+		QLOG() << QStringLiteral("Failed to create browser.");
 	}
 }
 
 CCefWindow::~CCefWindow()
 {
-	host_ = NULL;
+	pQCefViewWidget_ = NULL;
 
 	auto it = instance_map_.find((HWND)winId());
 	if (it != instance_map_.end())
@@ -65,25 +75,15 @@ CCefWindow::~CCefWindow()
 		hwndCefBrowser_ = NULL;
 	}
 
-	if (handler_)
+	if (pQCefViewHandler)
 	{
-		handler_ = NULL;
+		pQCefViewHandler = NULL;
 	}
 
 	CCefManager::getInstance().ReleaseBrowserRefCount();
 }
 
-QPointer<QCefView> CCefWindow::GetHostWidget(HWND h)
-{
-	auto it = instance_map_.find(h);
-	if (it != instance_map_.end())
-	{
-		return it->second;
-	}
-	return QPointer<QCefView>();
-}
-
-void CCefWindow::resizeEvent(QResizeEvent *e)
+void CCefWindow::updateCefBrowserWindow()
 {
 	if (!hwndCefBrowser_)
 	{
@@ -96,25 +96,18 @@ void CCefWindow::resizeEvent(QResizeEvent *e)
 		::MoveWindow(hwndCefBrowser_, 0, 0,
 			width(), height(), TRUE);
 	}
-
-	return __super::resizeEvent(e);
 }
 
 void CCefWindow::exposeEvent(QExposeEvent *e)
 {
-	if (!hwndCefBrowser_)
-	{
-		hwndCefBrowser_ = ::FindWindowExA((HWND)winId(),
-			NULL, CEF_BROWSER_WINDOW_CLASS_NAME_A, NULL);
-	}
-
-	if (hwndCefBrowser_)
-	{
-		::MoveWindow(hwndCefBrowser_, 0, 0,
-			width(), height(), TRUE);
-	}
-
+	updateCefBrowserWindow();
 	return __super::exposeEvent(e);
+}
+
+void CCefWindow::resizeEvent(QResizeEvent *e)
+{
+	updateCefBrowserWindow();
+	return __super::resizeEvent(e);
 }
 
 CCefWindow::operator HWND()
@@ -124,7 +117,7 @@ CCefWindow::operator HWND()
 
 const CefRefPtr<QCefViewBrowserHandler>& CCefWindow::cefViewHandler() const
 {
-	return handler_;
+	return pQCefViewHandler;
 }
 
 
