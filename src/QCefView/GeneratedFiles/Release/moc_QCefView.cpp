@@ -84,7 +84,7 @@ void QCefView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->processQCefUrlRequest((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 1: _t->processQCefQueryRequest((*reinterpret_cast< QCefQuery(*)>(_a[1]))); break;
+        case 1: _t->processQCefQueryRequest((*reinterpret_cast< const QCefQuery(*)>(_a[1]))); break;
         case 2: _t->onInvokeMethodNotify((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< const QVariantList(*)>(_a[4]))); break;
         default: ;
         }

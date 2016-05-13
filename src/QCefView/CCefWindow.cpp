@@ -54,7 +54,7 @@ CCefWindow::CCefWindow(const QString& url, QCefView* host, QWindow *parent /*= 0
 		browserSettings,		// settings
 		NULL))
 	{
-		QLOG() << QStringLiteral("Failed to create browser.");
+		QLOG(QStringLiteral("Failed to create browser."));
 	}
 }
 

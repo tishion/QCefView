@@ -5,9 +5,9 @@
 
 #if defined(_DEBUG) || defined(DEBUG)
 #include <QDebug>
-#define QLOG	qDebug
+#define QLOG(x)	qDebug() << x
 #else
-#define QLOG	__noop
+#define QLOG(x)	__noop(x)
 #endif
 
 //#define QCEF_QUERY_NAME						"QCefQuery"
