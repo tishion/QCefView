@@ -1,36 +1,74 @@
 #pragma once
 
+#pragma region stl_headers
 #include <mutex>
+#pragma endregion stl_headers
+
+#pragma region qt_headers
 #include <QObject>
 #include <QWidget>
 #include <QThread>
 #include <QCoreApplication>
+#pragma endregion qt_headers
 
 #include "CefViewBrowserApp/QCefViewBrowserApp.h"
-#include "CefViewBrowserApp/QCefViewBrowserHandler.h"
 
+/// <summary>
+/// 
+/// </summary>
 class CCefManager
 	: public QObject
 {
 	Q_OBJECT
-protected:
-	CCefManager();
-	~CCefManager();
 
-protected slots :
-	void releaseCef();
+protected:
+	/// <summary>
+	/// 
+	/// </summary>
+	CCefManager();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	~CCefManager() {};
 
 public:
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
 	static CCefManager& getInstance();
 
-	void AddBrowserRefCount();
+	/// <summary>
+	/// 
+	/// </summary>
+	void initializeCef();
 
-	void ReleaseBrowserRefCount();
+	/// <summary>
+	/// 
+	/// </summary>
+	void uninitializeCef();
+
+protected slots :
+	/// <summary>
+	/// 
+	/// </summary>
+	void releaseCef();
 
 private:
+	/// <summary>
+	/// 
+	/// </summary>
 	CefRefPtr<QCefViewBrowserApp> app_;
+
+	/// <summary>
+	/// 
+	/// </summary>
 	CefSettings cef_settings_;
 
-	int nBrowserRefCount_;
+	/// <summary>
+	/// 
+	/// </summary>
+	int64_t nBrowserRefCount_;
 };
 

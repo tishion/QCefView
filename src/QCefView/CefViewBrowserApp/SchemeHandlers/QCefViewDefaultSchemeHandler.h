@@ -4,12 +4,19 @@
 #include <vector>
 #pragma endregion stl_headers
 
+
+#pragma region qt_headers
+#include <QObject>
+#include <QPointer>
+#pragma endregion qt_headers
+
 #pragma region cef_headers
 #include <include/cef_base.h>
+#include <include/cef_browser.h>
+#include <include/cef_scheme.h>
 #pragma endregion cef_headers
 
-class CefBrowser;
-class CefSchemeRegistrar;
+#include "../CCefWindow.h"
 
 namespace QCefViewDefaultSchemeHandler
 {
@@ -23,7 +30,7 @@ namespace QCefViewDefaultSchemeHandler
 		: public CefResourceHandler
 	{
 	public:
-		SchemeHandler(HWND h = 0);
+		SchemeHandler(CCefWindow* pQCefWin);
 
 		virtual bool ProcessRequest(CefRefPtr<CefRequest> request, 
 			CefRefPtr<CefCallback> callback);
@@ -44,7 +51,7 @@ namespace QCefViewDefaultSchemeHandler
 		virtual void Cancel();
 
 	private:
-		HWND hWnd_;
+		QPointer<CCefWindow> pQCefWindow_;
 		std::string data_;
 		std::string mime_type_;
 		int offset_;
@@ -55,14 +62,14 @@ namespace QCefViewDefaultSchemeHandler
 
 	class SchemeHandlerFactory 
 		: public CefSchemeHandlerFactory {
-	 public:
+
 	  // Return a new scheme handler instance to handle the request.
 		 virtual CefRefPtr<CefResourceHandler> Create(
 			 CefRefPtr<CefBrowser> browser,
 			 CefRefPtr<CefFrame> frame,
 			 const CefString& scheme_name,
 			 CefRefPtr<CefRequest> request);
-	
+
 	private:
 		IMPLEMENT_REFCOUNTING(SchemeHandlerFactory);
 	};

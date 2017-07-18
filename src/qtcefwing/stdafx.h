@@ -17,6 +17,6 @@
 #include <memory.h>
 #include <tchar.h>
 
-#include "../public/QCefCommon.h"
+#include "QCefCommon.h"
 
 // TODO: reference additional headers your program requires here

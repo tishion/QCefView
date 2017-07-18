@@ -42,9 +42,6 @@
     <ClInclude Include="CefViewRenderApp\RenderDelegates\QCefClient.h">
       <Filter>RenderApp\RenderDelegates</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\QCefCommon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

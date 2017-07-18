@@ -15,16 +15,14 @@
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
 
-#include "../../inc/QCefView.h"
-#include "../../CCefWindow.h"
 #include "QCefViewDefaultSchemeHandler.h"
 
 namespace QCefViewDefaultSchemeHandler
 {
 	//////////////////////////////////////////////////////////////////////////
 	// handler
-	SchemeHandler::SchemeHandler(HWND h /*= 0*/)
-		: hWnd_(h)
+	SchemeHandler::SchemeHandler(CCefWindow* pQCefWin)
+		: pQCefWindow_(pQCefWin)
 		, offset_(0)
 	{
 	}
@@ -33,16 +31,11 @@ namespace QCefViewDefaultSchemeHandler
 		CefRefPtr<CefCallback> callback)
 	{
 		CEF_REQUIRE_IO_THREAD();
-		QPointer<QCefView> host = CCefWindow::GetHostWidget(hWnd_);
-		if (host)
+		if (pQCefWindow_)
 		{
 			CefString cefStrUrl = request->GetURL();
 			QString url = QString::fromStdString(cefStrUrl.ToString());
-
-			QMetaObject::invokeMethod(host, 
-				"processQCefUrlRequest", 
-				Qt::QueuedConnection, 
-				Q_ARG(const QString&, url));
+			pQCefWindow_->processUrlRequest(url);
 		}
 		// no matter whether we have found the handler or not, 
 		// we don't response this request.
@@ -109,15 +102,14 @@ namespace QCefViewDefaultSchemeHandler
 		const CefString& scheme_name, 
 		CefRefPtr<CefRequest> request)
 	{
-		// we must find corresponding QWidget
-		HWND hWndHost = (HWND)(browser->GetHost()->GetWindowHandle());
-		HWND hWndParent = ::GetParent(hWndHost);
-		//hWnaParent is the QWindow that contains this browser.
-		return new SchemeHandler(hWndParent);
+		// 
+		// TO DO (Get the correct SchemeHandler corresponding to the browser)
+		// 
+
+		return new SchemeHandler(nullptr);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	// 
 	bool RegisterScheme(CefRefPtr<CefSchemeRegistrar> registrar)
 	{
 		return registrar->AddCustomScheme(scheme_name, false, false, false);

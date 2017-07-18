@@ -76,7 +76,7 @@ void QCefViewTest::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
 
 const QMetaObject QCefViewTest::staticMetaObject = {
     { &QMainWindow::staticMetaObject, qt_meta_stringdata_QCefViewTest.data,
-      qt_meta_data_QCefViewTest,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_QCefViewTest,  qt_static_metacall, Q_nullptrPTR, Q_nullptrPTR}
 };
 
 
@@ -87,7 +87,7 @@ const QMetaObject *QCefViewTest::metaObject() const
 
 void *QCefViewTest::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return Q_nullptrPTR;
     if (!strcmp(_clname, qt_meta_stringdata_QCefViewTest.stringdata0))
         return static_cast<void*>(const_cast< QCefViewTest*>(this));
     return QMainWindow::qt_metacast(_clname);

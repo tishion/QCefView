@@ -18,164 +18,422 @@
 #include "inc/QCefEvent.h"
 #include "CCefManager.h"
 #include "CCefWindow.h"
+#include "CefViewBrowserApp/QCefViewBrowserHandler.h"
 
 //////////////////////////////////////////////////////////////////////////
-QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
-	: QWidget(parent)
-	, pCefWindow_(NULL)
+class QCefView::Implementation
 {
-	QGridLayout* layout = new QGridLayout;
-	layout->setContentsMargins(0, 0, 0, 0);
-
-	/*
-	 * Here we must create a QWidget as a wrapper 
-	 * to encapsulate the QWindow
-	 */
-	pCefWindow_ = new CCefWindow(url, this, window()->windowHandle());
-	QWidget* windowContainer = createWindowContainer(pCefWindow_, this);
-	if (windowContainer)
+public:
+	explicit Implementation(const QString& url, QWindow* parent)
+		: pCefWindow_(nullptr), pQCefViewHandler_(nullptr)
 	{
-		layout->addWidget(windowContainer);
+		// Here we must create a QWidget as a wrapper to encapsulate the QWindow
+		pCefWindow_ = new CCefWindow(parent);
+		pCefWindow_->create();
+
+		CCefManager::getInstance().initializeCef();
+
+		// Set window info
+		CefWindowInfo window_info;
+		RECT rc = { 0 };
+		window_info.SetAsChild((HWND)pCefWindow_->winId(), rc);
+
+		CefBrowserSettings browserSettings;
+		browserSettings.plugins = STATE_DISABLED;	// disable all plugins
+
+		//
+		pQCefViewHandler_ = new QCefViewBrowserHandler(pCefWindow_);
+
+		// Create the main browser window.
+		if (!CefBrowserHost::CreateBrowser(
+			window_info,				// window info
+			pQCefViewHandler_,			// handler
+			url.toStdString(),			// url
+			browserSettings,			// settings
+			CefRequestContext::GetGlobalContext()))
+		{
+			QLOG(QStringLiteral("Failed to create browser."));
+		}
 	}
 
+	~Implementation()
+	{
+		CCefManager::getInstance().uninitializeCef();
+	}
+
+	CCefWindow* cefWindow()
+	{
+		return pCefWindow_;
+	}
+
+	WId getCefWinId()
+	{
+		if (pCefWindow_)
+		{
+			return pCefWindow_->winId();
+		}
+		return 0;
+	}
+
+	void navigateToString(const QString& content, const QString& url)
+	{
+		if (pQCefViewHandler_)
+		{
+			CefString strContent;
+			strContent.FromString(content.toStdString());
+			CefString strUrl;
+			strUrl.FromString(url.toStdString());
+			pQCefViewHandler_->GetBrowser()->GetMainFrame()->LoadString(strContent, strUrl);
+		}
+	}
+
+	void navigateToUrl(const QString& url)
+	{
+		if (pQCefViewHandler_)
+		{
+			CefString strUrl;
+			strUrl.FromString(url.toStdString());
+			pQCefViewHandler_->GetBrowser()->GetMainFrame()->LoadURL(strUrl);
+		}
+	}
+
+	bool browserCanGoBack()
+	{
+		if (pQCefViewHandler_)
+		{
+			return pQCefViewHandler_->GetBrowser()->CanGoBack();
+		}
+		return false;
+	}
+
+	bool browserCanGoForward()
+	{
+		if (pQCefViewHandler_)
+		{
+			return pQCefViewHandler_->GetBrowser()->CanGoForward();
+		}
+		return false;
+	}
+
+	void browserGoBack()
+	{
+		if (pQCefViewHandler_)
+		{
+			pQCefViewHandler_->GetBrowser()->GoBack();
+		}
+	}
+
+	void browserGoForward()
+	{
+		if (pQCefViewHandler_)
+		{
+			pQCefViewHandler_->GetBrowser()->CanGoForward();
+		}
+	}
+
+	bool browserIsLoading()
+	{
+		if (pQCefViewHandler_)
+		{
+			return pQCefViewHandler_->GetBrowser()->IsLoading();
+		}
+		return false;
+	}
+
+	void browserReload()
+	{
+		if (pQCefViewHandler_)
+		{
+			pQCefViewHandler_->GetBrowser()->Reload();
+		}
+	}
+
+	void browserStopLoad()
+	{
+		if (pQCefViewHandler_)
+		{
+			pQCefViewHandler_->GetBrowser()->StopLoad();
+		}
+	}
+
+	bool triggerEvent(int frameId, const QString& name, const QCefEvent& event)
+	{
+		if (!name.isEmpty())
+		{
+			if (pQCefViewHandler_)
+			{
+				auto frame = pQCefViewHandler_->GetBrowser()->GetFrame(frameId);
+				if (frame)
+				{
+					return sendEVentNotifyMessage(frameId, name, event);
+				}
+			}
+		}
+
+		return false;
+	}
+
+	bool broadcastEvent(const QString& name, const QCefEvent& event)
+	{
+		if (!name.isEmpty())
+		{
+			if (pQCefViewHandler_)
+			{
+				return sendEVentNotifyMessage(0, name, event);
+			}
+		}
+		return false;
+	}
+
+	bool responseQCefQuery(const QCefQuery& query)
+	{
+		if (pQCefViewHandler_)
+		{
+			CefString res;
+			res.FromString(query.response().toStdString());
+			return pQCefViewHandler_->ResponseQuery(query.id(), query.result(), res, query.error());
+		}
+		return false;
+	}
+
+	void notifyMoveOrResizeStarted()
+	{
+		if (pQCefViewHandler_)
+		{
+			CefRefPtr<CefBrowser> browser = pQCefViewHandler_->GetBrowser();
+			if (browser)
+			{
+				CefRefPtr<CefBrowserHost> host = browser->GetHost();
+				if (host)
+				{
+					host->NotifyMoveOrResizeStarted();
+				}
+			}
+		}
+	}
+
+	bool sendEVentNotifyMessage(int frameId, const QString& name, const QCefEvent& event)
+	{
+		CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(
+			TRIGGEREVENT_NOTIFY_MESSAGE);
+		CefRefPtr<CefListValue> arguments = msg->GetArgumentList();
+
+		int idx = 0;
+		arguments->SetInt(idx++, frameId);
+
+		CefString eventName = name.toStdString();
+		arguments->SetString(idx++, eventName);
+
+		CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
+
+		CefString cefStr;
+		cefStr.FromWString(event.objectName().toStdWString());
+		dict->SetString("name", cefStr);
+
+		QList<QByteArray> keys = event.dynamicPropertyNames();
+		for (QByteArray key : keys)
+		{
+			QVariant value = event.property(key.data());
+			if (value.type() == QMetaType::Bool)
+			{
+				dict->SetBool(key.data(), value.toBool());
+			}
+			else if (value.type() == QMetaType::Int || value.type() == QMetaType::UInt)
+			{
+				dict->SetInt(key.data(), value.toInt());
+			}
+			else if (value.type() == QMetaType::Double)
+			{
+				dict->SetDouble(key.data(), value.toDouble());
+			}
+			else if (value.type() == QMetaType::QString)
+			{
+				cefStr.FromWString(value.toString().toStdWString());
+				dict->SetString(key.data(), cefStr);
+			}
+			else
+			{
+				__noop(_T("QCefView"), _T("Unknown Type!"));
+			}
+		}
+
+		arguments->SetDictionary(idx++, dict);
+
+		return pQCefViewHandler_->TriggerEvent(msg);
+	}
+
+private:
+	/// <summary>
+	/// 
+	/// </summary>
+	QPointer<CCefWindow> pCefWindow_;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	CefRefPtr<QCefViewBrowserHandler> pQCefViewHandler_;
+};
+
+QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
+	: QWidget(parent)
+	, pImpl_(nullptr)
+{
+	pImpl_ = std::make_unique<Implementation>(url, windowHandle());
+
+	QGridLayout* layout = new QGridLayout;
+	layout->setContentsMargins(0, 0, 0, 0);
+	QWidget* windowContainer = createWindowContainer(pImpl_->cefWindow(), this);
+	layout->addWidget(windowContainer);
 	setLayout(layout);
+
+	connect(pImpl_->cefWindow(), SIGNAL(loadingStateChanged(bool, bool, bool)),
+		this, SLOT(onLoadingStateChanged(bool, bool, bool)));
+
+	connect(pImpl_->cefWindow(), SIGNAL(loadStart()),
+		this, SLOT(onLoadStart()));
+
+	connect(pImpl_->cefWindow(), SIGNAL(loadEnd()),
+		this, SLOT(onLoadEnd(int)));
+	
+	connect(pImpl_->cefWindow(), SIGNAL(loadError(int, const QString&, const QString&)),
+		this, SLOT(onLoadError(int, const QString&, const QString&)));
+
+	connect(pImpl_->cefWindow(), SIGNAL(processUrlRequest(const QString&)),
+		this, SLOT(onQCefUrlRequest(const QString&)));
+
+	connect(pImpl_->cefWindow(), SIGNAL(processQueryRequest(const QCefQuery&)),
+		this, SLOT(onQCefQueryRequest(const QCefQuery&)));
+
+	connect(pImpl_->cefWindow(), SIGNAL(invokeMethodNotify(int, int, const QString&, const QVariantList&)),
+		this, SLOT(onInvokeMethodNotify(int, int, const QString&, const QVariantList&)));
 }
 
 QCefView::~QCefView()
 {
-
+	disconnect();
 }
 
-void QCefView::processQCefUrlRequest(const QString& url)
+WId QCefView::getCefWinId()
 {
-
-}
-
-void QCefView::processQCefQueryRequest(const QCefQuery& query)
-{
-
-}
-
-void QCefView::onInvokeMethodNotify(
-	int browserId, 
-	int frameId, 
-	const QString method,
-	const QVariantList arguments)
-{
-
+	if (pImpl_)
+	{
+		return pImpl_->getCefWinId();
+	}
+	
+	return 0;
 }
 
 void QCefView::navigateToString(const QString& content, const QString& url)
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		CefString strContent;
-		strContent.FromString(content.toStdString());
-		CefString strUrl;
-		strUrl.FromString(url.toStdString());
-		pCefWindow_->cefViewHandler()->GetBrowser()->GetMainFrame()->LoadString(strContent, strUrl);
+		pImpl_->navigateToString(content, url);
 	}
 }
 
 void QCefView::navigateToUrl(const QString& url)
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		CefString strUrl;
-		strUrl.FromString(url.toStdString());
-		pCefWindow_->cefViewHandler()->GetBrowser()->GetMainFrame()->LoadURL(strUrl);
+		pImpl_->navigateToUrl(url);
 	}
 }
 
 bool QCefView::browserCanGoBack()
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		return pCefWindow_->cefViewHandler()->GetBrowser()->CanGoBack();
+		return pImpl_->browserCanGoBack();
 	}
 	return false;
 }
 
 bool QCefView::browserCanGoForward()
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		return pCefWindow_->cefViewHandler()->GetBrowser()->CanGoForward();
+		return pImpl_->browserCanGoForward();
 	}
 	return false;
 }
 
 void QCefView::browserGoBack()
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		pCefWindow_->cefViewHandler()->GetBrowser()->GoBack();
+		pImpl_->browserGoBack();
 	}
 }
 
 void QCefView::browserGoForward()
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		pCefWindow_->cefViewHandler()->GetBrowser()->CanGoForward();
+		pImpl_->browserGoForward();
 	}
 }
 
 bool QCefView::browserIsLoading()
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		return pCefWindow_->cefViewHandler()->GetBrowser()->IsLoading();
+		return pImpl_->browserIsLoading();
 	}
 	return false;
 }
 
 void QCefView::browserReload()
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		pCefWindow_->cefViewHandler()->GetBrowser()->Reload();
+		pImpl_->browserReload();
 	}
 }
 
 void QCefView::browserStopLoad()
 {
-	if (pCefWindow_)
+	if (pImpl_)
 	{
-		pCefWindow_->cefViewHandler()->GetBrowser()->StopLoad();
+		pImpl_->browserStopLoad();
 	}
 }
 
 bool QCefView::triggerEvent(int frameId, const QString& name, const QCefEvent& event)
 {
-	if (!name.isEmpty())
+	if(pImpl_)
 	{
-		if (pCefWindow_)
-		{
-			auto frame = pCefWindow_->cefViewHandler()->GetBrowser()->GetFrame(frameId);
-			if (frame)
-			{
-				return sendEVentNotifyMessage(frameId, name, event);
-			}
-		}
+		return pImpl_->triggerEvent(frameId, name, event);
 	}
-
 	return false;
 }
 
 bool QCefView::broadcastEvent(const QString& name, const QCefEvent& event)
 {
-	if (!name.isEmpty())
+	if (pImpl_)
 	{
-		if (pCefWindow_)
-		{
-			return sendEVentNotifyMessage(0, name, event);
-		}
+		return pImpl_->broadcastEvent(name, event);
 	}
 	return false;
 }
 
-void QCefView::onLoadStateChange(bool isLoading)
+bool QCefView::responseQCefQuery(const QCefQuery& query)
+{
+	if (pImpl_)
+	{
+		return pImpl_->responseQCefQuery(query);
+	}
+	return false;
+}
+
+void QCefView::notifyMoveOrResizeStarted()
+{
+	if (pImpl_)
+	{
+		pImpl_->notifyMoveOrResizeStarted();
+	}
+}
+
+void QCefView::onLoadingStateChanged(bool isLoading, bool canGoBack, bool canGoForward)
 {
 
 }
@@ -190,97 +448,22 @@ void QCefView::onLoadEnd(int httpStatusCode)
 
 }
 
-void QCefView::onLoadError(int errorCode,
-	const QString& errorMsg,
-	const QString& failedUrl)
+void QCefView::onLoadError(int errorCode, const QString& errorMsg, const QString& failedUrl)
 {
 
 }
 
-WId QCefView::getCefWinId()
+void QCefView::onQCefUrlRequest(const QString& url)
 {
-	return (WId)(HWND)(*pCefWindow_);
+
 }
 
-void QCefView::notifyMoveOrResizeStarted()
+void QCefView::onQCefQueryRequest(const QCefQuery& query)
 {
-	if (pCefWindow_)
-	{
-		CefRefPtr<QCefViewBrowserHandler> handler = pCefWindow_->cefViewHandler();
-		if (handler)
-		{
-			CefRefPtr<CefBrowser> browser = handler->GetBrowser();
-			if (browser)
-			{
-				CefRefPtr<CefBrowserHost> host = browser->GetHost();
-				if (host)
-				{
-					host->NotifyMoveOrResizeStarted();
-				}
-			}
-		}
-	}
+
 }
 
-bool QCefView::sendEVentNotifyMessage(int frameId, const QString& name, const QCefEvent& event)
+void QCefView::onInvokeMethodNotify(int browserId, int frameId, const QString& method, const QVariantList& arguments)
 {
-	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create(
-		TRIGGEREVENT_NOTIFY_MESSAGE);
-	CefRefPtr<CefListValue> arguments = msg->GetArgumentList();
 
-	int idx = 0;
-	arguments->SetInt(idx++, frameId);
-
-	CefString eventName = name.toStdString();
-	arguments->SetString(idx++, eventName);
-
-	CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
-
-	CefString cefStr;
-	cefStr.FromWString(event.objectName().toStdWString());
-	dict->SetString("name", cefStr);
-
-	QList<QByteArray> keys = event.dynamicPropertyNames();
-	for (QByteArray key : keys)
-	{
-		QVariant value = event.property(key.data());
-		if (value.type() == QMetaType::Bool)
-		{
-			dict->SetBool(key.data(), value.toBool());
-		}
-		else if (value.type() == QMetaType::Int || value.type() == QMetaType::UInt)
-		{
-			dict->SetInt(key.data(), value.toInt());
-		}
-		else if (value.type() == QMetaType::Double)
-		{
-			dict->SetDouble(key.data(), value.toDouble());
-		}
-		else if (value.type() == QMetaType::QString)
-		{
-			cefStr.FromWString(value.toString().toStdWString());
-			dict->SetString(key.data(), cefStr);
-		}
-		else
-		{
-			__noop(_T("QCefView"), _T("Unknow Type!"));
-		}
-	}
-
-	arguments->SetDictionary(idx++, dict);
-
-	return pCefWindow_->cefViewHandler()->TriggerEvent(msg);
-}
-
-bool QCefView::responseQCefQuery(int64_t query, 
-	bool success, const QString& response, int error)
-{
-	if (pCefWindow_)
-	{
-		CefString res;
-		res.FromString(response.toStdString());
-		return pCefWindow_->cefViewHandler()->ResponseQuery(
-			query, success, res, error);
-	}
-	return false;
 }

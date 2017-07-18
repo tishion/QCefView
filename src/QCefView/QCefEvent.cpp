@@ -11,7 +11,7 @@
 #include "inc/QCefEvent.h"
 
 QCefEvent::QCefEvent()
-	: QObject(NULL)
+	: QObject(nullptr)
 {
 
 }

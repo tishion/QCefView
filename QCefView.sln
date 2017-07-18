@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QCefView", "src\QCefView\QCefView.vcxproj", "{B12702AD-ABFB-343A-A199-8E24837244A3}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -18,7 +18,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QCefViewTest", "test\src\QC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{10BD08FC-D6D0-415D-B63D-9EC0D378B0A4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared", "src\Shared\Shared.vcxitems", "{FA98646F-03D5-489A-BAD4-547EF0A404D2}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Shared\Shared.vcxitems*{30e74a1e-80ed-41ff-b512-04f0689cdace}*SharedItemsImports = 4
+		src\Shared\Shared.vcxitems*{b12702ad-abfb-343a-a199-8e24837244a3}*SharedItemsImports = 4
+		src\Shared\Shared.vcxitems*{fa98646f-03d5-489a-bad4-547ef0a404d2}*SharedItemsImports = 9
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32

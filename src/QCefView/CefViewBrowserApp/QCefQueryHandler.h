@@ -1,19 +1,23 @@
 #pragma once
+#pragma region stl_headers
 #include <map>
+#include <mutex>
+#pragma endregion stl_headers
 
 #pragma region cef_headers
+#include <include/cef_base.h>
 #include <include/wrapper/cef_stream_resource_handler.h>
 #include <include/wrapper/cef_message_router.h>
 #pragma endregion cef_headers
 
-#include "../inc/QCefView.h"
-#include "../CCefWindow.h"
+#include "CCefWindow.h"
 
 class QCefQueryHandler 
-	: public CefMessageRouterBrowserSide::Handler
+	: public CefBase
+	, public CefMessageRouterBrowserSide::Handler
 {
 public:
-	QCefQueryHandler(QCefView* host);
+	QCefQueryHandler(CCefWindow* pQCefWin);
 	~QCefQueryHandler();
 
 	virtual bool OnQuery(CefRefPtr<CefBrowser> browser,
@@ -23,7 +27,6 @@ public:
 		bool persistent,
 		CefRefPtr<Callback> callback) OVERRIDE;
 
-
 	virtual void OnQueryCanceled(CefRefPtr<CefBrowser> browser, 
 		CefRefPtr<CefFrame> frame, 
 		int64 query_id) override;
@@ -32,9 +35,11 @@ public:
 		bool success, const CefString& response, int error);
 
 private:
-	typedef std::map<int64, CefRefPtr<Callback>> CallbackMap;
-	CallbackMap	mapCallback_;
+	QPointer<CCefWindow> pQCefWindow_;
+	std::map<int64, CefRefPtr<Callback>>	mapCallback_;
 	std::mutex	mtxCallbackMap_;
-	QPointer<QCefView> hostWidget_;
+
+private:
+	IMPLEMENT_REFCOUNTING(QCefQueryHandler);
 };
 

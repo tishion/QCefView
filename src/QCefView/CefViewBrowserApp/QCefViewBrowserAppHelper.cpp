@@ -10,7 +10,6 @@
 #pragma endregion cef_headers
 
 #include "QCefViewBrowserApp.h"
-#include "QCefViewBrowserHandler.h"
 #include "BrowserDelegates/QCefViewDefaultBrowserDelegate.h"
 #include "SchemeHandlers/QCefViewDefaultSchemeHandler.h"
 

@@ -5,11 +5,6 @@
 
 #include "CCefSetting.h"
 
-void CCefSetting::initializeInstance()
-{
-	static CCefSetting s_instance;
-}
-
 CefString CCefSetting::browser_sub_process_path;
 
 CefString CCefSetting::resource_directory_path;
@@ -17,6 +12,11 @@ CefString CCefSetting::resource_directory_path;
 CefString CCefSetting::locales_directory_path;
 
 CefString CCefSetting::user_agent;
+
+void CCefSetting::initializeInstance()
+{
+	static CCefSetting s_instance;
+}
 
 CCefSetting::CCefSetting()
 {
@@ -35,9 +35,4 @@ CCefSetting::CCefSetting()
 		QDir::toNativeSeparators(ResPath.filePath(LOCALES_DIRECTORY_NAME)).toStdString());
 
 	user_agent.FromString(QCEF_USER_AGENT);
-}
-
-CCefSetting::~CCefSetting()
-{
-
 }

@@ -23,7 +23,7 @@ void CustomCefView::changeColor()
 	broadcastEvent("colorChange", event);
 }
 
-void CustomCefView::processQCefUrlRequest(const QString& url)
+void CustomCefView::onQCefUrlRequest(const QString& url)
 {
 	QString title("QCef Url Request");
 	QString text = QString(
@@ -33,7 +33,7 @@ void CustomCefView::processQCefUrlRequest(const QString& url)
 	QMessageBox::information(this->window(), title, text);
 }
 
-void CustomCefView::processQCefQueryRequest(const QCefQuery& query)
+void CustomCefView::onQCefQueryRequest(const QCefQuery& query)
 {
 	QString title("QCef Query Request");
 	QString text = QString(
@@ -43,13 +43,14 @@ void CustomCefView::processQCefQueryRequest(const QCefQuery& query)
 	QMessageBox::information(this->window(), title, text);
 
 	QString response = query.reqeust().toUpper();
-	query.responseSuccess(response);
+	query.setResponseResult(true, response);
+	responseQCefQuery(query);
 }
 
 void CustomCefView::onInvokeMethodNotify(int browserId, 
 	int frameId, 
-	const QString method, 
-	const QVariantList arguments)
+	const QString& method, 
+	const QVariantList& arguments)
 {
 	if (0 == method.compare("onDragAreaMouseDown"))
 	{

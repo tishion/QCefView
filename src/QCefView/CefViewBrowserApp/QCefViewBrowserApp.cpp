@@ -10,7 +10,6 @@
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
 
-#include "QCefViewBrowserHandler.h"
 #include "QCefViewBrowserApp.h"
 
 QCefViewBrowserApp::QCefViewBrowserApp()
@@ -31,6 +30,7 @@ void QCefViewBrowserApp::OnBeforeCommandLineProcessing(
 	command_line->AppendSwitch("disable-pdf-extension");
 	command_line->AppendSwitch("enable-direct-write");
 	command_line->AppendSwitch("allow-file-access-from-files");
+	command_line->AppendSwitchWithValue ("renderer-process-limit", "1");
 }
 
 void QCefViewBrowserApp::OnRegisterCustomSchemes(
@@ -53,13 +53,13 @@ void QCefViewBrowserApp::OnContextInitialized()
 	CreateBrowserDelegates(browser_delegates_);
 
 	// Register cookieable schemes with the global cookie manager.
-	CefRefPtr<CefCookieManager> manager = CefCookieManager::GetGlobalManager(NULL);
+	CefRefPtr<CefCookieManager> manager = CefCookieManager::GetGlobalManager(nullptr);
 	DCHECK(manager.get());
 	typedef std::vector<CefString> CookiableSchemeSet;
 	CookiableSchemeSet cookieable_schemes_;
 	cookieable_schemes_.push_back("http");
 	cookieable_schemes_.push_back("https");
-	manager->SetSupportedSchemes(cookieable_schemes_, NULL);
+	manager->SetSupportedSchemes(cookieable_schemes_, nullptr);
 
 	RegisterCustomSchemesHandlerFactories();
 

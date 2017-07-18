@@ -29,5 +29,4 @@ namespace QCefViewDefaultBrowserDelegate
 	private:
 		IMPLEMENT_REFCOUNTING(BrowserDelegate);
 	};
-
 }

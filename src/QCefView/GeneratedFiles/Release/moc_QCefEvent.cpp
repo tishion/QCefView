@@ -63,7 +63,7 @@ void QCefEvent::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
 
 const QMetaObject QCefEvent::staticMetaObject = {
     { &QObject::staticMetaObject, qt_meta_stringdata_QCefEvent.data,
-      qt_meta_data_QCefEvent,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_QCefEvent,  qt_static_metacall, Q_nullptrPTR, Q_nullptrPTR}
 };
 
 
@@ -74,7 +74,7 @@ const QMetaObject *QCefEvent::metaObject() const
 
 void *QCefEvent::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return Q_nullptrPTR;
     if (!strcmp(_clname, qt_meta_stringdata_QCefEvent.stringdata0))
         return static_cast<void*>(const_cast< QCefEvent*>(this));
     return QObject::qt_metacast(_clname);

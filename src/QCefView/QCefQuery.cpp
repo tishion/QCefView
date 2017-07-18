@@ -13,29 +13,31 @@
 int QCefQuery::TYPEID = qRegisterMetaType<QCefQuery>("QCefQuery");
 
 //////////////////////////////////////////////////////////////////////////
-QCefQuery::QCefQuery(QPointer<QCefView> cefView, QString req, int64_t query)
-	: pCefView_(cefView), reqeust_(req), query_id_(query)
+QCefQuery::QCefQuery(QString req, int64_t query)
+	: reqeust_(req), id_(query), restult_(false), error_(0)
 {
 }
 
 QCefQuery::QCefQuery()
-	: pCefView_(NULL), query_id_(-1)
+	: id_(-1), restult_(false), error_(0)
 {
 
 }
 
 QCefQuery::QCefQuery(const QCefQuery& other)
 {
-	pCefView_ = other.pCefView_;
 	reqeust_ = other.reqeust_;
-	query_id_ = other.query_id_;
+	id_ = other.id_;
+	restult_ = other.restult_;
+	response_ = other.response_;
 }
 
 QCefQuery& QCefQuery::operator=(const QCefQuery& other)
 {
-	pCefView_ = other.pCefView_;
 	reqeust_ = other.reqeust_;
-	query_id_ = other.query_id_;
+	id_ = other.id_;
+	restult_ = other.restult_;
+	response_ = other.response_;
 	return *this;
 }
 
@@ -49,20 +51,29 @@ const QString QCefQuery::reqeust() const
 	return reqeust_;
 }
 
-bool QCefQuery::responseSuccess(const QString& response) const
+const int64_t QCefQuery::id() const
 {
-	if (pCefView_)
-	{
-		return pCefView_->responseQCefQuery(query_id_, true, response, 0);
-	}
-	return false;
+	return id_;
 }
 
-bool QCefQuery::responseFailure(int ec, const QString& response) const
+const QString QCefQuery::response() const
 {
-	if (pCefView_)
-	{
-		return pCefView_->responseQCefQuery(query_id_, false, response, ec);
-	}
-	return false;
+	return response_;
+}
+
+const bool QCefQuery::result() const
+{
+	return restult_;
+}
+
+const int QCefQuery::error() const
+{
+	return error_;
+}
+
+void QCefQuery::setResponseResult(bool success, const QString& response, int error /*= 0*/) const
+{
+	restult_ = success;
+	response_ = response;
+	error_ = error;
 }

@@ -1,15 +1,13 @@
 #include "stdafx.h"
 
-#include "QCefQueryHandler.h"
 #include "inc/QCefQuery.h"
+#include "QCefQueryHandler.h"
 
-
-QCefQueryHandler::QCefQueryHandler(QCefView* host)
-	: hostWidget_(host)
+QCefQueryHandler::QCefQueryHandler(CCefWindow* pQCefWin)
+	: pQCefWindow_(pQCefWin)
 {
 
 }
-
 
 QCefQueryHandler::~QCefQueryHandler()
 {
@@ -23,17 +21,15 @@ bool QCefQueryHandler::OnQuery(CefRefPtr<CefBrowser> browser,
 	bool persistent,
 	CefRefPtr<Callback> callback)
 {
-	if (hostWidget_)
+	if (pQCefWindow_)
 	{
 		mtxCallbackMap_.lock();
 		mapCallback_[query_id] = callback;
 		mtxCallbackMap_.unlock();
 
 		QString strRequest = QString::fromStdString(request.ToString());
-		QMetaObject::invokeMethod(hostWidget_,
-			"processQCefQueryRequest",
-			Qt::QueuedConnection,
-			Q_ARG(QCefQuery, QCefQuery(hostWidget_, strRequest, query_id)));
+		pQCefWindow_->processQueryRequest(QCefQuery(strRequest, query_id));
+
 		return true;
 	}
 	return false;

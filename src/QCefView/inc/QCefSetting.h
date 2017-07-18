@@ -1,6 +1,7 @@
 #ifndef QCEFSETTINGS_H
 #define QCEFSETTINGS_H
 #pragma once
+
 #pragma region qt_headers
 #include <QtCore/qglobal.h>
 #include <QString>
@@ -16,16 +17,44 @@
 
 namespace QCefSetting
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	void QCEFVIEW_EXPORT setBrowserSubProcessPath(const QString& path);
+
+	/// <summary>
+	/// 
+	/// </summary>
 	const QCEFVIEW_EXPORT QString browserSubProcessPath();
 
+	/// <summary>
+	/// 
+	/// </summary>
 	void QCEFVIEW_EXPORT setResourceDirectoryPath(const QString& path);
+
+	/// <summary>
+	/// 
+	/// </summary>
 	const QCEFVIEW_EXPORT QString resourceDirectoryPath();
 
+	/// <summary>
+	/// 
+	/// </summary>
 	void QCEFVIEW_EXPORT setLocalesDirectoryPath(const QString& path);
+
+	/// <summary>
+	/// 
+	/// </summary>
 	const QCEFVIEW_EXPORT QString localesDirectoryPath();
 
+	/// <summary>
+	/// 
+	/// </summary>
 	void QCEFVIEW_EXPORT setUserAgent(const QString& agent);
+
+	/// <summary>
+	/// 
+	/// </summary>
 	const QCEFVIEW_EXPORT QString userAgent();
 };
 

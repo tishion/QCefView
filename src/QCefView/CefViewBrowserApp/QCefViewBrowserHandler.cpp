@@ -11,18 +11,21 @@
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
 
+#pragma region qt_headers
+#include <QRect>
+#include <QWindow>
 #include <QVariant>
-#include "QCefViewBrowserHandler.h"
-#include "QCefQueryHandler.h"
+#pragma endregion qt_headers
 
-QCefViewBrowserHandler::QCefViewBrowserHandler(QCefView* host)
+#include "QCefViewBrowserHandler.h"
+
+QCefViewBrowserHandler::QCefViewBrowserHandler(CCefWindow* pQCefWin)
 	: is_closing_(false)
-	, hostWidget_(host)
-	, message_router_(NULL)
+	, pQCefWindow_(pQCefWin)
+	, cefquery_handler_(new QCefQueryHandler(pQCefWin))
+	, message_router_(nullptr)
 	, browser_count_(0)
 {
-	// Create a message Handler
-	cefquery_handler_ = new QCefQueryHandler(hostWidget_);
 }
 
 QCefViewBrowserHandler::~QCefViewBrowserHandler()
@@ -206,10 +209,10 @@ bool QCefViewBrowserHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
 {
 	CEF_REQUIRE_IO_THREAD();
 
-	// redirect all popup page into the source frame forcefully
+	// Redirect all popup page into the source frame forcefully
 	frame->LoadURL(target_url);
 
-	// don't allow new window or tab
+	// Don't allow new window or tab
 	return true;
 }
 
@@ -223,10 +226,10 @@ void QCefViewBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 		CefMessageRouterConfig config;
 		config.js_query_function = QCEF_QUERY_NAME;
 		config.js_cancel_function = QCEF_QUERY_CANCEL_NAME;
-		message_router_ = CefMessageRouterBrowserSide::Create(config);
 
 		// Register handlers with the router.
-		message_router_->AddHandler(cefquery_handler_, false);
+		message_router_ = CefMessageRouterBrowserSide::Create(config);
+		message_router_->AddHandler(cefquery_handler_.get(), false);
 	}
 
 	if (!GetBrowser())
@@ -236,9 +239,9 @@ void QCefViewBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 		main_browser_ = browser;
 		main_browser_id_ = browser->GetIdentifier();
 
-		if (hostWidget_)
+		if (pQCefWindow_)
 		{
-			QRect rc = hostWidget_->rect();
+			QRect rc = pQCefWindow_->frameGeometry();
 			::MoveWindow(browser->GetHost()->GetWindowHandle(),
 				rc.left(), rc.top(), rc.width(), rc.height(), TRUE);
 		}
@@ -288,16 +291,14 @@ void QCefViewBrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 		{
 			std::lock_guard<std::mutex> lock_scope(mtx_);
 			// Free the browser pointer so that the browser can be destroyed
-			main_browser_ = NULL;
+			main_browser_ = nullptr;
 		}
 	}
 	else if (browser->IsPopup())
 	{
 		// Remove from the browser popup list.
-		BrowserList::iterator it;
-		for (it = popup_browser_list_.begin();
-		it != popup_browser_list_.end();
-			++it)
+		for (auto it = popup_browser_list_.begin();
+		it != popup_browser_list_.end(); ++it)
 		{
 			if ((*it)->IsSame(browser))
 			{
@@ -309,10 +310,9 @@ void QCefViewBrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 
 	if (--browser_count_ == 0)
 	{
-		message_router_->RemoveHandler(cefquery_handler_);
-		delete cefquery_handler_;
-		cefquery_handler_ = NULL;
-		message_router_ = NULL;
+		message_router_->RemoveHandler(cefquery_handler_.get());
+		cefquery_handler_ = nullptr;
+		message_router_ = nullptr;
 	}
 }
 
@@ -322,9 +322,9 @@ void QCefViewBrowserHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 	bool canGoForward)
 {
 	CEF_REQUIRE_UI_THREAD();
-	if (hostWidget_)
+	if (pQCefWindow_)
 	{
-		hostWidget_->onLoadStateChange(isLoading);
+		pQCefWindow_->loadingStateChanged(isLoading, canGoBack, canGoForward);
 	}
 }
 
@@ -332,9 +332,9 @@ void QCefViewBrowserHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame)
 {
 	CEF_REQUIRE_UI_THREAD();
-	if (hostWidget_)
+	if (pQCefWindow_)
 	{
-		hostWidget_->onLoadStart();
+		pQCefWindow_->loadStart();
 	}
 }
 
@@ -343,9 +343,9 @@ void QCefViewBrowserHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 	int httpStatusCode)
 {
 	CEF_REQUIRE_UI_THREAD();
-	if (hostWidget_)
+	if (pQCefWindow_)
 	{
-		hostWidget_->onLoadEnd(httpStatusCode);
+		pQCefWindow_->loadEnd(httpStatusCode);
 	}
 }
 
@@ -373,9 +373,9 @@ void QCefViewBrowserHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
 		arg(errorCode);
 
 	frame->LoadString(content.toStdString(), failedUrl);
-	if (hostWidget_)
+	if (pQCefWindow_)
 	{
-		hostWidget_->onLoadError(errorCode, msg, url);
+		pQCefWindow_->loadError(errorCode, msg, url);
 	}
 }
 
@@ -407,7 +407,7 @@ CefRefPtr<CefResourceHandler> QCefViewBrowserHandler::GetResourceHandler(CefRefP
 {
 	CEF_REQUIRE_IO_THREAD();
 
-	return NULL;
+	return nullptr;
 }
 
 bool QCefViewBrowserHandler::OnQuotaRequest(CefRefPtr<CefBrowser> browser,
@@ -436,11 +436,6 @@ void QCefViewBrowserHandler::OnRenderProcessTerminated(CefRefPtr<CefBrowser> bro
 	browser->GetMainFrame()->LoadURL(browser->GetMainFrame()->GetURL());
 
 	message_router_->OnRenderProcessTerminated(browser);
-}
-
-void QCefViewBrowserHandler::setHostWidget(QCefView* host)
-{
-	hostWidget_ = host;
 }
 
 CefRefPtr<CefBrowser> QCefViewBrowserHandler::GetBrowser() const
@@ -486,10 +481,8 @@ void QCefViewBrowserHandler::CloseAllPopupBrowsers(bool force_close)
 
 	if (!popup_browser_list_.empty())
 	{
-		BrowserList::const_iterator it;
-		for (it = popup_browser_list_.begin();
-		it != popup_browser_list_.end();
-			++it)
+		for (auto it = popup_browser_list_.begin();
+		it != popup_browser_list_.end(); ++it)
 		{
 			(*it)->GetHost()->CloseBrowser(force_close);
 		}
@@ -531,7 +524,7 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 	CefProcessId source_process,
 	CefRefPtr<CefProcessMessage> message)
 {
-	if (hostWidget_ && message->GetName() == INVOKEMETHOD_NOTIFY_MESSAGE)
+	if (pQCefWindow_ && message->GetName() == INVOKEMETHOD_NOTIFY_MESSAGE)
 	{
 		CefRefPtr<CefListValue> messageArguments = message->GetArgumentList();
 		if (messageArguments && (messageArguments->GetSize() >= 2))
@@ -596,22 +589,14 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 							else
 							{
 								// do log
-								__noop(_T("QCefView"), _T("Unknow Type!"));
+								__noop(_T("QCefView"), _T("Unknown Type!"));
 							}
 						}
-
-						QMetaObject::invokeMethod(hostWidget_,
-							"onInvokeMethodNotify",
-							Qt::QueuedConnection,
-							Q_ARG(int, browserId),
-							Q_ARG(int, frameId),
-							Q_ARG(const QString, method),
-							Q_ARG(const QVariantList, arguments));
-
+						pQCefWindow_->invokeMethodNotify(browserId, frameId, method, arguments);
 						return true;
-						}
 					}
 				}
+			}
 		}
 	}
 

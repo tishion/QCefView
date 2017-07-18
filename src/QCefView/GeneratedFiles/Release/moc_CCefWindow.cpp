@@ -63,7 +63,7 @@ void CCefWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
 
 const QMetaObject CCefWindow::staticMetaObject = {
     { &QWindow::staticMetaObject, qt_meta_stringdata_CCefWindow.data,
-      qt_meta_data_CCefWindow,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_CCefWindow,  qt_static_metacall, Q_nullptrPTR, Q_nullptrPTR}
 };
 
 
@@ -74,7 +74,7 @@ const QMetaObject *CCefWindow::metaObject() const
 
 void *CCefWindow::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return Q_nullptrPTR;
     if (!strcmp(_clname, qt_meta_stringdata_CCefWindow.stringdata0))
         return static_cast<void*>(const_cast< CCefWindow*>(this));
     return QWindow::qt_metacast(_clname);

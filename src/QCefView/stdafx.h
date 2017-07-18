@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <tchar.h>
 
-#include "../public/QCefCommon.h"
+#include "QCefCommon.h"
 
 #if defined(_DEBUG) || defined(DEBUG)
 #include <QDebug>

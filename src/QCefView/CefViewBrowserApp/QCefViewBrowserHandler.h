@@ -2,18 +2,22 @@
 #define QCEFVIEWHANDLER_H_
 #pragma once
 
+#pragma region stl_headers
 #include <list>
 #include <map>
 #include <set>
 #include <string>
 #include <mutex>
 #include <QPointer>
+#pragma endregion stl_headers
 
-#include "include/cef_client.h"
-#include "include/wrapper/cef_message_router.h"
-#include "../../inc/QCefView.h"
+#pragma region cef_headers
+#include <include/cef_client.h>
+#include <include/wrapper/cef_message_router.h>
+#pragma endregion cef_headers
 
-class QCefQueryHandler;
+#include "../CCefWindow.h"
+#include "QCefQueryHandler.h"
 
 class QCefViewBrowserHandler
 	: public CefClient
@@ -29,12 +33,16 @@ class QCefViewBrowserHandler
 	, public CefLoadHandler
 	, public CefRequestHandler
 {
-	typedef CefRefPtr<CefMessageRouterBrowserSide>	MessageRouterPtr;
-	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;
-	typedef std::list<CefRefPtr<CefBrowser> > BrowserList;
 public:
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="host"></param>
+	QCefViewBrowserHandler(CCefWindow* pQCefWin);
 
-	QCefViewBrowserHandler(QCefView* host);
+	/// <summary>
+	/// 
+	/// </summary>
 	~QCefViewBrowserHandler();
 
 	//////////////////////////////////////////////////////////////////////////
@@ -240,8 +248,6 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 
-	void setHostWidget(QCefView* host);
-
 	CefRefPtr<CefBrowser> GetBrowser() const;
 
 	int GetBrowserId() const;
@@ -263,26 +269,53 @@ public:
 		CefRefPtr<CefProcessMessage> message);
 
 private:
+	/// <summary>
+	/// 
+	/// </summary>
+	QPointer<CCefWindow> pQCefWindow_;
+
+	/// <summary>
+	/// 
+	/// </summary>
 	int browser_count_;
+
+	/// <summary>
+	/// 
+	/// </summary>
 	int main_browser_id_;
+
+	/// <summary>
+	/// 
+	/// </summary>
 	bool is_closing_;
+
+	/// <summary>
+	/// 
+	/// </summary>
 	mutable std::mutex	mtx_;
 
+	/// <summary>
+	/// 
+	/// </summary>
 	CefRefPtr<CefBrowser> main_browser_;
 
-	QPointer<QCefView> hostWidget_;
+	/// <summary>
+	/// 
+	/// </summary>
+	CefRefPtr<CefMessageRouterBrowserSide> message_router_;
 
-	MessageRouterPtr message_router_;
-
-	//MessageHandlerSet message_handler_set_;
-	QCefQueryHandler* cefquery_handler_;
+	/// <summary>
+	/// 
+	/// </summary>
+	CefRefPtr<QCefQueryHandler> cefquery_handler_;
 	
-	// List of existing browser windows. Only accessed on the CEF UI thread.
-	BrowserList popup_browser_list_;
+	/// <summary>
+	/// List of existing browser windows. Only accessed on the CEF UI thread.
+	/// </summary>
+	std::list<CefRefPtr<CefBrowser>> popup_browser_list_;
 
 	// Include the default reference counting implementation.
 	IMPLEMENT_REFCOUNTING(QCefViewBrowserHandler);
 };
-
 #endif
 

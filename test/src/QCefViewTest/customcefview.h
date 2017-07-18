@@ -15,13 +15,13 @@ public:
 	void changeColor();
 
 protected:
-	virtual void processQCefUrlRequest(const QString& url) override;
+	virtual void onQCefUrlRequest(const QString& url) override;
 
-	virtual void processQCefQueryRequest(const QCefQuery& query) override;
+	virtual void onQCefQueryRequest(const QCefQuery& query) override;
 
 	virtual void onInvokeMethodNotify(int browserId, int frameId, 
-		const QString method, 
-		const QVariantList arguments) override;
+		const QString& method, 
+		const QVariantList& arguments) override;
 
 private:
 	

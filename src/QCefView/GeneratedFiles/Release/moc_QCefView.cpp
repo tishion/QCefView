@@ -104,7 +104,7 @@ void QCefView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
 
 const QMetaObject QCefView::staticMetaObject = {
     { &QWidget::staticMetaObject, qt_meta_stringdata_QCefView.data,
-      qt_meta_data_QCefView,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_QCefView,  qt_static_metacall, Q_nullptrPTR, Q_nullptrPTR}
 };
 
 
@@ -115,7 +115,7 @@ const QMetaObject *QCefView::metaObject() const
 
 void *QCefView::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return Q_nullptrPTR;
     if (!strcmp(_clname, qt_meta_stringdata_QCefView.stringdata0))
         return static_cast<void*>(const_cast< QCefView*>(this));
     return QWidget::qt_metacast(_clname);
