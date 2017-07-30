@@ -16,7 +16,6 @@
 #include "inc/QCefQuery.h"
 #include "inc/QCefView.h"
 #include "inc/QCefEvent.h"
-#include "CCefManager.h"
 #include "CCefWindow.h"
 #include "CefViewBrowserApp/QCefViewBrowserHandler.h"
 
@@ -30,8 +29,6 @@ public:
 		// Here we must create a QWidget as a wrapper to encapsulate the QWindow
 		pCefWindow_ = new CCefWindow(parent);
 		pCefWindow_->create();
-
-		CCefManager::getInstance().initializeCef();
 
 		// Set window info
 		CefWindowInfo window_info;
@@ -58,7 +55,6 @@ public:
 
 	~Implementation()
 	{
-		CCefManager::getInstance().uninitializeCef();
 	}
 
 	CCefWindow* cefWindow()

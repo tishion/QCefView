@@ -7,6 +7,7 @@
 #pragma endregion qt_headers
 
 #include "CCefWindow.h"
+#include "CCefManager.h"
 
 #define CEF_BROWSER_WINDOW_CLASS_NAME_A "CefBrowserWindow"
 
@@ -14,8 +15,9 @@ CCefWindow::CCefWindow(QWindow *parent /*= 0*/)
 	: QWindow(parent)
 	, hwndCefBrowser_(nullptr)
 {
-
 	setFlags(Qt::FramelessWindowHint);
+
+	CCefManager::getInstance().initializeCef();
 }
 
 CCefWindow::~CCefWindow()
@@ -26,6 +28,8 @@ CCefWindow::~CCefWindow()
 	{
 		hwndCefBrowser_ = nullptr;
 	}
+
+	CCefManager::getInstance().uninitializeCef();
 }
 
 void CCefWindow::updateCefBrowserWindow()
