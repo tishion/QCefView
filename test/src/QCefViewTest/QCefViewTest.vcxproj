@@ -68,6 +68,9 @@
     <PostBuildEvent>
       <Command>xcopy /r /y "$(ProjectDir)*.html" "$(SolutionDir)QCefViewSDK\bin\$(Configuration)\web\"</Command>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -87,6 +90,9 @@
     <PostBuildEvent>
       <Command>xcopy /r /y "$(ProjectDir)*.html" "$(SolutionDir)QCefViewSDK\bin\$(Configuration)\web\"</Command>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="customcefview.cpp" />
