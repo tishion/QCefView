@@ -25,9 +25,7 @@ CCefWindow::~CCefWindow()
 	destroy();
 	
 	if (hwndCefBrowser_)
-	{
 		hwndCefBrowser_ = nullptr;
-	}
 
 	CCefManager::getInstance().uninitializeCef();
 }
@@ -35,15 +33,10 @@ CCefWindow::~CCefWindow()
 void CCefWindow::updateCefBrowserWindow()
 {
 	if (!hwndCefBrowser_)
-	{
-		hwndCefBrowser_ = ::FindWindowExA((HWND)winId(),
-			nullptr, CEF_BROWSER_WINDOW_CLASS_NAME_A, nullptr);
-	}
+		hwndCefBrowser_ = ::FindWindowExA((HWND)winId(), nullptr, CEF_BROWSER_WINDOW_CLASS_NAME_A, nullptr);
 
 	if (hwndCefBrowser_)
-	{
 		::MoveWindow(hwndCefBrowser_, 0, 0, width(), height(), TRUE);
-	}
 }
 
 void CCefWindow::exposeEvent(QExposeEvent *e)

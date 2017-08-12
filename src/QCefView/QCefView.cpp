@@ -55,6 +55,8 @@ public:
 
 	~Implementation()
 	{
+		if (pQCefViewHandler_)
+			pQCefViewHandler_->CloseAllBrowsers(true);
 	}
 
 	CCefWindow* cefWindow()
@@ -65,9 +67,8 @@ public:
 	WId getCefWinId()
 	{
 		if (pCefWindow_)
-		{
 			return pCefWindow_->winId();
-		}
+
 		return 0;
 	}
 
@@ -96,60 +97,49 @@ public:
 	bool browserCanGoBack()
 	{
 		if (pQCefViewHandler_)
-		{
 			return pQCefViewHandler_->GetBrowser()->CanGoBack();
-		}
+
 		return false;
 	}
 
 	bool browserCanGoForward()
 	{
 		if (pQCefViewHandler_)
-		{
 			return pQCefViewHandler_->GetBrowser()->CanGoForward();
-		}
+
 		return false;
 	}
 
 	void browserGoBack()
 	{
 		if (pQCefViewHandler_)
-		{
 			pQCefViewHandler_->GetBrowser()->GoBack();
-		}
 	}
 
 	void browserGoForward()
 	{
 		if (pQCefViewHandler_)
-		{
 			pQCefViewHandler_->GetBrowser()->CanGoForward();
-		}
 	}
 
 	bool browserIsLoading()
 	{
 		if (pQCefViewHandler_)
-		{
 			return pQCefViewHandler_->GetBrowser()->IsLoading();
-		}
+
 		return false;
 	}
 
 	void browserReload()
 	{
 		if (pQCefViewHandler_)
-		{
 			pQCefViewHandler_->GetBrowser()->Reload();
-		}
 	}
 
 	void browserStopLoad()
 	{
 		if (pQCefViewHandler_)
-		{
 			pQCefViewHandler_->GetBrowser()->StopLoad();
-		}
 	}
 
 	bool triggerEvent(int frameId, const QString& name, const QCefEvent& event)
@@ -160,9 +150,7 @@ public:
 			{
 				auto frame = pQCefViewHandler_->GetBrowser()->GetFrame(frameId);
 				if (frame)
-				{
 					return sendEVentNotifyMessage(frameId, name, event);
-				}
 			}
 		}
 
@@ -174,10 +162,9 @@ public:
 		if (!name.isEmpty())
 		{
 			if (pQCefViewHandler_)
-			{
 				return sendEVentNotifyMessage(0, name, event);
-			}
 		}
+
 		return false;
 	}
 
@@ -201,9 +188,7 @@ public:
 			{
 				CefRefPtr<CefBrowserHost> host = browser->GetHost();
 				if (host)
-				{
 					host->NotifyMoveOrResizeStarted();
-				}
 			}
 		}
 	}
@@ -231,31 +216,28 @@ public:
 		{
 			QVariant value = event.property(key.data());
 			if (value.type() == QMetaType::Bool)
-			{
 				dict->SetBool(key.data(), value.toBool());
-			}
 			else if (value.type() == QMetaType::Int || value.type() == QMetaType::UInt)
-			{
 				dict->SetInt(key.data(), value.toInt());
-			}
 			else if (value.type() == QMetaType::Double)
-			{
 				dict->SetDouble(key.data(), value.toDouble());
-			}
 			else if (value.type() == QMetaType::QString)
 			{
 				cefStr.FromWString(value.toString().toStdWString());
 				dict->SetString(key.data(), cefStr);
 			}
 			else
-			{
 				__noop(_T("QCefView"), _T("Unknown Type!"));
-			}
 		}
 
 		arguments->SetDictionary(idx++, dict);
 
 		return pQCefViewHandler_->TriggerEvent(msg);
+	}
+
+	void onToplevelWidgetMoveOrResize()
+	{
+		notifyMoveOrResizeStarted();
 	}
 
 private:
@@ -312,9 +294,7 @@ QCefView::~QCefView()
 WId QCefView::getCefWinId()
 {
 	if (pImpl_)
-	{
 		return pImpl_->getCefWinId();
-	}
 	
 	return 0;
 }
@@ -322,111 +302,110 @@ WId QCefView::getCefWinId()
 void QCefView::navigateToString(const QString& content, const QString& url)
 {
 	if (pImpl_)
-	{
 		pImpl_->navigateToString(content, url);
-	}
 }
 
 void QCefView::navigateToUrl(const QString& url)
 {
 	if (pImpl_)
-	{
 		pImpl_->navigateToUrl(url);
-	}
 }
 
 bool QCefView::browserCanGoBack()
 {
 	if (pImpl_)
-	{
 		return pImpl_->browserCanGoBack();
-	}
+
 	return false;
 }
 
 bool QCefView::browserCanGoForward()
 {
 	if (pImpl_)
-	{
 		return pImpl_->browserCanGoForward();
-	}
+
 	return false;
 }
 
 void QCefView::browserGoBack()
 {
 	if (pImpl_)
-	{
 		pImpl_->browserGoBack();
-	}
 }
 
 void QCefView::browserGoForward()
 {
 	if (pImpl_)
-	{
 		pImpl_->browserGoForward();
-	}
 }
 
 bool QCefView::browserIsLoading()
 {
 	if (pImpl_)
-	{
 		return pImpl_->browserIsLoading();
-	}
+
 	return false;
 }
 
 void QCefView::browserReload()
 {
 	if (pImpl_)
-	{
 		pImpl_->browserReload();
-	}
 }
 
 void QCefView::browserStopLoad()
 {
 	if (pImpl_)
-	{
 		pImpl_->browserStopLoad();
-	}
 }
 
 bool QCefView::triggerEvent(int frameId, const QString& name, const QCefEvent& event)
 {
 	if(pImpl_)
-	{
 		return pImpl_->triggerEvent(frameId, name, event);
-	}
+
 	return false;
 }
 
 bool QCefView::broadcastEvent(const QString& name, const QCefEvent& event)
 {
 	if (pImpl_)
-	{
 		return pImpl_->broadcastEvent(name, event);
-	}
+
 	return false;
 }
 
 bool QCefView::responseQCefQuery(const QCefQuery& query)
 {
 	if (pImpl_)
-	{
 		return pImpl_->responseQCefQuery(query);
-	}
+
 	return false;
 }
 
-void QCefView::notifyMoveOrResizeStarted()
+void QCefView::changeEvent(QEvent * event)
 {
-	if (pImpl_)
+	if (QEvent::ParentAboutToChange == event->type())
 	{
-		pImpl_->notifyMoveOrResizeStarted();
+		if (this->window())
+			this->window()->removeEventFilter(this);
 	}
+	else if (QEvent::ParentChange == event->type())
+	{
+		if (this->window())
+			this->window()->installEventFilter(this);
+	}
+	QWidget::changeEvent(event);
+}
+
+bool QCefView::eventFilter(QObject *watched, QEvent *event)
+{
+	if (pImpl_ && watched == this->window())
+	{
+		if (QEvent::Resize == event->type() || QEvent::Move == event->type())
+			pImpl_->onToplevelWidgetMoveOrResize();
+	}
+	return QWidget::eventFilter(watched, event);
 }
 
 void QCefView::onLoadingStateChanged(bool isLoading, bool canGoBack, bool canGoForward)

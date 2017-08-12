@@ -38,21 +38,13 @@ bool QCefClient::V8Handler::Execute(const CefString& function,
 	CefString& exception)
 {
 	if (function == QCEF_INVOKEMETHOD)
-	{
 		ExecuteInvokeMethod(function, object, arguments, retval, exception);
-	}
 	else if (function == QCEF_ADDEVENTLISTENER)
-	{
 		ExecuteAddEventListener(function, object, arguments, retval, exception);
-	}
 	else if (function == QCEF_REMOVEEVENTLISTENER)
-	{
 		ExecuteRemoveEventListener(function, object, arguments, retval, exception);
-	}
 	else
-	{
 		return false;
-	}
 
 	return true;
 }
@@ -76,36 +68,21 @@ void QCefClient::V8Handler::ExecuteInvokeMethod(const CefString& function,
 	for (std::size_t i = 0; i < arguments.size(); i++)
 	{
 		if (arguments[i]->IsBool())
-		{
-			args->SetBool(idx++,
-				arguments[i]->GetBoolValue());
-		}
+			args->SetBool(idx++, arguments[i]->GetBoolValue());
 		else if (arguments[i]->IsInt())
-		{
-			args->SetInt(idx++,
-				arguments[i]->GetIntValue());
-		}
+			args->SetInt(idx++, arguments[i]->GetIntValue());
 		else if (arguments[i]->IsDouble())
-		{
-			args->SetDouble(idx++,
-				arguments[i]->GetDoubleValue());
-		}
+			args->SetDouble(idx++, arguments[i]->GetDoubleValue());
 		else if (arguments[i]->IsString())
-		{
-			args->SetString(idx++,
-				arguments[i]->GetStringValue());
-		}
+			args->SetString(idx++, arguments[i]->GetStringValue());
 		else
-		{
 			args->SetNull(idx++);
-		}
 	}
 
 	bool bRet = false;
 	if (browser_)
-	{	
 		bRet = browser_->SendProcessMessage(PID_BROWSER, msg);
-	}
+
 	retval = CefV8Value::CreateBool(bRet);
 }
 
@@ -150,26 +127,18 @@ void QCefClient::V8Handler::ExecuteAddEventListener(const CefString& function,
 					}
 
 					if (!found)
-					{
 						eventListenerList.push_back(listener);
-					}
 				}
 				bRet = true;
 			}
 			else
-			{
 				exception = "Invalid parameters; parameter 2 is expecting a function";
-			}
 		}
 		else
-		{
 			exception = "Invalid parameters; parameter 1 is expecting a string";
-		}
 	}
 	else
-	{
 		exception = "Invalid parameters; expecting 2 parameters";
-	}
 
 	retval = CefV8Value::CreateBool(bRet);
 }
@@ -202,26 +171,18 @@ void QCefClient::V8Handler::ExecuteRemoveEventListener(const CefString& function
 						itListener ++)
 					{
 						if (itListener->callback_->IsSame(listener.callback_))
-						{
 							eventListenerList.erase(itListener);
-						}
 					}
 				}
 			}
 			else
-			{
 				exception = "Invalid parameters; parameter 2 is expecting a function";
-			}
 		}
 		else
-		{
 			exception = "Invalid parameters; parameter 1 is expecting a string";
-		}
 	}
 	else
-	{
 		exception = "Invalid parameters; expecting 2 parameters";
-	}
 
 	retval = CefV8Value::CreateBool(bRet);
 }
@@ -284,27 +245,15 @@ void QCefClient::ExecuteEventListener(const CefString eventName,
 			{
 				value = dict->GetValue(key);
 				if (VTYPE_BOOL == value->GetType())
-				{
 					v8Value = CefV8Value::CreateBool(value->GetBool());
-				}
 				else if (VTYPE_INT == value->GetType())
-				{
 					v8Value = CefV8Value::CreateInt(value->GetInt());
-
-				}
 				else if (VTYPE_DOUBLE == value->GetType())
-				{
 					v8Value = CefV8Value::CreateDouble(value->GetDouble());
-				}
 				else if (VTYPE_STRING == value->GetType())
-				{
 					v8Value = CefV8Value::CreateString(value->GetString());
-				}
 				else
-				{
-					// unknown type
 					continue;
-				}
 
 				eventObject->SetValue(key, v8Value,
 					V8_PROPERTY_ATTRIBUTE_READONLY);

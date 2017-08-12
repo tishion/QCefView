@@ -66,9 +66,7 @@ void QCefViewRenderApp::OnWebKitInitialized()
 
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end(); ++it)
-	{
 		(*it)->OnWebKitInitialized(this);
-	}
 }
 
 void QCefViewRenderApp::OnBrowserCreated(
@@ -77,9 +75,7 @@ void QCefViewRenderApp::OnBrowserCreated(
 	CEF_REQUIRE_RENDERER_THREAD();
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end(); ++it)
-	{
 		(*it)->OnBrowserCreated(this, browser);
-	}
 }
 
 void QCefViewRenderApp::OnBrowserDestroyed(
@@ -88,9 +84,7 @@ void QCefViewRenderApp::OnBrowserDestroyed(
 	CEF_REQUIRE_RENDERER_THREAD();
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end(); ++it)
-	{
 		(*it)->OnBrowserDestroyed(this, browser);
-	}
 }
 
 CefRefPtr<CefLoadHandler> QCefViewRenderApp::GetLoadHandler()
@@ -98,9 +92,7 @@ CefRefPtr<CefLoadHandler> QCefViewRenderApp::GetLoadHandler()
 	CefRefPtr<CefLoadHandler> load_handler;
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end() && !load_handler.get(); ++it)
-	{
 		load_handler = (*it)->GetLoadHandler(this);
-	}
 
 	return load_handler;
 }
@@ -117,11 +109,8 @@ bool QCefViewRenderApp::OnBeforeNavigation(
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end(); ++it) 
 	{
-		if ((*it)->OnBeforeNavigation(this, browser, frame, request,
-			navigation_type, is_redirect)) 
-		{
+		if ((*it)->OnBeforeNavigation(this, browser, frame, request, navigation_type, is_redirect)) 
 			return true;
-		}
 	}
 
 	return false;
@@ -136,9 +125,7 @@ void QCefViewRenderApp::OnContextCreated(
 
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end(); ++it)
-	{
 		(*it)->OnContextCreated(this, browser, frame, context);
-	}
 }
 
 void QCefViewRenderApp::OnContextReleased(
@@ -149,9 +136,7 @@ void QCefViewRenderApp::OnContextReleased(
 	CEF_REQUIRE_RENDERER_THREAD();
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end(); ++it)
-	{
 		(*it)->OnContextReleased(this, browser, frame, context);
-	}
 }
 
 void QCefViewRenderApp::OnUncaughtException(
@@ -164,11 +149,7 @@ void QCefViewRenderApp::OnUncaughtException(
 	CEF_REQUIRE_RENDERER_THREAD();
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end(); ++it)
-	{
-		(*it)->OnUncaughtException(this, browser, frame, context, exception,
-			stackTrace);
-	}
-
+		(*it)->OnUncaughtException(this, browser, frame, context, exception, stackTrace);
 }
 
 void QCefViewRenderApp::OnFocusedNodeChanged(
@@ -179,9 +160,7 @@ void QCefViewRenderApp::OnFocusedNodeChanged(
 	CEF_REQUIRE_RENDERER_THREAD();
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end(); ++it)
-	{
 		(*it)->OnFocusedNodeChanged(this, browser, frame, node);
-	}
 }
 
 bool QCefViewRenderApp::OnProcessMessageReceived(
@@ -196,10 +175,7 @@ bool QCefViewRenderApp::OnProcessMessageReceived(
 
 	RenderDelegateSet::iterator it = render_delegates_.begin();
 	for (; it != render_delegates_.end() && !handled; ++it)
-	{
-		handled = (*it)->OnProcessMessageReceived(
-			this, browser, source_process, message);
-	}
+		handled = (*it)->OnProcessMessageReceived(this, browser, source_process, message);
 
 	return handled;
 }

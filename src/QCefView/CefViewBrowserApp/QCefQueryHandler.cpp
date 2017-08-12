@@ -32,6 +32,7 @@ bool QCefQueryHandler::OnQuery(CefRefPtr<CefBrowser> browser,
 
 		return true;
 	}
+
 	return false;
 }
 
@@ -42,9 +43,8 @@ void QCefQueryHandler::OnQueryCanceled(CefRefPtr<CefBrowser> browser,
 	mtxCallbackMap_.lock();
 	auto it = mapCallback_.find(query_id);
 	if (it != mapCallback_.end())
-	{
 		mapCallback_.erase(it);
-	}
+
 	mtxCallbackMap_.unlock();
 }
 
@@ -62,18 +62,12 @@ bool QCefQueryHandler::Response(int64_t query,
 	mtxCallbackMap_.unlock();
 
 	if (!cb)
-	{
 		return false;
-	}
 
 	if (success)
-	{
 		cb->Success(response);
-	}
 	else
-	{
 		cb->Failure(error, response);
-	}
 
 	return true;
 }

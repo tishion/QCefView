@@ -30,7 +30,7 @@ void QCefViewBrowserApp::OnBeforeCommandLineProcessing(
 	command_line->AppendSwitch("disable-pdf-extension");
 	command_line->AppendSwitch("enable-direct-write");
 	command_line->AppendSwitch("allow-file-access-from-files");
-	command_line->AppendSwitchWithValue ("renderer-process-limit", "1");
+	command_line->AppendSwitchWithValue("renderer-process-limit", "1");
 }
 
 void QCefViewBrowserApp::OnRegisterCustomSchemes(
@@ -65,9 +65,7 @@ void QCefViewBrowserApp::OnContextInitialized()
 
 	BrowserDelegateSet::iterator it = browser_delegates_.begin();
 	for (; it != browser_delegates_.end(); ++it)
-	{
 		(*it)->OnContextInitialized(this);
-	}
 }
 
 void QCefViewBrowserApp::OnBeforeChildProcessLaunch(
@@ -75,9 +73,7 @@ void QCefViewBrowserApp::OnBeforeChildProcessLaunch(
 {
 	BrowserDelegateSet::iterator it = browser_delegates_.begin();
 	for (; it != browser_delegates_.end(); ++it)
-	{
 		(*it)->OnBeforeChildProcessLaunch(this, command_line);
-	}
 }
 
 void QCefViewBrowserApp::OnRenderProcessThreadCreated(
@@ -86,8 +82,6 @@ void QCefViewBrowserApp::OnRenderProcessThreadCreated(
 	CEF_REQUIRE_IO_THREAD();
 	BrowserDelegateSet::iterator it = browser_delegates_.begin();
 	for (; it != browser_delegates_.end(); ++it)
-	{
 		(*it)->OnRenderProcessThreadCreated(this, extra_info);
-	}
 }
 

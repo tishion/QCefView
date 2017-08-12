@@ -21,11 +21,10 @@ int APIENTRY _tWinMain(
 	CefRefPtr<QCefViewRenderApp> app(new QCefViewRenderApp);
 	CefMainArgs main_args(hInstance);
 	void* sandboxInfo = nullptr;
-	int exit_code = CefExecuteProcess(
-		main_args, app.get(), sandboxInfo);
+	int exit_code = CefExecuteProcess(main_args, app.get(), sandboxInfo);
+	
 	if (exit_code >= 0)
-	{
 		return exit_code;
-	}
+	
 	return 0;
 }

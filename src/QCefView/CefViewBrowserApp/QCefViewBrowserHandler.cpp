@@ -37,16 +37,11 @@ bool QCefViewBrowserHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> brow
 	CefRefPtr<CefProcessMessage> message)
 {
 	CEF_REQUIRE_UI_THREAD();
-	if (message_router_->OnProcessMessageReceived(
-		browser, source_process, message))
-	{
+	if (message_router_->OnProcessMessageReceived(browser, source_process, message))
 		return true;
-	}
 
 	if (DispatchNotifyRequest(browser, source_process, message))
-	{
 		return true;
-	}
 
 	return false;
 }
@@ -105,15 +100,13 @@ bool QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 {
 	CEF_REQUIRE_UI_THREAD();
 	if (source.empty() || message.empty())
-	{
 		return false;
-	}
+
 	std::string src = source.ToString();
 	std::size_t found = src.find_last_of("/\\");
 	if (found != std::string::npos && found < src.length() - 1)
-	{
 		src = src.substr(found + 1);
-	}
+
 	__noop(src, message.ToString());
 	return false;
 }
@@ -267,10 +260,8 @@ bool QCefViewBrowserHandler::DoClose(CefRefPtr<CefBrowser> browser)
 	// documentation in the CEF header for a detailed description of this
 	// process.
 	if (GetBrowserId() == browser->GetIdentifier())
-	{
 		// Set a flag to indicate that the window close should be allowed.
 		is_closing_ = true;
-	}
 
 	// Allow the close. For windowed browsers this will result in the OS close
 	// event being sent.
@@ -323,9 +314,7 @@ void QCefViewBrowserHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 {
 	CEF_REQUIRE_UI_THREAD();
 	if (pQCefWindow_)
-	{
 		pQCefWindow_->loadingStateChanged(isLoading, canGoBack, canGoForward);
-	}
 }
 
 void QCefViewBrowserHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
@@ -344,9 +333,7 @@ void QCefViewBrowserHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 {
 	CEF_REQUIRE_UI_THREAD();
 	if (pQCefWindow_)
-	{
 		pQCefWindow_->loadEnd(httpStatusCode);
-	}
 }
 
 void QCefViewBrowserHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
@@ -357,9 +344,7 @@ void QCefViewBrowserHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
 {
 	CEF_REQUIRE_UI_THREAD();
 	if (errorCode == ERR_ABORTED)
-	{
 		return;
-	}
 
 	QString msg = QString::fromStdString(errorText.ToString());
 	QString url = QString::fromStdString(failedUrl.ToString());
@@ -374,9 +359,7 @@ void QCefViewBrowserHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
 
 	frame->LoadString(content.toStdString(), failedUrl);
 	if (pQCefWindow_)
-	{
 		pQCefWindow_->loadError(errorCode, msg, url);
-	}
 }
 
 bool QCefViewBrowserHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
@@ -463,10 +446,8 @@ void QCefViewBrowserHandler::CloseAllBrowsers(bool force_close)
 	CloseAllPopupBrowsers(force_close);
 
 	if (main_browser_.get())
-	{
 		// Request that the main browser close.
 		main_browser_->GetHost()->CloseBrowser(force_close);
-	}
 }
 
 void QCefViewBrowserHandler::CloseAllPopupBrowsers(bool force_close)
@@ -483,9 +464,7 @@ void QCefViewBrowserHandler::CloseAllPopupBrowsers(bool force_close)
 	{
 		for (auto it = popup_browser_list_.begin();
 		it != popup_browser_list_.end(); ++it)
-		{
 			(*it)->GetHost()->CloseBrowser(force_close);
-		}
 	}
 }
 
@@ -497,15 +476,11 @@ bool QCefViewBrowserHandler::IsClosing() const
 bool QCefViewBrowserHandler::TriggerEvent(const CefRefPtr<CefProcessMessage> msg)
 {
 	if (msg->GetName().empty())
-	{
 		return false;
-	}
 
 	CefRefPtr<CefBrowser> browser = GetBrowser();
 	if (browser)
-	{
 		return browser->SendProcessMessage(PID_RENDERER, msg);
-	}
 
 	return false;
 }
@@ -514,9 +489,8 @@ bool QCefViewBrowserHandler::ResponseQuery(int64_t query,
 	bool success, const CefString& response, int error)
 {
 	if (cefquery_handler_)
-	{
 		return cefquery_handler_->Response(query, success, response, error);
-	}
+
 	return false;
 }
 
@@ -556,21 +530,14 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 						QString qStr;
 						for (idx; idx < messageArguments->GetSize(); idx++)
 						{
-							if (CefValueType::VTYPE_BOOL == messageArguments->GetType(idx))
-							{
-								arguments.push_back(QVariant::fromValue(
-									messageArguments->GetBool(idx)));
-							}
+							if (CefValueType::VTYPE_NULL == messageArguments->GetType(idx))
+								arguments.push_back(0);
+							else if (CefValueType::VTYPE_BOOL == messageArguments->GetType(idx))
+								arguments.push_back(QVariant::fromValue(messageArguments->GetBool(idx)));
 							else if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
-							{
-								arguments.push_back(QVariant::fromValue(
-									messageArguments->GetInt(idx)));
-							}
+								arguments.push_back(QVariant::fromValue(messageArguments->GetInt(idx)));
 							else if (CefValueType::VTYPE_DOUBLE == messageArguments->GetType(idx))
-							{
-								arguments.push_back(QVariant::fromValue(
-									messageArguments->GetDouble(idx)));
-							}
+								arguments.push_back(QVariant::fromValue(messageArguments->GetDouble(idx)));
 							else if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
 							{
 								#if defined(CEF_STRING_TYPE_UTF16)
@@ -582,15 +549,8 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 								#endif
 								arguments.push_back(qStr);
 							}
-							else if (CefValueType::VTYPE_NULL == messageArguments->GetType(idx))
-							{
-								arguments.push_back(0);
-							}
 							else
-							{
-								// do log
 								__noop(_T("QCefView"), _T("Unknown Type!"));
-							}
 						}
 						pQCefWindow_->invokeMethodNotify(browserId, frameId, method, arguments);
 						return true;

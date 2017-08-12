@@ -23,9 +23,7 @@ void CCefManager::initializeCef()
 {
 	// This is not the first time initialization
 	if (++nBrowserRefCount_ > 1)
-	{
 		return;
-	}
 
 	// This is the first time initialization
 	CCefSetting::initializeInstance();
@@ -44,7 +42,7 @@ void CCefManager::initializeCef()
 
 #ifndef NDEBUG
 	cef_settings_.log_severity = LOGSEVERITY_DEFAULT;
-	cef_settings_.remote_debugging_port = 8080;
+	cef_settings_.remote_debugging_port = 7777;
 #else
 	cef_settings_.log_severity = LOGSEVERITY_DISABLE;
 #endif
@@ -57,19 +55,14 @@ void CCefManager::initializeCef()
 	// Initialize CEF.
 	void* sandboxInfo = nullptr;
 	if (CefInitialize(main_args, cef_settings_, app_.get(), sandboxInfo))
-	{
-		// log
 		__noop(_T("CefManager"), _T("Failed at CefInitialize"));
-	}
 }
 
 void CCefManager::uninitializeCef()
 {
 	// This is not the last time release
 	if (--nBrowserRefCount_ > 0)
-	{
 		return;
-	}
 
 	// The last time release 
 	releaseCef();

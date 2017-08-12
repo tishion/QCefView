@@ -153,7 +153,16 @@ protected:
 	/// <summary>
 	/// 
 	/// </summary>
-	void notifyMoveOrResizeStarted();
+	/// <param name="event"></param>
+	virtual void changeEvent(QEvent * event) override;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="watched"></param>
+	/// <param name="event"></param>
+	/// <returns></returns>
+	virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected slots:
 	/// <summary>
