@@ -86,9 +86,9 @@ Web Side:
     Sample: 
     ```javascript
     QCefClient.addEventListener(
-    "colorChange",                      // Event name
-    function onColorChanged (event) {   // Event handler callback
-        document.getElementById("main").style.backgroundColor = event["color"];
+        "colorChange",                      // Event name
+        function onColorChanged (event) {   // Event handler callback
+            document.getElementById("main").style.backgroundColor = event["color"];
     });
     ```
     
@@ -96,7 +96,8 @@ Web Side:
         
     Sample: 
     ```javascript
-    QCefClient.removeEventListener("colorChange", onColorChanged); // onColorChanged is not an anonymous function
+    QCefClient.removeEventListener("colorChange", onColorChanged);
+    // onColorChanged is not an anonymous function
     ```
 ---
 
