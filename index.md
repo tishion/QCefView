@@ -50,115 +50,22 @@ There is one test demo project in the QCefView Solution
 
 ---------
 
-Document
+Document 
 ---------
 
-- Qt Side:
----
+Please refer to the soruce code.
 
----
-- QCefView Class
+Qt Side
+----
+- [QCefEvent](https://github.com/tishion/QCefView/blob/master/src/QCefView/inc/QCefEvent.h)
 
-    Consturtors: 
-    > QCefView(const QString url, QWidget* parent = 0)
-    >
-    > url:
-    >
-    > parent:
-        
-    Methods:
-    > void navigateToString(const QString& content, const QString& url)
-    >
-    > void navigateToUrl(const QString& url)
-    >
-    > bool browserCanGoBack()
-    >
-    > bool browserCanGoForward()
-    >
-    > void browserGoBack()
-    >
-    > void browserGoForward()
-    >
-    > bool browserIsLoading()
-    >
-    > void browserReload()
-    >
-    > void browserStopLoad()
-    >
-    > bool triggerEvent(int frameId, const QString& name, const QCefEvent& event)
-    >
-    > bool broadcastEvent(const QString& name, const QCefEvent& event)
-    >
-    > virtual void onLoadStateChange(bool isLoading)
-    >	
-    > virtual void onLoadStart()
-    >	
-    > virtual void onLoadEnd(int httpStatusCode)
-    >	
-    > virtual void onLoadError(int errorCode, const QString& errorMsg, const QString& failedUrl)
-    >
-    > WId getCefWinId()
-        
-    Slots:
-    > virtual void processQCefUrlRequest(const QString& url);
-    >	
-    > virtual void processQCefQueryRequest(QCefQuery query);
-    >
-    > virtual void onInvokeMethodNotify(int browserId, int frameId,const QString method, const QVariantList arguments);
-
----
-- QCefSettings Class
-
-    > void setBrowserSubProcessPath(const QString& path)
-    >
-    > const QString browserSubProcessPath()
-    > 
-    > void setResourceDirectoryPath(const QString& path)
-    >
-    > const QString resourceDirectoryPath()
-    > 
-    > void setLocalesDirectoryPath(const QString& path)
-    >
-    > const QString localesDirectoryPath()
-    > 
-    > void setUserAgent(const QString& agent)
-    >
-    > const QString userAgent()
-    
----
-- QCefQuery Class
-
-    Methods: 
-    > const QString reqeust() const
-    > 
-    > void responseSuccess(const QString& response) const
-    > 
-    > void responseFailure(int ec, const QString& response) const
-    > 
-    > QCefQuery& operator=(const QCefQuery& other)
-    
----
-- QCefEvent Class
-
-    Constuctors:
-    > QCefEvent();
-    >
-    > QCefEvent(const char* name);
-    > 
-    Methods:
-    > void setEventName(const char* name);
-    > 
-    > void setIntProperty(const char* key, int value);
-    > 
-    > void setDoubleProperty(const char*  key, double value);
-    > 
-    > void setStringProperty(const char*  key, QString value);
-    > 
-    > void setBoolProperty(const char*  key, bool value);
-
-
----
-
+- [QCefQuery](https://github.com/tishion/QCefView/blob/master/src/QCefView/inc/QCefQuery.h) 
+ 
+- [QCefSettings](https://github.com/tishion/QCefView/blob/master/src/QCefView/inc/QCefSetting.h)
+ 
+- [QCefView](https://github.com/tishion/QCefView/blob/master/src/QCefView/inc/QCefView.h) 
+ 
+ 
 Web Side:
 ---
 
@@ -166,26 +73,67 @@ Web Side:
 - QCefClient Object
 
     Methods:
-    > invokeMethod(name, args, ...)
-    >
-    > addEventListener(name, listener)
-    >
-    > removeEventListener(name, listener)
- 
----
     
+    > invokeMethod(name, args, ...)
+    
+    Sample: 
+    ```javascript
+    QCefClient.invokeMethod("TestMethod", 1, false, "arg3");
+    ```
+    
+    > addEventListener(name, listener)
+    
+    Sample: 
+    ```javascript
+    QCefClient.addEventListener(
+    "colorChange",                      // Event name
+    function onColorChanged (event) {   // Event handler callback
+        document.getElementById("main").style.backgroundColor = event["color"];
+    });
+    ```
+    
+    > removeEventListener(name, listener)
+        
+    Sample: 
+    ```javascript
+    QCefClient.removeEventListener("colorChange", onColorChanged); // onColorChanged is not an anonymous function
+    ```
+---
 
 - QCef Query
 
     Functions:
+    
     > QCefQuery
-    >
+    
     > QCefQueryCancel
-
+    
+    Sample:
+    ```javascript
+    var queryId = window.QCefQuery({
+        request: "Hello, this message is sent from javascript code.",
+        onSuccess: function(response) {
+            alert(response);
+        },
+        onFailure: function(error_code, error_message) {
+            alert(error_message);
+        }
+    });
+    
+    //
+    
+    window.QCefQueryCancel(queryId);
+    ```
 ---
   
 - QCef Url Request
 
     Protocol:
+    
     > qcef://xxxxxx
+    
+    Sampe:
+    ```html
+    <a href="qcef://test/a/b">qcef://test/a/b</a>
+    ```
 ---
