@@ -1,4 +1,3 @@
-:
 Quick Start with Qt+Cef
 ======
 
@@ -9,8 +8,8 @@ How to change the CEF version
 ======
 
 1. download cef binary distribution from:
-~~~https://cefbuilds.com~~~ 
-http://opensource.spotify.com/cefbuilds/index.html
+- ~~~https://cefbuilds.com~~~ 
+- http://opensource.spotify.com/cefbuilds/index.html
 
 2. build libcef_dll_wrapper.lib with your platform toolset, remember to use the same configuration of Runtime Library wiht the Qt SDK you are using (Project Properties > C/C++ > Code Generation > Runtime Library)
 
