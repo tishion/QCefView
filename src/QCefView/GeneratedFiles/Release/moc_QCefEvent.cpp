@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'QCefEvent.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -13,7 +13,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'QCefEvent.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.0. It"
+#error "This file was generated using the moc from 5.6.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -63,7 +63,7 @@ void QCefEvent::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
 
 const QMetaObject QCefEvent::staticMetaObject = {
     { &QObject::staticMetaObject, qt_meta_stringdata_QCefEvent.data,
-      qt_meta_data_QCefEvent,  qt_static_metacall, Q_nullptrPTR, Q_nullptrPTR}
+      qt_meta_data_QCefEvent,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
 };
 
 
@@ -74,7 +74,7 @@ const QMetaObject *QCefEvent::metaObject() const
 
 void *QCefEvent::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_nullptrPTR;
+    if (!_clname) return Q_NULLPTR;
     if (!strcmp(_clname, qt_meta_stringdata_QCefEvent.stringdata0))
         return static_cast<void*>(const_cast< QCefEvent*>(this));
     return QObject::qt_metacast(_clname);
