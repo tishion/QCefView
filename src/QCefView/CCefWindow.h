@@ -3,6 +3,7 @@
 #pragma region qt_headers
 #include <QWindow>
 #include <QPointer>
+#include <QVariant>
 #pragma endregion qt_headers
 
 #pragma region cef_headers
