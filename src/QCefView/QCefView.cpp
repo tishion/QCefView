@@ -119,7 +119,7 @@ public:
 	void browserGoForward()
 	{
 		if (pQCefViewHandler_)
-			pQCefViewHandler_->GetBrowser()->CanGoForward();
+			pQCefViewHandler_->GetBrowser()->GoForward();
 	}
 
 	bool browserIsLoading()
