@@ -270,7 +270,7 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 	connect(pImpl_->cefWindow(), SIGNAL(loadStart()),
 		this, SLOT(onLoadStart()));
 
-	connect(pImpl_->cefWindow(), SIGNAL(loadEnd()),
+	connect(pImpl_->cefWindow(), SIGNAL(loadEnd(int)),
 		this, SLOT(onLoadEnd(int)));
 	
 	connect(pImpl_->cefWindow(), SIGNAL(loadError(int, const QString&, const QString&)),
