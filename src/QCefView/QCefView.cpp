@@ -285,7 +285,7 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 	connect(pImpl_->cefWindow(), SIGNAL(invokeMethodNotify(int, int, const QString&, const QVariantList&)),
 		this, SLOT(onInvokeMethodNotify(int, int, const QString&, const QVariantList&)));
 }
-
+	 
 QCefView::~QCefView()
 {
 	disconnect();

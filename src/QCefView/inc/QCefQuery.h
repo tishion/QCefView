@@ -2,9 +2,9 @@
 #define QCEFQUERY_H
 #pragma once
 
-#pragma region cpp_headers
+#pragma region std_headers
 #include <cstdint>
-#pragma endregion cpp_headers
+#pragma endregion std_headers
 
 #pragma region qt_headers
 #include <QtCore/qglobal.h>

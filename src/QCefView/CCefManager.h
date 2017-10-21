@@ -1,8 +1,8 @@
 #pragma once
 
-#pragma region stl_headers
+#pragma region std_headers
 #include <mutex>
-#pragma endregion stl_headers
+#pragma endregion std_headers
 
 #pragma region qt_headers
 #include <QObject>

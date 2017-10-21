@@ -2,14 +2,14 @@
 #define QCEFVIEWHANDLER_H_
 #pragma once
 
-#pragma region stl_headers
+#pragma region std_headers
 #include <list>
 #include <map>
 #include <set>
 #include <string>
 #include <mutex>
 #include <QPointer>
-#pragma endregion stl_headers
+#pragma endregion std_headers
 
 #pragma region cef_headers
 #include <include/cef_client.h>

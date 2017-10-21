@@ -2,9 +2,9 @@
 #define QCEFVIEW_H
 #pragma once
 
-#pragma region stl_headers
+#pragma region std_headers
 #include <memory>
-#pragma endregion stl_headers
+#pragma endregion std_headers
 
 #pragma region qt_headers
 #include <QtCore/qglobal.h>

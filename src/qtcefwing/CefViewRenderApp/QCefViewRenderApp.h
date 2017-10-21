@@ -2,9 +2,9 @@
 #define QCEFVIEWRENDERAPP_H_
 #pragma once
 
-#pragma region stl_headers
+#pragma region std_headers
 #include <set>
-#pragma endregion stl_headers
+#pragma endregion std_headers
 
 #pragma region cef_headers
 #include <include/cef_app.h>

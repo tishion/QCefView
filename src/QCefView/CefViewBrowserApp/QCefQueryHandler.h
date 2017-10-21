@@ -1,8 +1,8 @@
 #pragma once
-#pragma region stl_headers
+#pragma region std_headers
 #include <map>
 #include <mutex>
-#pragma endregion stl_headers
+#pragma endregion std_headers
 
 #pragma region cef_headers
 #include <include/cef_base.h>

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-#pragma region stl_headers
+#pragma region std_headers
 #include <string>
-#pragma endregion stl_headers
+#pragma endregion std_headers
 
 #pragma region cef_headers
 #include <include/wrapper/cef_helpers.h>
