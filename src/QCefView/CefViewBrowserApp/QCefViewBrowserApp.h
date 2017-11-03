@@ -19,7 +19,7 @@ public:
 	~QCefViewBrowserApp();
 
 	class BrowserDelegate
-		: public virtual CefBase 
+		: public virtual CefBaseRefCounted 
 	{
 	public:
 		virtual void OnContextInitialized(CefRefPtr<QCefViewBrowserApp> app) {}
@@ -43,7 +43,7 @@ private:
 	static void RegisterCustomSchemesHandlerFactories();
 
 	// Registers custom schemes. Implemented in client_app_delegates.
-	static void RegisterCustomSchemes(CefRefPtr<CefSchemeRegistrar> registrar);
+	static void RegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar);
 
 	//////////////////////////////////////////////////////////////////////////
 	// CefApp methods:
@@ -52,7 +52,7 @@ private:
 		CefRefPtr<CefCommandLine> command_line);
 
 	virtual void OnRegisterCustomSchemes(
-		CefRefPtr<CefSchemeRegistrar> registrar);
+		CefRawPtr<CefSchemeRegistrar> registrar);
 
 	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler();
 

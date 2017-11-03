@@ -26,7 +26,7 @@ void QCefViewBrowserApp::RegisterCustomSchemesHandlerFactories()
 	QCefViewDefaultSchemeHandler::RegisterSchemeHandlerFactory();
 }
 
-void QCefViewBrowserApp::RegisterCustomSchemes(CefRefPtr<CefSchemeRegistrar> registrar)
+void QCefViewBrowserApp::RegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 {
 	QCefViewDefaultSchemeHandler::RegisterScheme(registrar);
 }

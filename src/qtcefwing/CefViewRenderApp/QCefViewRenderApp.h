@@ -32,7 +32,7 @@ public:
 	/// 
 	/// </summary>
 	class RenderDelegate 
-		: public virtual CefBase 
+		: public virtual CefBaseRefCounted
 	{
 	public:
 		/// <summary>
@@ -199,7 +199,7 @@ private:
 	/// </summary>
 	/// <param name="registrar"></param>
 	virtual void OnRegisterCustomSchemes(
-		CefRefPtr<CefSchemeRegistrar> registrar);
+		CefRawPtr<CefSchemeRegistrar> registrar);
 
 	/// <summary>
 	/// 
