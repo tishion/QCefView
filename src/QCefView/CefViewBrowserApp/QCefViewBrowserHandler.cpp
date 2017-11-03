@@ -7,7 +7,7 @@
 
 #pragma region cef_headers
 #include <include/cef_app.h>
-#include <include/cef_runnable.h>
+#include <include/wrapper/cef_closure_task.h>
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
 
@@ -247,7 +247,7 @@ void QCefViewBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 		// Give focus to the popup browser. Perform asynchronously because the
 		// parent window may attempt to keep focus after launching the popup.
 		CefPostTask(TID_UI,
-			NewCefRunnableMethod(browser->GetHost().get(), &CefBrowserHost::SetFocus, true));
+			CefCreateClosureTask(base::Bind(&CefBrowserHost::SetFocus, browser->GetHost().get(), true)));
 	}
 	browser_count_++;
 }
@@ -439,7 +439,7 @@ void QCefViewBrowserHandler::CloseAllBrowsers(bool force_close)
 	{
 		// Execute on the UI thread.
 		CefPostTask(TID_UI,
-			NewCefRunnableMethod(this, &QCefViewBrowserHandler::CloseAllBrowsers, force_close));
+			CefCreateClosureTask(base::Bind(&QCefViewBrowserHandler::CloseAllBrowsers, this, force_close)));
 		return;
 	}
 
@@ -456,7 +456,7 @@ void QCefViewBrowserHandler::CloseAllPopupBrowsers(bool force_close)
 	{
 		// Execute on the UI thread.
 		CefPostTask(TID_UI,
-			NewCefRunnableMethod(this, &QCefViewBrowserHandler::CloseAllPopupBrowsers, force_close));
+			CefCreateClosureTask(base::Bind(&QCefViewBrowserHandler::CloseAllPopupBrowsers, this, force_close)));
 		return;
 	}
 
