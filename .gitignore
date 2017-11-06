@@ -1,3 +1,21 @@
+# Visual Studio files
 /src/QCefView/*.user
 /src/qtcefwing/*.user
 /test/src/QCefViewTest/*.user
+.vs/*
+
+# Dependencies (may be updated independently)
+dep/*
+
+# Build products
+output/*
+temp/*
+QCefViewSDK/*
+
+# x64-specific build products
+x64/*
+test/src/QCefViewTest/x64/*
+
+# Qt-generated files
+src/QCefView/GeneratedFiles/*
+test/src/QCefViewTest/GeneratedFiles/*
