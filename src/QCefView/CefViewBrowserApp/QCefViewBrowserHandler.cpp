@@ -66,18 +66,6 @@ bool QCefViewBrowserHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
 	return false;
 }
 
-//bool QCefViewHandler::OnFileDialog(CefRefPtr<CefBrowser> browser, 
-//	FileDialogMode mode, 
-//	const CefString& title, 
-//	const CefString& default_file_name, 
-//	const std::vector<CefString>& accept_types, 
-//	CefRefPtr<CefFileDialogCallback> callback)
-//{
-//	CEF_REQUIRE_UI_THREAD();
-//
-//	return false;
-//}
-
 void QCefViewBrowserHandler::OnAddressChange(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	const CefString& url)
@@ -111,24 +99,6 @@ bool QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 	return false;
 }
 
-//void QCefViewHandler::OnBeforeDownload(CefRefPtr<CefBrowser> browser, 
-//	CefRefPtr<CefDownloadItem> download_item, 
-//	const CefString& suggested_name, 
-//	CefRefPtr<CefBeforeDownloadCallback> cal
-//	CEF_REQUIRE_UI_THREAD();lback)
-//{
-//	CEF_REQUIRE_UI_THREAD();
-//
-//}
-
-//void QCefViewHandler::OnDownloadUpdated(CefRefPtr<CefBrowser> browser, 
-//	CefRefPtr<CefDownloadItem> download_item, 
-//	CefRefPtr<CefDownloadItemCallback> callback)
-//{
-//	CEF_REQUIRE_UI_THREAD();
-//
-//}
-
 bool QCefViewBrowserHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefDragData> dragData,
 	CefDragHandler::DragOperationsMask mask)
@@ -137,16 +107,6 @@ bool QCefViewBrowserHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
 
 	return true;
 }
-
-//bool QCefViewHandler::OnRequestGeolocationPermission(CefRefPtr<CefBrowser> browser, 
-//	const CefString& requesting_url, 
-//	int request_id, 
-//	CefRefPtr<CefGeolocationCallback> callback)
-//{
-//	CEF_REQUIRE_UI_THREAD();
-//
-//	return false;
-//}
 
 bool QCefViewBrowserHandler::OnJSDialog(CefRefPtr<CefBrowser> browser,
 	const CefString& origin_url,
@@ -562,5 +522,3 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 
 	return false;
 }
-
-

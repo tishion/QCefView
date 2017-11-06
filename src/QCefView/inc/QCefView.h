@@ -46,6 +46,14 @@
  **
  **/
 
+class CefContextMenuHandler;
+class CefDialogHandler;
+class CefDisplayHandler;
+class CefDownloadHandler;
+class CefGeolocationHandler;
+class CefJSDialogHandler;
+class CefKeyboardHandler;
+
 /// <summary>
 /// 
 /// </summary>
@@ -148,6 +156,48 @@ public:
 	/// <param name="query"></param>
 	/// <returns></returns>
 	bool responseQCefQuery(const QCefQuery& query);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="handler"></param>
+	void setContextMenuHandler(CefContextMenuHandler* handler);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="handler"></param>
+	void setDialogHandler(CefDialogHandler* handler);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="handler"></param>
+	void setDisplayHandler(CefDisplayHandler* handler);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="handler"></param>
+	void setDownloadHandler(CefDownloadHandler* handler);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="handler"></param>
+	void setGeolocationHandler(CefGeolocationHandler* handler);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="handler"></param>
+	void setJSDialogHandler(CefJSDialogHandler* handler);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="handler"></param>
+	void setKeyboardHandler(CefKeyboardHandler* handler);
 
 protected:
 	/// <summary>
