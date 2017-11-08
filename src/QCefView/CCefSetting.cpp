@@ -13,6 +13,22 @@ CefString CCefSetting::locales_directory_path;
 
 CefString CCefSetting::user_agent;
 
+CefString CCefSetting::cache_path;
+
+CefString CCefSetting::user_data_path;
+
+int CCefSetting::persist_session_cookies;
+
+int CCefSetting::persist_user_preferences;
+
+CefString CCefSetting::locale;
+
+int CCefSetting::remote_debugging_port;
+
+cef_color_t CCefSetting::background_color;
+
+CefString CCefSetting::accept_language_list;
+
 void CCefSetting::initializeInstance()
 {
 	static CCefSetting s_instance;

@@ -46,5 +46,45 @@ public:
 	/// 
 	/// </summary>
 	static CefString user_agent;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	static CefString cache_path;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	static CefString user_data_path;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	static int persist_session_cookies;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	static int persist_user_preferences;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	static CefString locale;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	static int remote_debugging_port;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	static cef_color_t background_color;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	static CefString accept_language_list;
 };
 

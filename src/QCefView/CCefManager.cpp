@@ -38,6 +38,20 @@ void CCefManager::initializeCef()
 	::CefString(&cef_settings_.user_agent)
 		= CCefSetting::user_agent;
 
+	CefString(&cef_settings_.cache_path)
+		= CCefSetting::cache_path;
+	CefString(&cef_settings_.user_data_path)
+		= CCefSetting::user_data_path;
+	CefString(&cef_settings_.locale)
+		= CCefSetting::locale;
+	CefString(&cef_settings_.accept_language_list)
+		= CCefSetting::accept_language_list;
+
+	cef_settings_.persist_session_cookies = CCefSetting::persist_session_cookies;
+	cef_settings_.persist_user_preferences = CCefSetting::persist_user_preferences;
+	cef_settings_.remote_debugging_port = CCefSetting::remote_debugging_port;
+	cef_settings_.background_color = CCefSetting::background_color;
+
 	cef_settings_.multi_threaded_message_loop = TRUE;
 
 #ifndef NDEBUG
