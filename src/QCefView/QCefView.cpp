@@ -49,7 +49,7 @@ public:
 			browserSettings,			// settings
 			CefRequestContext::GetGlobalContext()))
 		{
-			QLOG(QStringLiteral("Failed to create browser."));
+			throw std::exception("Failed to create browser.");
 		}
 	}
 
