@@ -1,4 +1,4 @@
-Quick Start with Qt+Cef
+Quick Start with Qt+Cef https://tishion.github.io/QCefView 
 ======
 
 checkout the repo and build the solution, you will get QCefView SDK, and then you can deploy it into your development environment.
