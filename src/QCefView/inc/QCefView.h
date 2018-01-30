@@ -74,6 +74,11 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
+	QCefView(QWidget* parent = 0);
+
+	/// <summary>
+	/// 
+	/// </summary>
 	~QCefView();
 
 	/// <summary>
