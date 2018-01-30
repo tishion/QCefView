@@ -18,6 +18,8 @@ int APIENTRY _tWinMain(
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
+	CefEnableHighDPISupport();
+
 	CefRefPtr<QCefViewRenderApp> app(new QCefViewRenderApp);
 	CefMainArgs main_args(hInstance);
 	void* sandboxInfo = nullptr;
