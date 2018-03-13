@@ -7,7 +7,7 @@
 
 #pragma region cef_headers
 #include <include/cef_app.h>
-#include <include/cef_runnable.h>
+#include <include/wrapper/cef_closure_task.h>
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
 
@@ -66,18 +66,6 @@ bool QCefViewBrowserHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
 	return false;
 }
 
-//bool QCefViewHandler::OnFileDialog(CefRefPtr<CefBrowser> browser, 
-//	FileDialogMode mode, 
-//	const CefString& title, 
-//	const CefString& default_file_name, 
-//	const std::vector<CefString>& accept_types, 
-//	CefRefPtr<CefFileDialogCallback> callback)
-//{
-//	CEF_REQUIRE_UI_THREAD();
-//
-//	return false;
-//}
-
 void QCefViewBrowserHandler::OnAddressChange(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	const CefString& url)
@@ -111,24 +99,6 @@ bool QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 	return false;
 }
 
-//void QCefViewHandler::OnBeforeDownload(CefRefPtr<CefBrowser> browser, 
-//	CefRefPtr<CefDownloadItem> download_item, 
-//	const CefString& suggested_name, 
-//	CefRefPtr<CefBeforeDownloadCallback> cal
-//	CEF_REQUIRE_UI_THREAD();lback)
-//{
-//	CEF_REQUIRE_UI_THREAD();
-//
-//}
-
-//void QCefViewHandler::OnDownloadUpdated(CefRefPtr<CefBrowser> browser, 
-//	CefRefPtr<CefDownloadItem> download_item, 
-//	CefRefPtr<CefDownloadItemCallback> callback)
-//{
-//	CEF_REQUIRE_UI_THREAD();
-//
-//}
-
 bool QCefViewBrowserHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefDragData> dragData,
 	CefDragHandler::DragOperationsMask mask)
@@ -137,16 +107,6 @@ bool QCefViewBrowserHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
 
 	return true;
 }
-
-//bool QCefViewHandler::OnRequestGeolocationPermission(CefRefPtr<CefBrowser> browser, 
-//	const CefString& requesting_url, 
-//	int request_id, 
-//	CefRefPtr<CefGeolocationCallback> callback)
-//{
-//	CEF_REQUIRE_UI_THREAD();
-//
-//	return false;
-//}
 
 bool QCefViewBrowserHandler::OnJSDialog(CefRefPtr<CefBrowser> browser,
 	const CefString& origin_url,
@@ -247,7 +207,7 @@ void QCefViewBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 		// Give focus to the popup browser. Perform asynchronously because the
 		// parent window may attempt to keep focus after launching the popup.
 		CefPostTask(TID_UI,
-			NewCefRunnableMethod(browser->GetHost().get(), &CefBrowserHost::SetFocus, true));
+			CefCreateClosureTask(base::Bind(&CefBrowserHost::SetFocus, browser->GetHost().get(), true)));
 	}
 	browser_count_++;
 }
@@ -439,7 +399,7 @@ void QCefViewBrowserHandler::CloseAllBrowsers(bool force_close)
 	{
 		// Execute on the UI thread.
 		CefPostTask(TID_UI,
-			NewCefRunnableMethod(this, &QCefViewBrowserHandler::CloseAllBrowsers, force_close));
+			CefCreateClosureTask(base::Bind(&QCefViewBrowserHandler::CloseAllBrowsers, this, force_close)));
 		return;
 	}
 
@@ -456,7 +416,7 @@ void QCefViewBrowserHandler::CloseAllPopupBrowsers(bool force_close)
 	{
 		// Execute on the UI thread.
 		CefPostTask(TID_UI,
-			NewCefRunnableMethod(this, &QCefViewBrowserHandler::CloseAllPopupBrowsers, force_close));
+			CefCreateClosureTask(base::Bind(&QCefViewBrowserHandler::CloseAllPopupBrowsers, this, force_close)));
 		return;
 	}
 
@@ -562,5 +522,3 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
 
 	return false;
 }
-
-

@@ -110,9 +110,9 @@ namespace QCefViewDefaultSchemeHandler
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool RegisterScheme(CefRefPtr<CefSchemeRegistrar> registrar)
+	bool RegisterScheme(CefRawPtr<CefSchemeRegistrar> registrar)
 	{
-		return registrar->AddCustomScheme(scheme_name, false, false, false);
+		return registrar->AddCustomScheme(scheme_name, false, false, false, false, false, false);
 	}
 
 	bool RegisterSchemeHandlerFactory()

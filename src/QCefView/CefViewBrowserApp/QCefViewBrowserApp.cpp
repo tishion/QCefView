@@ -34,7 +34,7 @@ void QCefViewBrowserApp::OnBeforeCommandLineProcessing(
 }
 
 void QCefViewBrowserApp::OnRegisterCustomSchemes(
-	CefRefPtr<CefSchemeRegistrar> registrar)
+	CefRawPtr<CefSchemeRegistrar> registrar)
 {
 	RegisterCustomSchemes(registrar);
 }

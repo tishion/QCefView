@@ -191,7 +191,7 @@ void QCefClient::V8Handler::ExecuteRemoveEventListener(const CefString& function
 
 QCefClient::QCefClient(CefRefPtr<CefBrowser> browser, 
 	CefRefPtr<CefFrame> frame)
-	: object_(CefV8Value::CreateObject(nullptr))
+	: object_(CefV8Value::CreateObject(nullptr, nullptr))
 	, browser_(browser)
 	, frame_(frame)
 {
@@ -236,7 +236,7 @@ void QCefClient::ExecuteEventListener(const CefString eventName,
 		{
 			listener.context_->Enter();
 
-			CefRefPtr<CefV8Value> eventObject = CefV8Value::CreateObject(nullptr);
+			CefRefPtr<CefV8Value> eventObject = CefV8Value::CreateObject(nullptr, nullptr);
 			CefDictionaryValue::KeyList kyes;
 			dict->GetKeys(kyes);
 			CefRefPtr<CefValue> value;

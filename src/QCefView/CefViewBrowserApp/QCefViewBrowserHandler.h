@@ -22,11 +22,8 @@
 class QCefViewBrowserHandler
 	: public CefClient
 	, public CefContextMenuHandler
-	//, public CefDialogHandler
 	, public CefDisplayHandler
-	//, public CefDownloadHandler
 	, public CefDragHandler
-	//, public CefGeolocationHandler
 	, public CefJSDialogHandler
 	, public CefKeyboardHandler
 	, public CefLifeSpanHandler
@@ -49,35 +46,35 @@ public:
 	// CefClient methods:
 	virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler()
 	{
-		return this;
+		return pContextMenuHandler_ ? pContextMenuHandler_ : this;
 	}
-	//virtual CefRefPtr<CefDialogHandler> GetDialogHandler()
-	//{
-	//	return this;
-	//}
+	virtual CefRefPtr<CefDialogHandler> GetDialogHandler()
+	{
+		return pDialogHandler_;
+	}
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler()
 	{
-		return this;
+		return pDisplayHandler_ ? pDisplayHandler_ : this;
 	}
-	//virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler()
-	//{
-	//	return this;
-	//}
+	virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler()
+	{
+		return pDownloadHandler_;
+	}
 	virtual CefRefPtr<CefDragHandler> GetDragHandler()
 	{
 		return this;
 	}
-	//virtual CefRefPtr<CefGeolocationHandler> GetGeolocationHandler()
-	//{
-	//	return this;
-	//}
+	virtual CefRefPtr<CefGeolocationHandler> GetGeolocationHandler()
+	{
+		return pGeolocationHandler_;
+	}
 	virtual CefRefPtr<CefJSDialogHandler> GetJSDialogHandler()
 	{
-		return this;
+		return pJSDialogHandler_ ? pJSDialogHandler_ : this;
 	}
 	virtual CefRefPtr<CefKeyboardHandler> GetKeyboardHandler()
 	{
-		return this;
+		return pKeyboardHandler_ ? pKeyboardHandler_ : this;
 	}
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler()
 	{
@@ -110,15 +107,6 @@ public:
 		int command_id,
 		EventFlags event_flags);
 
-	// CefDialogHandler methods
-	//virtual bool OnFileDialog(
-	//	CefRefPtr<CefBrowser> browser,
-	//	FileDialogMode mode,
-	//	const CefString& title,
-	//	const CefString& default_file_name,
-	//	const std::vector<CefString>& accept_types,
-	//	CefRefPtr<CefFileDialogCallback> callback);
-
 	// CefDisplayHandler methods
 	virtual void OnAddressChange(
 		CefRefPtr<CefBrowser> browser,
@@ -133,29 +121,11 @@ public:
 		const CefString& source,
 		int line);
 
-	// CefDownloadHandler methods
-	//virtual void OnBeforeDownload(
-	//	CefRefPtr<CefBrowser> browser,
-	//	CefRefPtr<CefDownloadItem> download_item,
-	//	const CefString& suggested_name,
-	//	CefRefPtr<CefBeforeDownloadCallback> callback);
-	//virtual void OnDownloadUpdated(
-	//	CefRefPtr<CefBrowser> browser,
-	//	CefRefPtr<CefDownloadItem> download_item,
-	//	CefRefPtr<CefDownloadItemCallback> callback);
-
 	//CefDragHandler methods
 	virtual bool OnDragEnter(
 		CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefDragData> dragData,
 		CefDragHandler::DragOperationsMask mask);
-
-	// CefGeolocationHandler methods
-	//virtual bool OnRequestGeolocationPermission(
-	//	CefRefPtr<CefBrowser> browser,
-	//	const CefString& requesting_url,
-	//	int request_id,
-	//	CefRefPtr<CefGeolocationCallback> callback);
 
 	// CefJSDialogHandler methods
 	virtual bool OnJSDialog(
@@ -268,6 +238,41 @@ public:
 		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message);
 
+	void SetContextMenuHandler(CefRefPtr<CefContextMenuHandler> handler)
+	{
+		pContextMenuHandler_ = handler;
+	}
+
+	void SetDialogHandler(CefRefPtr<CefDialogHandler> handler)
+	{
+		pDialogHandler_ = handler;
+	}
+
+	void SetDisplayHandler(CefRefPtr<CefDisplayHandler> handler)
+	{
+		pDisplayHandler_ = handler;
+	}
+
+	void SetDownloadHandler(CefRefPtr<CefDownloadHandler> handler)
+	{
+		pDownloadHandler_ = handler;
+	}
+
+	void SetGeolocationHandler(CefRefPtr<CefGeolocationHandler> handler)
+	{
+		pGeolocationHandler_ = handler;
+	}
+
+	void SetJSDialogHandler(CefRefPtr<CefJSDialogHandler> handler)
+	{
+		pJSDialogHandler_ = handler;
+	}
+
+	void SetKeyboardHandler(CefRefPtr<CefKeyboardHandler> handler)
+	{
+		pKeyboardHandler_ = handler;
+	}
+
 private:
 	/// <summary>
 	/// 
@@ -314,8 +319,15 @@ private:
 	/// </summary>
 	std::list<CefRefPtr<CefBrowser>> popup_browser_list_;
 
+	CefRefPtr<CefContextMenuHandler> pContextMenuHandler_;
+	CefRefPtr<CefDialogHandler> pDialogHandler_;
+	CefRefPtr<CefDisplayHandler> pDisplayHandler_;
+	CefRefPtr<CefDownloadHandler> pDownloadHandler_;
+	CefRefPtr<CefGeolocationHandler> pGeolocationHandler_;
+	CefRefPtr<CefJSDialogHandler> pJSDialogHandler_;
+	CefRefPtr<CefKeyboardHandler> pKeyboardHandler_;
+
 	// Include the default reference counting implementation.
 	IMPLEMENT_REFCOUNTING(QCefViewBrowserHandler);
 };
 #endif
-

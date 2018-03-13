@@ -56,6 +56,86 @@ namespace QCefSetting
 	/// 
 	/// </summary>
 	const QCEFVIEW_EXPORT QString userAgent();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void QCEFVIEW_EXPORT setCachePath(const QString& path);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	const QCEFVIEW_EXPORT QString cachePath();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void QCEFVIEW_EXPORT setUserDataPath(const QString& path);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	const QCEFVIEW_EXPORT QString userDataPath();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void QCEFVIEW_EXPORT setPersistSessionCookies(bool enabled);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	const QCEFVIEW_EXPORT bool persistSessionCookies();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void QCEFVIEW_EXPORT setPersistUserPreferences(bool enabled);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	const QCEFVIEW_EXPORT bool persistUserPreferences();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void QCEFVIEW_EXPORT setLocale(const QString& locale);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	const QCEFVIEW_EXPORT QString locale();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void QCEFVIEW_EXPORT setRemoteDebuggingPort(int port);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	const QCEFVIEW_EXPORT int remoteDebuggingPort();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void QCEFVIEW_EXPORT setBackgroundColor(const QColor& color);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	const QCEFVIEW_EXPORT QColor backgroundColor();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void QCEFVIEW_EXPORT setAcceptLanguageList(const QString& languages);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	const QCEFVIEW_EXPORT QString acceptLanguageList();
 };
 
 #endif

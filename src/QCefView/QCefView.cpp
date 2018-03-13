@@ -49,7 +49,7 @@ public:
 			browserSettings,			// settings
 			CefRequestContext::GetGlobalContext()))
 		{
-			QLOG(QStringLiteral("Failed to create browser."));
+			throw std::exception("Failed to create browser.");
 		}
 	}
 
@@ -240,6 +240,48 @@ public:
 		notifyMoveOrResizeStarted();
 	}
 
+	void setContextMenuHandler(CefContextMenuHandler* handler)
+	{
+		if (pQCefViewHandler_)
+			pQCefViewHandler_->SetContextMenuHandler(handler);
+	}
+
+	void setDialogHandler(CefDialogHandler* handler)
+	{
+		if (pQCefViewHandler_)
+			pQCefViewHandler_->SetDialogHandler(handler);
+	}
+
+	void setDisplayHandler(CefDisplayHandler* handler)
+	{
+		if (pQCefViewHandler_)
+			pQCefViewHandler_->SetDisplayHandler(handler);
+	}
+
+	void setDownloadHandler(CefDownloadHandler* handler)
+	{
+		if (pQCefViewHandler_)
+			pQCefViewHandler_->SetDownloadHandler(handler);
+	}
+
+	void setGeolocationHandler(CefGeolocationHandler* handler)
+	{
+		if (pQCefViewHandler_)
+			pQCefViewHandler_->SetGeolocationHandler(handler);
+	}
+
+	void setJSDialogHandler(CefJSDialogHandler* handler)
+	{
+		if (pQCefViewHandler_)
+			pQCefViewHandler_->SetJSDialogHandler(handler);
+	}
+
+	void setKeyboardHandler(CefKeyboardHandler* handler)
+	{
+		if (pQCefViewHandler_)
+			pQCefViewHandler_->SetKeyboardHandler(handler);
+	}
+
 private:
 	/// <summary>
 	/// 
@@ -284,6 +326,12 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 
 	connect(pImpl_->cefWindow(), SIGNAL(invokeMethodNotify(int, int, const QString&, const QVariantList&)),
 		this, SLOT(onInvokeMethodNotify(int, int, const QString&, const QVariantList&)));
+}
+
+QCefView::QCefView(QWidget* parent /*= 0*/) :
+	QCefView("about:blank", parent)
+{
+
 }
 	 
 QCefView::~QCefView()
@@ -381,6 +429,48 @@ bool QCefView::responseQCefQuery(const QCefQuery& query)
 		return pImpl_->responseQCefQuery(query);
 
 	return false;
+}
+
+void QCefView::setContextMenuHandler(CefContextMenuHandler* handler)
+{
+	if (pImpl_)
+		return pImpl_->setContextMenuHandler(handler);
+}
+
+void QCefView::setDialogHandler(CefDialogHandler* handler)
+{
+	if (pImpl_)
+		return pImpl_->setDialogHandler(handler);
+}
+
+void QCefView::setDisplayHandler(CefDisplayHandler* handler)
+{
+	if (pImpl_)
+		return pImpl_->setDisplayHandler(handler);
+}
+
+void QCefView::setDownloadHandler(CefDownloadHandler* handler)
+{
+	if (pImpl_)
+		return pImpl_->setDownloadHandler(handler);
+}
+
+void QCefView::setGeolocationHandler(CefGeolocationHandler* handler)
+{
+	if (pImpl_)
+		return pImpl_->setGeolocationHandler(handler);
+}
+
+void QCefView::setJSDialogHandler(CefJSDialogHandler* handler)
+{
+	if (pImpl_)
+		return pImpl_->setJSDialogHandler(handler);
+}
+
+void QCefView::setKeyboardHandler(CefKeyboardHandler* handler)
+{
+	if (pImpl_)
+		return pImpl_->setKeyboardHandler(handler);
 }
 
 void QCefView::changeEvent(QEvent * event)

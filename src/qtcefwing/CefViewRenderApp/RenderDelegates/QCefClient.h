@@ -12,7 +12,7 @@
 /// 
 /// </summary>
 class QCefClient
-	: public CefBase
+	: public CefBaseRefCounted
 {
 	//class Accessor
 	//	: public CefV8Accessor
