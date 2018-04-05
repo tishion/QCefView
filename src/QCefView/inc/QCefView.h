@@ -50,7 +50,6 @@ class CefContextMenuHandler;
 class CefDialogHandler;
 class CefDisplayHandler;
 class CefDownloadHandler;
-class CefGeolocationHandler;
 class CefJSDialogHandler;
 class CefKeyboardHandler;
 
@@ -185,12 +184,6 @@ public:
 	/// </summary>
 	/// <param name="handler"></param>
 	void setDownloadHandler(CefDownloadHandler* handler);
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="handler"></param>
-	void setGeolocationHandler(CefGeolocationHandler* handler);
 
 	/// <summary>
 	/// 

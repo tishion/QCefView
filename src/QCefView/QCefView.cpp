@@ -264,12 +264,6 @@ public:
 			pQCefViewHandler_->SetDownloadHandler(handler);
 	}
 
-	void setGeolocationHandler(CefGeolocationHandler* handler)
-	{
-		if (pQCefViewHandler_)
-			pQCefViewHandler_->SetGeolocationHandler(handler);
-	}
-
 	void setJSDialogHandler(CefJSDialogHandler* handler)
 	{
 		if (pQCefViewHandler_)
@@ -453,12 +447,6 @@ void QCefView::setDownloadHandler(CefDownloadHandler* handler)
 {
 	if (pImpl_)
 		return pImpl_->setDownloadHandler(handler);
-}
-
-void QCefView::setGeolocationHandler(CefGeolocationHandler* handler)
-{
-	if (pImpl_)
-		return pImpl_->setGeolocationHandler(handler);
 }
 
 void QCefView::setJSDialogHandler(CefJSDialogHandler* handler)
