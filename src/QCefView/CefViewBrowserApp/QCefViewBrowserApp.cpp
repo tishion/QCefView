@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #pragma region std_headers
 #include <string>
 #pragma endregion std_headers
@@ -12,76 +10,96 @@
 
 #include "QCefViewBrowserApp.h"
 
-QCefViewBrowserApp::QCefViewBrowserApp()
+QCefViewBrowserApp::QCefViewBrowserApp() {}
+
+QCefViewBrowserApp::~QCefViewBrowserApp() {}
+
+//////////////////////////////////////////////////////////////////////////
+void
+QCefViewBrowserApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
+  command_line->AppendSwitch("disable-spell-checking");
+  command_line->AppendSwitch("disable-extensions");
+  command_line->AppendSwitch("disable-pdf-extension");
+  command_line->AppendSwitch("enable-direct-write");
+  command_line->AppendSwitch("allow-file-access-from-files");
+  command_line->AppendSwitch("no-proxy-server");
+  command_line->AppendSwitch("in-process-gpu");
+  command_line->AppendSwitch("disable-direct-composition");
+  command_line->AppendSwitchWithValue("disable-features", "NetworkService");
+  command_line->AppendSwitchWithValue("renderer-process-limit", "1");
 }
 
-QCefViewBrowserApp::~QCefViewBrowserApp()
+void
+QCefViewBrowserApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 {
+  RegisterCustomSchemes(registrar);
+}
+
+CefRefPtr<CefResourceBundleHandler>
+QCefViewBrowserApp::GetResourceBundleHandler()
+{
+  return nullptr;
+}
+
+CefRefPtr<CefBrowserProcessHandler>
+QCefViewBrowserApp::GetBrowserProcessHandler()
+{
+  return this;
+}
+
+CefRefPtr<CefRenderProcessHandler>
+QCefViewBrowserApp::GetRenderProcessHandler()
+{
+  return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////
-void QCefViewBrowserApp::OnBeforeCommandLineProcessing(
-	const CefString& process_type, 
-	CefRefPtr<CefCommandLine> command_line)
+void
+QCefViewBrowserApp::OnContextInitialized()
 {
-	command_line->AppendSwitch("disable-spell-checking");
-	command_line->AppendSwitch("disable-extensions");
-	command_line->AppendSwitch("disable-pdf-extension");
-	command_line->AppendSwitch("enable-direct-write");
-	command_line->AppendSwitch("allow-file-access-from-files");
-	command_line->AppendSwitchWithValue("renderer-process-limit", "1");
+  CEF_REQUIRE_UI_THREAD();
+
+  // create all browser delegates
+  CreateBrowserDelegates(browser_delegates_);
+
+  // Register cookieable schemes with the global cookie manager.
+  CefRefPtr<CefCookieManager> manager = CefCookieManager::GetGlobalManager(nullptr);
+  DCHECK(manager.get());
+  typedef std::vector<CefString> CookiableSchemeSet;
+  CookiableSchemeSet cookieable_schemes_;
+  manager->SetSupportedSchemes(cookieable_schemes_, true, nullptr);
+
+  RegisterCustomSchemesHandlerFactories();
+
+  BrowserDelegateSet::iterator it = browser_delegates_.begin();
+  for (; it != browser_delegates_.end(); ++it)
+    (*it)->OnContextInitialized(this);
 }
 
-void QCefViewBrowserApp::OnRegisterCustomSchemes(
-	CefRawPtr<CefSchemeRegistrar> registrar)
+void
+QCefViewBrowserApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
 {
-	RegisterCustomSchemes(registrar);
+  BrowserDelegateSet::iterator it = browser_delegates_.begin();
+  for (; it != browser_delegates_.end(); ++it)
+    (*it)->OnBeforeChildProcessLaunch(this, command_line);
 }
 
-CefRefPtr<CefBrowserProcessHandler> QCefViewBrowserApp::GetBrowserProcessHandler()
+void
+QCefViewBrowserApp::OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_info)
 {
-	return this;
+  CEF_REQUIRE_IO_THREAD();
+  BrowserDelegateSet::iterator it = browser_delegates_.begin();
+  for (; it != browser_delegates_.end(); ++it)
+    (*it)->OnRenderProcessThreadCreated(this, extra_info);
 }
 
-//////////////////////////////////////////////////////////////////////////
-void QCefViewBrowserApp::OnContextInitialized()
+CefRefPtr<CefPrintHandler>
+QCefViewBrowserApp::GetPrintHandler()
 {
-	CEF_REQUIRE_UI_THREAD();
-
-	// create all browser delegates
-	CreateBrowserDelegates(browser_delegates_);
-
-	// Register cookieable schemes with the global cookie manager.
-	CefRefPtr<CefCookieManager> manager = CefCookieManager::GetGlobalManager(nullptr);
-	DCHECK(manager.get());
-	typedef std::vector<CefString> CookiableSchemeSet;
-	CookiableSchemeSet cookieable_schemes_;
-	cookieable_schemes_.push_back("http");
-	cookieable_schemes_.push_back("https");
-	manager->SetSupportedSchemes(cookieable_schemes_, nullptr);
-
-	RegisterCustomSchemesHandlerFactories();
-
-	BrowserDelegateSet::iterator it = browser_delegates_.begin();
-	for (; it != browser_delegates_.end(); ++it)
-		(*it)->OnContextInitialized(this);
+  return nullptr;
 }
 
-void QCefViewBrowserApp::OnBeforeChildProcessLaunch(
-	CefRefPtr<CefCommandLine> command_line)
-{
-	BrowserDelegateSet::iterator it = browser_delegates_.begin();
-	for (; it != browser_delegates_.end(); ++it)
-		(*it)->OnBeforeChildProcessLaunch(this, command_line);
-}
-
-void QCefViewBrowserApp::OnRenderProcessThreadCreated(
-	CefRefPtr<CefListValue> extra_info)
-{
-	CEF_REQUIRE_IO_THREAD();
-	BrowserDelegateSet::iterator it = browser_delegates_.begin();
-	for (; it != browser_delegates_.end(); ++it)
-		(*it)->OnRenderProcessThreadCreated(this, extra_info);
-}
-
+void
+QCefViewBrowserApp::OnScheduleMessagePumpWork(int64 delay_ms)
+{}

@@ -6,27 +6,24 @@
 
 #include "../QCefViewBrowserApp.h"
 
-namespace QCefViewDefaultBrowserDelegate
+namespace QCefViewDefaultBrowserDelegate {
+void
+CreateBrowserDelegate(QCefViewBrowserApp::BrowserDelegateSet& delegates);
+
+class BrowserDelegate : public QCefViewBrowserApp::BrowserDelegate
 {
-	void CreateBrowserDelegate(QCefViewBrowserApp::BrowserDelegateSet& delegates);
+public:
+  BrowserDelegate();
 
-	class BrowserDelegate
-		: public QCefViewBrowserApp::BrowserDelegate
-	{
-	public:
-		BrowserDelegate();
+  virtual void OnContextInitialized(CefRefPtr<QCefViewBrowserApp> app) override;
 
-		virtual void OnContextInitialized(CefRefPtr<QCefViewBrowserApp> app);
+  virtual void OnBeforeChildProcessLaunch(CefRefPtr<QCefViewBrowserApp> app,
+                                          CefRefPtr<CefCommandLine> command_line) override;
 
-		virtual void OnBeforeChildProcessLaunch(
-			CefRefPtr<QCefViewBrowserApp> app,
-			CefRefPtr<CefCommandLine> command_line);
+  virtual void OnRenderProcessThreadCreated(CefRefPtr<QCefViewBrowserApp> app,
+                                            CefRefPtr<CefListValue> extra_info) override;
 
-		virtual void OnRenderProcessThreadCreated(
-			CefRefPtr<QCefViewBrowserApp> app,
-			CefRefPtr<CefListValue> extra_info);
-
-	private:
-		IMPLEMENT_REFCOUNTING(BrowserDelegate);
-	};
+private:
+  IMPLEMENT_REFCOUNTING(BrowserDelegate);
+};
 }

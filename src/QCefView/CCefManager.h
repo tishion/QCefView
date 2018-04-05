@@ -14,61 +14,59 @@
 #include "CefViewBrowserApp/QCefViewBrowserApp.h"
 
 /// <summary>
-/// 
+///
 /// </summary>
-class CCefManager
-	: public QObject
+class CCefManager : public QObject
 {
-	Q_OBJECT
+  Q_OBJECT
 
 protected:
-	/// <summary>
-	/// 
-	/// </summary>
-	CCefManager();
+  /// <summary>
+  ///
+  /// </summary>
+  CCefManager();
 
-	/// <summary>
-	/// 
-	/// </summary>
-	~CCefManager() {};
+  /// <summary>
+  ///
+  /// </summary>
+  ~CCefManager(){};
 
 public:
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
-	static CCefManager& getInstance();
+  /// <summary>
+  ///
+  /// </summary>
+  /// <returns></returns>
+  static CCefManager& getInstance();
 
-	/// <summary>
-	/// 
-	/// </summary>
-	void initializeCef();
+  /// <summary>
+  ///
+  /// </summary>
+  void initializeCef();
 
-	/// <summary>
-	/// 
-	/// </summary>
-	void uninitializeCef();
+  /// <summary>
+  ///
+  /// </summary>
+  void uninitializeCef();
 
-protected slots :
-	/// <summary>
-	/// 
-	/// </summary>
-	void releaseCef();
+protected slots:
+  /// <summary>
+  ///
+  /// </summary>
+  void releaseCef();
 
 private:
-	/// <summary>
-	/// 
-	/// </summary>
-	CefRefPtr<QCefViewBrowserApp> app_;
+  /// <summary>
+  ///
+  /// </summary>
+  CefRefPtr<QCefViewBrowserApp> app_;
 
-	/// <summary>
-	/// 
-	/// </summary>
-	CefSettings cef_settings_;
+  /// <summary>
+  ///
+  /// </summary>
+  CefSettings cef_settings_;
 
-	/// <summary>
-	/// 
-	/// </summary>
-	int64_t nBrowserRefCount_;
+  /// <summary>
+  ///
+  /// </summary>
+  int64_t nBrowserRefCount_;
 };
-

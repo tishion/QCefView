@@ -11,66 +11,74 @@
 #pragma endregion cef_headers
 
 class QCefViewBrowserApp
-	: public CefApp
-	, public CefBrowserProcessHandler
+  : public CefApp
+  , public CefBrowserProcessHandler
 {
 public:
-	QCefViewBrowserApp();
-	~QCefViewBrowserApp();
+  QCefViewBrowserApp();
+  ~QCefViewBrowserApp();
 
-	class BrowserDelegate
-		: public virtual CefBaseRefCounted 
-	{
-	public:
-		virtual void OnContextInitialized(CefRefPtr<QCefViewBrowserApp> app) {}
+  class BrowserDelegate : public virtual CefBaseRefCounted
+  {
+  public:
+    virtual void OnContextInitialized(CefRefPtr<QCefViewBrowserApp> app) {}
 
-		virtual void OnBeforeChildProcessLaunch(
-			CefRefPtr<QCefViewBrowserApp> app,
-			CefRefPtr<CefCommandLine> command_line) {}
+    virtual void OnBeforeChildProcessLaunch(CefRefPtr<QCefViewBrowserApp> app, CefRefPtr<CefCommandLine> command_line)
+    {}
 
-		virtual void OnRenderProcessThreadCreated(
-			CefRefPtr<QCefViewBrowserApp> app,
-			CefRefPtr<CefListValue> extra_info) {}
-	};
-	typedef std::set<CefRefPtr<BrowserDelegate> > BrowserDelegateSet;
+    virtual void OnRenderProcessThreadCreated(CefRefPtr<QCefViewBrowserApp> app, CefRefPtr<CefListValue> extra_info) {}
+  };
+  typedef std::set<CefRefPtr<BrowserDelegate>> BrowserDelegateSet;
 
 private:
-	// Creates all of the BrowserDelegate objects. Implemented in
-	// client_app_delegates.
-	static void CreateBrowserDelegates(BrowserDelegateSet& delegates);
+  // Creates all of the BrowserDelegate objects. Implemented in
+  // client_app_delegates.
+  static void CreateBrowserDelegates(BrowserDelegateSet& delegates);
 
-	// Rigster custom schemes handler factories
-	static void RegisterCustomSchemesHandlerFactories();
+  // Rigster custom schemes handler factories
+  static void RegisterCustomSchemesHandlerFactories();
 
-	// Registers custom schemes. Implemented in client_app_delegates.
-	static void RegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar);
+  // Registers custom schemes. Implemented in client_app_delegates.
+  static void RegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar);
 
-	//////////////////////////////////////////////////////////////////////////
-	// CefApp methods:
-	virtual void OnBeforeCommandLineProcessing(
-		const CefString& process_type,
-		CefRefPtr<CefCommandLine> command_line);
+#pragma region CefApp
 
-	virtual void OnRegisterCustomSchemes(
-		CefRawPtr<CefSchemeRegistrar> registrar);
+  //////////////////////////////////////////////////////////////////////////
+  // CefApp methods:
+  virtual void OnBeforeCommandLineProcessing(const CefString& process_type,
+                                             CefRefPtr<CefCommandLine> command_line) override;
 
-	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler();
+  virtual void OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar) override;
 
-	// CefBrowserProcessHandler methods:
-	virtual void OnContextInitialized();
+  virtual CefRefPtr<CefResourceBundleHandler> GetResourceBundleHandler() override;
 
-	virtual void OnBeforeChildProcessLaunch(
-		CefRefPtr<CefCommandLine> command_line);
+  virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override;
 
-	virtual void OnRenderProcessThreadCreated(
-		CefRefPtr<CefListValue> extra_info);
-	
+  virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override;
+
+#pragma endregion CefApp
+
+#pragma region CefBrowserProcessHandler
+
+  // CefBrowserProcessHandler methods:
+  virtual void OnContextInitialized() override;
+
+  virtual void OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line) override;
+
+  virtual void OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_info) override;
+
+  virtual CefRefPtr<CefPrintHandler> GetPrintHandler() override;
+
+  virtual void OnScheduleMessagePumpWork(int64 delay_ms) override;
+
+#pragma endregion CefBrowserProcessHandler
+
 private:
-	// Set of supported BrowserDelegates. Only used in the browser process.
-	BrowserDelegateSet browser_delegates_;
-	
-	// Include the default reference counting implementation.
-	IMPLEMENT_REFCOUNTING(QCefViewBrowserApp);
+  // Set of supported BrowserDelegates. Only used in the browser process.
+  BrowserDelegateSet browser_delegates_;
+
+  // Include the default reference counting implementation.
+  IMPLEMENT_REFCOUNTING(QCefViewBrowserApp);
 };
 
-#endif	//  QCEFVIEWBROWSERAPP_H_
+#endif //  QCEFVIEWBROWSERAPP_H_

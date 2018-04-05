@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #pragma region qt_headers
 #include <QCoreApplication>
 #include <QResizeEvent>
@@ -11,42 +10,49 @@
 
 #define CEF_BROWSER_WINDOW_CLASS_NAME_A "CefBrowserWindow"
 
-CCefWindow::CCefWindow(QWindow *parent /*= 0*/)
-	: QWindow(parent)
-	, hwndCefBrowser_(nullptr)
+CCefWindow::CCefWindow(QWindow* parent /*= 0*/)
+  : QWindow(parent)
+  , hwndCefBrowser_(nullptr)
 {
-	setFlags(Qt::FramelessWindowHint);
+  setFlags(Qt::FramelessWindowHint);
 
-	CCefManager::getInstance().initializeCef();
+  CCefManager::getInstance().initializeCef();
 }
 
 CCefWindow::~CCefWindow()
 {
-	destroy();
-	
-	if (hwndCefBrowser_)
-		hwndCefBrowser_ = nullptr;
+  destroy();
 
-	CCefManager::getInstance().uninitializeCef();
+  if (hwndCefBrowser_)
+    hwndCefBrowser_ = nullptr;
+
+  CCefManager::getInstance().uninitializeCef();
 }
 
-void CCefWindow::updateCefBrowserWindow()
+void
+CCefWindow::setCefBrowserWindow(CefWindowHandle wnd)
 {
-	if (!hwndCefBrowser_)
-		hwndCefBrowser_ = ::FindWindowExA((HWND)winId(), nullptr, CEF_BROWSER_WINDOW_CLASS_NAME_A, nullptr);
-
-	if (hwndCefBrowser_)
-		::MoveWindow(hwndCefBrowser_, 0, 0, width(), height(), TRUE);
+  hwndCefBrowser_ = wnd;
+  syncCefBrowserWindow();
 }
 
-void CCefWindow::exposeEvent(QExposeEvent *e)
+void
+CCefWindow::syncCefBrowserWindow()
 {
-	updateCefBrowserWindow();
-	return __super::exposeEvent(e);
+  if (hwndCefBrowser_)
+    ::MoveWindow(hwndCefBrowser_, 0, 0, width(), height(), TRUE);
 }
 
-void CCefWindow::resizeEvent(QResizeEvent *e)
+void
+CCefWindow::exposeEvent(QExposeEvent* e)
 {
-	updateCefBrowserWindow();
-	return __super::resizeEvent(e);
+  syncCefBrowserWindow();
+  return __super::exposeEvent(e);
+}
+
+void
+CCefWindow::resizeEvent(QResizeEvent* e)
+{
+  syncCefBrowserWindow();
+  return __super::resizeEvent(e);
 }

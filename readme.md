@@ -1,16 +1,34 @@
 Quick Start with Qt+Cef https://tishion.github.io/QCefView 
 ======
 
-Checkout the repo and follow the build instructions below. You will get the QCefView SDK, and then you can deploy it into your development environment.
+This is the fresh new reforming version of QCefView, if you need to use the legacy one please checkout the ***legacy-archive*** branch.
 
-Building
-------
 
-1. Download the CEF binary distribution from:
-    - http://opensource.spotify.com/cefbuilds/index.html
+Build instruction:
 
-2. Build `libcef_dll_wrapper.lib` with your platform toolset, remember to use the same configuration of Runtime Library wiht the Qt SDK you are using (Project Properties > C/C++ > Code Generation > Runtime Library)
+1. Download and install [CMake](https://cmake.org/)
 
-3. Collect the CEF binary files, lib files, inlucde files and resource files into `dep\cef\` (following the instructions in the README there)
+2. Download and install Qt SDK from [Qt Downloads](https://download.qt.io/archive/qt/)
 
-4. Build QCefView solution and you will get the QCefViewSDK
+3. Download CEF binary distribution [Chromium Embedded Framework (CEF) Automated Builds](http://opensource.spotify.com/cefbuilds/index.html) and extract it to ***dep*** directory, for example:
+    ```
+    root
+    ├─dep
+    │  └─cef_binary_76.1.13+gf19c584+chromium-76.0.3809.132_windows64
+    ├─src
+    └─test
+    ```
+
+4. Modify the [config.cmake](config.cmake) to set the required build configurations
+
+5. Just use CMake to build the project, for example:
+    ``` bat
+    REM create the build folder 
+    mkdir build.win && cd build.win
+
+    REM generate and build the project
+    cmake .. && cmake --build .
+    ```
+
+> Note:
+When I start the reforming I use Qt 5.12.4 and CEF cef_binary_76.1.13+gf19c584+chromium-76.0.3809.132_windows64. You need to make sure the version you are choosing is compatible with the code in this repo.

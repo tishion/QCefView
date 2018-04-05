@@ -4,7 +4,6 @@
 #include <vector>
 #pragma endregion std_headers
 
-
 #pragma region qt_headers
 #include <QObject>
 #include <QPointer>
@@ -16,61 +15,59 @@
 #include <include/cef_scheme.h>
 #pragma endregion cef_headers
 
-#include "../CCefWindow.h"
+#include <QCefProtocol.h>
 
-namespace QCefViewDefaultSchemeHandler
+#include "../../CCefWindow.h"
+
+namespace QCefViewDefaultSchemeHandler {
+static char* scheme_name = QCEF_SCHEMA;
+
+bool
+RegisterSchemeHandlerFactory();
+
+bool
+RegisterScheme(CefRawPtr<CefSchemeRegistrar> registrar);
+
+class SchemeHandler : public CefResourceHandler
 {
-	static char* scheme_name = QCEF_SCHEMA;
+public:
+  SchemeHandler(CCefWindow* pQCefWin);
 
-	bool RegisterSchemeHandlerFactory();
+  virtual bool Open(CefRefPtr<CefRequest> request, bool& handle_request, CefRefPtr<CefCallback> callback) override;
 
-	bool RegisterScheme(CefRawPtr<CefSchemeRegistrar> registrar);
+  virtual void GetResponseHeaders(CefRefPtr<CefResponse> response,
+                                  int64& response_length,
+                                  CefString& redirectUrl) override;
 
-	class SchemeHandler
-		: public CefResourceHandler
-	{
-	public:
-		SchemeHandler(CCefWindow* pQCefWin);
+  virtual bool Skip(int64 bytes_to_skip, int64& bytes_skipped, CefRefPtr<CefResourceSkipCallback> callback) override;
 
-		virtual bool ProcessRequest(CefRefPtr<CefRequest> request, 
-			CefRefPtr<CefCallback> callback);
+  virtual bool Read(void* data_out,
+                    int bytes_to_read,
+                    int& bytes_read,
+                    CefRefPtr<CefResourceReadCallback> callback) override;
 
-		virtual void GetResponseHeaders(CefRefPtr<CefResponse> response, 
-			int64& response_length, 
-			CefString& redirectUrl);
+  virtual void Cancel() override;
 
-		virtual bool ReadResponse(void* data_out, 
-			int bytes_to_read, 
-			int& bytes_read, 
-			CefRefPtr<CefCallback> callback);
+private:
+  QPointer<CCefWindow> pQCefWindow_;
+  std::string data_;
+  std::string mime_type_;
+  int offset_;
 
-		virtual bool CanGetCookie(const CefCookie& cookie);
+private:
+  IMPLEMENT_REFCOUNTING(SchemeHandler);
+};
 
-		virtual bool CanSetCookie(const CefCookie& cookie);
+class SchemeHandlerFactory : public CefSchemeHandlerFactory
+{
 
-		virtual void Cancel();
+  // Return a new scheme handler instance to handle the request.
+  virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
+                                               CefRefPtr<CefFrame> frame,
+                                               const CefString& scheme_name,
+                                               CefRefPtr<CefRequest> request);
 
-	private:
-		QPointer<CCefWindow> pQCefWindow_;
-		std::string data_;
-		std::string mime_type_;
-		int offset_;
-
-	private:
-		IMPLEMENT_REFCOUNTING(SchemeHandler);
-	};
-
-	class SchemeHandlerFactory 
-		: public CefSchemeHandlerFactory {
-
-	  // Return a new scheme handler instance to handle the request.
-		 virtual CefRefPtr<CefResourceHandler> Create(
-			 CefRefPtr<CefBrowser> browser,
-			 CefRefPtr<CefFrame> frame,
-			 const CefString& scheme_name,
-			 CefRefPtr<CefRequest> request);
-
-	private:
-		IMPLEMENT_REFCOUNTING(SchemeHandlerFactory);
-	};
+private:
+  IMPLEMENT_REFCOUNTING(SchemeHandlerFactory);
+};
 }
