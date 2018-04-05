@@ -326,6 +326,11 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 
 	connect(pImpl_->cefWindow(), SIGNAL(invokeMethodNotify(int, int, const QString&, const QVariantList&)),
 		this, SLOT(onInvokeMethodNotify(int, int, const QString&, const QVariantList&)));
+
+	// If we're already part of a window, we'll install our event handler
+	// If our parent changes later, this will be handled in QCefView::changeEvent()
+	if (this->window())
+		this->window()->installEventFilter(this);
 }
 
 QCefView::QCefView(QWidget* parent /*= 0*/) :
