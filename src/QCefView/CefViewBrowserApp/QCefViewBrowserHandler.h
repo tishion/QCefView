@@ -64,10 +64,6 @@ public:
 	{
 		return this;
 	}
-	virtual CefRefPtr<CefGeolocationHandler> GetGeolocationHandler()
-	{
-		return pGeolocationHandler_;
-	}
 	virtual CefRefPtr<CefJSDialogHandler> GetJSDialogHandler()
 	{
 		return pJSDialogHandler_ ? pJSDialogHandler_ : this;
@@ -258,11 +254,6 @@ public:
 		pDownloadHandler_ = handler;
 	}
 
-	void SetGeolocationHandler(CefRefPtr<CefGeolocationHandler> handler)
-	{
-		pGeolocationHandler_ = handler;
-	}
-
 	void SetJSDialogHandler(CefRefPtr<CefJSDialogHandler> handler)
 	{
 		pJSDialogHandler_ = handler;
@@ -323,7 +314,6 @@ private:
 	CefRefPtr<CefDialogHandler> pDialogHandler_;
 	CefRefPtr<CefDisplayHandler> pDisplayHandler_;
 	CefRefPtr<CefDownloadHandler> pDownloadHandler_;
-	CefRefPtr<CefGeolocationHandler> pGeolocationHandler_;
 	CefRefPtr<CefJSDialogHandler> pJSDialogHandler_;
 	CefRefPtr<CefKeyboardHandler> pKeyboardHandler_;
 
