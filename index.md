@@ -67,14 +67,14 @@ Web Side:
 QCefClient Object
 
 - Methods:
-  - invokeMethod(name, args, ...)
+  - **invokeMethod(name, args, ...)**
  
     Sample: 
     ```javascript
     QCefClient.invokeMethod("TestMethod", 1, false, "arg3");
     ```
     
-  - addEventListener(name, listener)
+  - **addEventListener(name, listener)**
     
     Sample: 
     ```javascript
@@ -85,7 +85,7 @@ QCefClient Object
     });
     ```
     
-  - removeEventListener(name, listener)
+  - **removeEventListener(name, listener)**
         
     Sample: 
     ```javascript
@@ -97,8 +97,8 @@ QCefClient Object
 
 QCef Query
 - Functions:
-  - QCefQuery
-  - QCefQueryCancel
+  - **QCefQuery**
+  - **QCefQueryCancel**
 
   Sample:
   ```javascript
@@ -121,7 +121,7 @@ QCef Query
   
 QCef Url Request
 - Protocol
-  - qcef://xxxxxx
+  - **qcef://**
     
     Sampe:
     ```html
