@@ -62,20 +62,19 @@ Qt Side
  
 Web Side:
 ---
-
 ---
-- QCefClient Object
 
-    Methods:
-    
-    > invokeMethod(name, args, ...)
-    
+QCefClient Object
+
+- Methods:
+  - invokeMethod(name, args, ...)
+ 
     Sample: 
     ```javascript
     QCefClient.invokeMethod("TestMethod", 1, false, "arg3");
     ```
     
-    > addEventListener(name, listener)
+  - addEventListener(name, listener)
     
     Sample: 
     ```javascript
@@ -86,49 +85,47 @@ Web Side:
     });
     ```
     
-    > removeEventListener(name, listener)
+  - removeEventListener(name, listener)
         
     Sample: 
     ```javascript
     QCefClient.removeEventListener("colorChange", onColorChanged);
     // onColorChanged is not an anonymous function
     ```
+
 ---
 
-- QCef Query
+QCef Query
+- Functions:
+  - QCefQuery
+  - QCefQueryCancel
 
-    Functions:
-    
-    > QCefQuery
-    
-    > QCefQueryCancel
-    
-    Sample:
-    ```javascript
-    var queryId = window.QCefQuery({
-        request: "Hello, this message is sent from javascript code.",
-        onSuccess: function(response) {
-            alert(response);
-        },
-        onFailure: function(error_code, error_message) {
-            alert(error_message);
-        }
-    });
-    
-    //
-    
-    window.QCefQueryCancel(queryId);
-    ```
+  Sample:
+  ```javascript
+  var queryId = window.QCefQuery({
+      request: "Hello, this message is sent from javascript code.",
+      onSuccess: function(response) {
+          alert(response);
+      },
+      onFailure: function(error_code, error_message) {
+          alert(error_message);
+      }
+  });
+  
+  //
+  
+  window.QCefQueryCancel(queryId);
+  ```
+
 ---
   
-- QCef Url Request
-
-    Protocol:
-    
-    > qcef://xxxxxx
+QCef Url Request
+- Protocol
+  - qcef://xxxxxx
     
     Sampe:
     ```html
     <a href="qcef://test/a/b">qcef://test/a/b</a>
     ```
+
 ---
