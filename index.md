@@ -12,39 +12,33 @@ Now you can try to use QCefView to develop your application. Just use it like an
 
 ----------
 
-How to use QCefView
+Build instruction:
 ----------
 
-* First of all, check out the QCefView repository. 
+1. Download and install [CMake](https://cmake.org/)
+2. Download and install Qt SDK from [Qt Downloads](https://download.qt.io/archive/qt/)
+3. Download CEF binary distribution [Chromium Embedded Framework (CEF) Automated Builds](http://opensource.spotify.com/cefbuilds/index.html) and extract it to ***dep*** directory, for example:
+    ```
+    root
+    ├─dep
+    │  └─cef_binary_76.1.13+gf19c584+chromium-76.0.3809.132_windows64
+    ├─src
+    └─test
+    ```
+4. Modify the [config.cmake](config.cmake) to set the required build configurations
+5. Just use CMake to build the project, for example:
+    ``` bat
+    REM create the build folder 
+    mkdir build.win && cd build.win
 
-* Deploy Qt SDK
+    REM generate and build the project
+    cmake .. && cmake --build .
+    ```
 
-    Because there are different versions of Qt and Visual Studio, you need to determine the version of Qt and Visual Studio you want to use in your development. As you know, once you have settled down with specified version of Visual Studio, you must use the corresponding version of Qt SDK. Here we use Visual Studio 2015. 
+> Note:
+When I start the reforming I use Qt 5.12.4 and CEF cef_binary_76.1.13+gf19c584+chromium-76.0.3809.132_windows64. You need to make sure the version you are choosing is compatible with the code in this repo.
 
-* Download CEF binary distribution files
-    
-    We use the binary distribution version, you can get them from here
-
-    > [https://cefbuilds.com/](https://cefbuilds.com/)
-    
-    Here we use branch 2526, download the **cef_binary_3.2526.1373.gb660893_windows32**. 
-
-* Build **libcef_dll_wrapper.lib**
-
-    You need to build the libcef_dll_wrapper.lib with your development environment
-    > **Note**:
-    
-    > - Use the same configuration of Runtime Library as the QT SDK you used 
-
-* Collect CEF files
-    
-    Put header files, lib files and binary files into QCefView\dep\cef folder, keep the structure of this folder the same with [this](https://github.com/tishion/QCefView/tree/master/dep/cef)
-   
-* Build QCefViewSDK & Test Demo
-    
-    Open the QCefView solution and build all the projects. Make sure to build the Test project last. After you build the QCefView you will get the QCefViewSdk folder, this includes all the files QCefView needed. You can deploy this SDK into your development environment and develop Qt+CEF applications with it.
-
-There is one test demo project in the QCefView Solution
+6. Collect all build artifacts in ***outpu*** folder
 
 ![](https://raw.githubusercontent.com/tishion/QCefView/gh-pages/images/Test.jpg)
 
