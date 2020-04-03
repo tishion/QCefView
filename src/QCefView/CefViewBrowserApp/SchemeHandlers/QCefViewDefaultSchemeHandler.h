@@ -35,6 +35,8 @@ public:
 
   virtual bool Open(CefRefPtr<CefRequest> request, bool& handle_request, CefRefPtr<CefCallback> callback) override;
 
+  virtual bool ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback) override;
+
   virtual void GetResponseHeaders(CefRefPtr<CefResponse> response,
                                   int64& response_length,
                                   CefString& redirectUrl) override;
@@ -45,6 +47,10 @@ public:
                     int bytes_to_read,
                     int& bytes_read,
                     CefRefPtr<CefResourceReadCallback> callback) override;
+  virtual bool ReadResponse(void* data_out,
+                            int bytes_to_read,
+                            int& bytes_read,
+                            CefRefPtr<CefCallback> callback) override;
 
   virtual void Cancel() override;
 

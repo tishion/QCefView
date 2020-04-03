@@ -4,6 +4,8 @@
 #include <QWindow>
 #include <QPointer>
 #include <QVariant>
+#include <QHash>
+#include <QMutex>
 #pragma endregion qt_headers
 
 #pragma region cef_headers
@@ -18,6 +20,23 @@
 class CCefWindow : public QWindow
 {
   Q_OBJECT
+
+  /// <summary>
+  ///
+  /// </summary>
+  static QHash<CefWindowHandle, CCefWindow*> instanceMap_;
+
+  /// <summary>
+  ///
+  /// </summary>
+  static QMutex instanceMtx_;
+  ;
+
+public:
+  /// <summary>
+  ///
+  /// </summary>
+  static CCefWindow* lookupInstance(CefWindowHandle wnd);
 
 public:
   /// <summary>

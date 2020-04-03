@@ -10,6 +10,17 @@
 
 #define CEF_BROWSER_WINDOW_CLASS_NAME_A "CefBrowserWindow"
 
+QHash<CefWindowHandle, CCefWindow*> CCefWindow::instanceMap_;
+
+QMutex CCefWindow::instanceMtx_;
+
+CCefWindow*
+CCefWindow::lookupInstance(CefWindowHandle wnd)
+{
+  QMutexLocker locker(&instanceMtx_);
+  return instanceMap_[wnd];
+}
+
 CCefWindow::CCefWindow(QWindow* parent /*= 0*/)
   : QWindow(parent)
   , hwndCefBrowser_(nullptr)
@@ -34,6 +45,11 @@ CCefWindow::setCefBrowserWindow(CefWindowHandle wnd)
 {
   hwndCefBrowser_ = wnd;
   syncCefBrowserWindow();
+
+  {
+    QMutexLocker locker(&instanceMtx_);
+    instanceMap_[wnd] = this;
+  }
 }
 
 void

@@ -33,8 +33,21 @@ SchemeHandler::Open(CefRefPtr<CefRequest> request, bool& handle_request, CefRefP
     QString url = QString::fromStdString(cefStrUrl.ToString());
     pQCefWindow_->processUrlRequest(url);
   }
+
   // no matter whether we have found the handler or not,
   // we don't response this request.
+  return false;
+}
+
+bool
+SchemeHandler::ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
+{
+  if (pQCefWindow_) {
+    CefString cefStrUrl = request->GetURL();
+    QString url = QString::fromStdString(cefStrUrl.ToString());
+    pQCefWindow_->processUrlRequest(url);
+  }
+
   return false;
 }
 
@@ -71,6 +84,13 @@ SchemeHandler::Read(void* data_out, int bytes_to_read, int& bytes_read, CefRefPt
   return bytes_read > 0;
 }
 
+bool
+SchemeHandler::ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, CefRefPtr<CefCallback> callback)
+{
+  bytes_read = -2;
+  return false;
+}
+
 void
 SchemeHandler::Cancel()
 {}
@@ -88,8 +108,10 @@ SchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
   //
   // TO DO (Get the correct SchemeHandler corresponding to the browser)
   //
-
-  return new SchemeHandler(nullptr);
+  // we must find corresponding QWidget
+  auto hostWnd = browser->GetHost()->GetWindowHandle();
+  auto cefWnd = CCefWindow::lookupInstance(hostWnd);
+  return new SchemeHandler(cefWnd);
 }
 
 //////////////////////////////////////////////////////////////////////////
