@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QHash>
 #include <QMutex>
+#include <QRegion>
 #pragma endregion qt_headers
 
 #pragma region cef_headers
@@ -82,7 +83,19 @@ signals:
   /// <param name="errorCode"></param>
   /// <param name="errorMsg"></param>
   /// <param name="failedUrl"></param>
-  void loadError(int errorCode, const QString& errorMsg, const QString& failedUrl);
+  void loadError(int errorCode, const QString& errorMsg, const QString& failedUrl, bool& handled);
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="regions"></param>
+  void draggableRegionChanged(const QRegion& region);
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="next"></param>
+  void takeFocus(bool next);
 
   /// <summary>
   ///

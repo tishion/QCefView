@@ -20,6 +20,7 @@ QCefViewBrowserApp::OnBeforeCommandLineProcessing(const CefString& process_type,
 {
   command_line->AppendSwitch("disable-spell-checking");
   command_line->AppendSwitch("disable-extensions");
+  command_line->AppendSwitch("disable-web-security");
   command_line->AppendSwitch("disable-pdf-extension");
   command_line->AppendSwitch("enable-direct-write");
   command_line->AppendSwitch("allow-file-access-from-files");

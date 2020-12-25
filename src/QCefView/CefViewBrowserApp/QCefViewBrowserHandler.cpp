@@ -5,6 +5,7 @@
 
 #pragma region cef_headers
 #include <include/cef_app.h>
+#include <include/cef_parser.h>
 #include <include/wrapper/cef_closure_task.h>
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
@@ -13,6 +14,7 @@
 #include <QRect>
 #include <QWindow>
 #include <QVariant>
+#include <QRegion>
 #pragma endregion qt_headers
 
 #include <QCefProtocol.h>
@@ -21,6 +23,7 @@
 
 QCefViewBrowserHandler::QCefViewBrowserHandler(CCefWindow* pQCefWin)
   : is_closing_(false)
+  , initial_navigation_(false)
   , pQCefWindow_(pQCefWin)
   , cefquery_handler_(new QCefQueryHandler(pQCefWin))
   , resource_manager_(new CefResourceManager())
@@ -111,6 +114,18 @@ QCefViewBrowserHandler::OnDragEnter(CefRefPtr<CefBrowser> browser,
   return true;
 }
 
+void
+QCefViewBrowserHandler::OnDraggableRegionsChanged(CefRefPtr<CefBrowser> browser,
+                                                  CefRefPtr<CefFrame> frame,
+                                                  const std::vector<CefDraggableRegion>& regions)
+{
+  CEF_REQUIRE_UI_THREAD();
+
+  NotifyDragRegion(regions);
+
+  return;
+}
+
 bool
 QCefViewBrowserHandler::OnJSDialog(CefRefPtr<CefBrowser> browser,
                                    const CefString& origin_url,
@@ -140,6 +155,26 @@ void
 QCefViewBrowserHandler::OnResetDialogState(CefRefPtr<CefBrowser> browser)
 {
   CEF_REQUIRE_UI_THREAD();
+}
+
+void
+QCefViewBrowserHandler::OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next)
+{
+  CEF_REQUIRE_UI_THREAD();
+
+  NotifyTakeFocus(next);
+}
+
+bool
+QCefViewBrowserHandler::OnSetFocus(CefRefPtr<CefBrowser> browser, FocusSource source)
+{
+  CEF_REQUIRE_UI_THREAD();
+
+  if (initial_navigation_) {
+    return true;
+  }
+
+  return false;
 }
 
 bool
@@ -297,6 +332,11 @@ QCefViewBrowserHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
                                              bool canGoForward)
 {
   CEF_REQUIRE_UI_THREAD();
+
+  if (!isLoading && initial_navigation_) {
+    initial_navigation_ = false;
+  }
+
   if (pQCefWindow_)
     pQCefWindow_->loadingStateChanged(isLoading, canGoBack, canGoForward);
 }
@@ -331,19 +371,26 @@ QCefViewBrowserHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
   if (errorCode == ERR_ABORTED)
     return;
 
-  QString msg = QString::fromStdString(errorText.ToString());
-  QString url = QString::fromStdString(failedUrl.ToString());
-  QString content = QString("<html><body bgcolor=\"white\">"
-                            "<h2>Failed to load URL: %1 </h2>"
-                            "<h2>Error: %2(%3)</h2>"
-                            "</body></html>")
-                      .arg(url)
-                      .arg(msg)
-                      .arg(errorCode);
+  bool handled = false;
+  if (pQCefWindow_) {
+    auto msg = QString::fromStdString(errorText.ToString());
+    auto url = QString::fromStdString(failedUrl.ToString());
+    pQCefWindow_->loadError(errorCode, msg, url, handled);
+  }
 
-  frame->LoadString(content.toStdString(), failedUrl);
-  if (pQCefWindow_)
-    pQCefWindow_->loadError(errorCode, msg, url);
+  if (handled)
+    return;
+
+  std::ostringstream oss;
+  oss << "<html><body bgcolor=\"white\">"
+      << "<h2>Failed to load URL: " << failedUrl << " </h2>"
+      << "<h2>Error: " << errorText << "(" << errorCode << ")</h2>"
+      << "</body></html>";
+
+  std::string data = oss.str();
+  data = CefURIEncode(CefBase64Encode(data.c_str(), data.size()), false).ToString();
+  data = "data:text/html;base64," + data;
+  frame->LoadURL(data);
 }
 
 bool
@@ -563,4 +610,37 @@ QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser,
   }
 
   return false;
+}
+
+void
+QCefViewBrowserHandler::NotifyTakeFocus(bool next)
+{
+  if (!CefCurrentlyOn(TID_UI)) {
+    // Execute this method on the main thread.
+    CefPostTask(TID_UI, CefCreateClosureTask(base::Bind(&QCefViewBrowserHandler::NotifyTakeFocus, this, next)));
+    return;
+  }
+
+  if (pQCefWindow_)
+    pQCefWindow_->takeFocus(next);
+}
+
+void
+QCefViewBrowserHandler::NotifyDragRegion(const std::vector<CefDraggableRegion> regions)
+{
+  if (!CefCurrentlyOn(TID_UI)) {
+    // Execute this method on the main thread.
+    CefPostTask(TID_UI, CefCreateClosureTask(base::Bind(&QCefViewBrowserHandler::NotifyDragRegion, this, regions)));
+    return;
+  }
+
+  // Determine new draggable region.
+  QRegion region;
+  std::vector<CefDraggableRegion>::const_iterator it = regions.begin();
+  for (; it != regions.end(); ++it) {
+    region += QRegion(it->bounds.x, it->bounds.y, it->bounds.width, it->bounds.height);
+  }
+
+  if (pQCefWindow_)
+    pQCefWindow_->draggableRegionChanged(region);
 }

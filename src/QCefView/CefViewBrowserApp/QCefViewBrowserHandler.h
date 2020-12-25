@@ -28,6 +28,7 @@ class QCefViewBrowserHandler
   , public CefContextMenuHandler
   , public CefDisplayHandler
   , public CefDragHandler
+  , public CefFocusHandler
   , public CefJSDialogHandler
   , public CefKeyboardHandler
   , public CefLifeSpanHandler
@@ -125,6 +126,10 @@ public:
                            CefRefPtr<CefDragData> dragData,
                            CefDragHandler::DragOperationsMask mask) override;
 
+  virtual void OnDraggableRegionsChanged(CefRefPtr<CefBrowser> browser,
+                                         CefRefPtr<CefFrame> frame,
+                                         const std::vector<CefDraggableRegion>& regions) override;
+
 #pragma endregion CefDragHandler
 
 #pragma region CefJSDialogHandler
@@ -145,6 +150,15 @@ public:
   virtual void OnResetDialogState(CefRefPtr<CefBrowser> browser) override;
 
 #pragma endregion CefJSDialogHandler
+
+#pragma region CefFocusHandler
+
+  // CefFocusHandler methods
+  virtual void OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next) override;
+
+  virtual bool OnSetFocus(CefRefPtr<CefBrowser> browser, FocusSource source) override;
+
+#pragma endregion CefFocusHandler
 
 #pragma region CefKeyboardHandler
 
@@ -263,6 +277,10 @@ public:
                              CefProcessId source_process,
                              CefRefPtr<CefProcessMessage> message);
 
+  void NotifyTakeFocus(bool next);
+
+  void NotifyDragRegion(const std::vector<CefDraggableRegion> regions);
+
   void SetContextMenuHandler(CefRefPtr<CefContextMenuHandler> handler) { pContextMenuHandler_ = handler; }
 
   void SetDialogHandler(CefRefPtr<CefDialogHandler> handler) { pDialogHandler_ = handler; }
@@ -290,6 +308,11 @@ private:
   ///
   /// </summary>
   bool is_closing_;
+
+  /// <summary>
+  ///
+  /// </summary>
+  bool initial_navigation_;
 
   /// <summary>
   ///

@@ -91,8 +91,7 @@ public:
   /// Navigates to the content.
   /// </summary>
   /// <param name="content"></param>
-  /// <param name="url"></param>
-  void navigateToString(const QString& content, const QString& url);
+  void navigateToString(const QString& content);
 
   /// <summary>
   ///
@@ -248,7 +247,20 @@ protected slots:
   /// <param name="errorCode"></param>
   /// <param name="errorMsg"></param>
   /// <param name="failedUrl"></param>
-  virtual void onLoadError(int errorCode, const QString& errorMsg, const QString& failedUrl);
+  /// <param name="handled"></param>
+  virtual void onLoadError(int errorCode, const QString& errorMsg, const QString& failedUrl, bool& handled);
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="region"></param>
+  virtual void onDraggableRegionChanged(const QRegion& region);
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="next"></param>
+  virtual void onTakeFocus(bool next);
 
   /// <summary>
   ///

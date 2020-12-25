@@ -9,6 +9,7 @@
 #include <include/cef_app.h>
 #include <include/cef_browser.h>
 #include <include/cef_frame.h>
+#include <include/cef_parser.h>
 #include <include/cef_sandbox_win.h>
 #pragma endregion cef_headers
 
@@ -75,14 +76,13 @@ public:
     return 0;
   }
 
-  void navigateToString(const QString& content, const QString& url)
+  void navigateToString(const QString& content)
   {
     if (pQCefViewHandler_) {
-      CefString strContent;
-      strContent.FromString(content.toStdString());
-      CefString strUrl;
-      strUrl.FromString(url.toStdString());
-      pQCefViewHandler_->GetBrowser()->GetMainFrame()->LoadString(strContent, strUrl);
+      std::string data = content.toStdString();
+      data = CefURIEncode(CefBase64Encode(data.c_str(), data.size()), false).ToString();
+      data = "data:text/html;base64," + data;
+      pQCefViewHandler_->GetBrowser()->GetMainFrame()->LoadURL(data);
     }
   }
 
@@ -282,9 +282,16 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
   connect(pImpl_->cefWindow(), SIGNAL(loadEnd(int)), this, SLOT(onLoadEnd(int)));
 
   connect(pImpl_->cefWindow(),
-          SIGNAL(loadError(int, const QString&, const QString&)),
+          SIGNAL(loadError(int, const QString&, const QString&, bool&)),
           this,
-          SLOT(onLoadError(int, const QString&, const QString&)));
+          SLOT(onLoadError(int, const QString&, const QString&, bool&)));
+
+  connect(pImpl_->cefWindow(),
+          SIGNAL(draggableRegionChanged(const QRegion&)),
+          this,
+          SLOT(onDraggableRegionChanged(const QRegion&)));
+
+  connect(pImpl_->cefWindow(), SIGNAL(takeFocus(bool)), this, SLOT(onTakeFocus(bool)));
 
   connect(pImpl_->cefWindow(), SIGNAL(processUrlRequest(const QString&)), this, SLOT(onQCefUrlRequest(const QString&)));
 
@@ -327,10 +334,10 @@ QCefView::getCefWinId()
 }
 
 void
-QCefView::navigateToString(const QString& content, const QString& url)
+QCefView::navigateToString(const QString& content)
 {
   if (pImpl_)
-    pImpl_->navigateToString(content, url);
+    pImpl_->navigateToString(content);
 }
 
 void
@@ -509,7 +516,15 @@ QCefView::onLoadEnd(int httpStatusCode)
 {}
 
 void
-QCefView::onLoadError(int errorCode, const QString& errorMsg, const QString& failedUrl)
+QCefView::onLoadError(int errorCode, const QString& errorMsg, const QString& failedUrl, bool& handled)
+{}
+
+void
+QCefView::onDraggableRegionChanged(const QRegion& region)
+{}
+
+void
+QCefView::onTakeFocus(bool next)
 {}
 
 void
