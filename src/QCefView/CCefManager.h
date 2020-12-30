@@ -46,6 +46,16 @@ public:
   /// <summary>
   ///
   /// </summary>
+  /// <param name="name"></param>
+  /// <param name="value"></param>
+  /// <param name="domain"></param>
+  /// <param name="url"></param>
+  /// <returns></returns>
+  bool addCookie(const std::string& name, const std::string& value, const std::string& domain, const std::string& url);
+
+  /// <summary>
+  ///
+  /// </summary>
   void uninitializeCef();
 
 protected slots:

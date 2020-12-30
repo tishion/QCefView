@@ -30,6 +30,11 @@ public:
   /// <summary>
   ///
   /// </summary>
+  static CefString bridge_object_name;
+
+  /// <summary>
+  ///
+  /// </summary>
   static CefString browser_sub_process_path;
 
   /// <summary>

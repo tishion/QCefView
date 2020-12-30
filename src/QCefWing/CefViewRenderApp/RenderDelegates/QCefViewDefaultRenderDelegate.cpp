@@ -5,12 +5,14 @@
 
 namespace QCefViewDefaultRenderDelegate {
 void
-CreateBrowserDelegate(QCefViewRenderApp::RenderDelegateSet& delegates)
+CreateBrowserDelegate(QCefViewRenderApp::RenderDelegateSet& delegates, const CefString& name)
 {
-  delegates.insert(new RenderDelegate());
+  delegates.insert(new RenderDelegate(name));
 }
 
-RenderDelegate::RenderDelegate() {}
+RenderDelegate::RenderDelegate(const CefString& name)
+  : bridge_object_name_(name)
+{}
 
 void
 RenderDelegate::OnWebKitInitialized(CefRefPtr<QCefViewRenderApp> app)
@@ -35,7 +37,10 @@ RenderDelegate::OnContextCreated(CefRefPtr<QCefViewRenderApp> app,
     // create and insert the QCefClient Object into this frame.window object
     CefRefPtr<CefV8Value> objWindow = context->GetGlobal();
     CefRefPtr<QCefClient> objClient = new QCefClient(browser, frame);
-    objWindow->SetValue(QCEF_OBJECT_NAME, objClient->GetObject(), V8_PROPERTY_ATTRIBUTE_READONLY);
+    if (bridge_object_name_.empty())
+      bridge_object_name_ = QCEF_OBJECT_NAME;
+
+    objWindow->SetValue(bridge_object_name_, objClient->GetObject(), V8_PROPERTY_ATTRIBUTE_READONLY);
     frame_id_to_client_map_[frameId] = objClient;
   }
 }

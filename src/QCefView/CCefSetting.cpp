@@ -5,6 +5,8 @@
 
 #include "CCefSetting.h"
 
+CefString CCefSetting::bridge_object_name;
+
 CefString CCefSetting::browser_sub_process_path;
 
 CefString CCefSetting::resource_directory_path;

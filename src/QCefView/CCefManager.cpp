@@ -49,12 +49,12 @@ CCefManager::initializeCef()
 
 #ifndef NDEBUG
   cef_settings_.log_severity = LOGSEVERITY_DEFAULT;
-  cef_settings_.remote_debugging_port = 7777;
+  cef_settings_.remote_debugging_port = CCefSetting::remote_debugging_port;
 #else
   cef_settings_.log_severity = LOGSEVERITY_DISABLE;
 #endif
 
-  app_ = new QCefViewBrowserApp();
+  app_ = new QCefViewBrowserApp(CCefSetting::bridge_object_name);
 
   HINSTANCE hInstance = ::GetModuleHandle(nullptr);
   CefMainArgs main_args(hInstance);
@@ -65,6 +65,19 @@ CCefManager::initializeCef()
     assert(0);
 }
 
+bool
+CCefManager::addCookie(const std::string& name,
+                       const std::string& value,
+                       const std::string& domain,
+                       const std::string& url)
+{
+  CefCookie cookie;
+  CefString(&cookie.name).FromString(name);
+  CefString(&cookie.value).FromString(value);
+  CefString(&cookie.domain).FromString(domain);
+  return CefCookieManager::GetGlobalManager(nullptr)->SetCookie(CefString(url), cookie, nullptr);
+}
+
 void
 CCefManager::uninitializeCef()
 {
@@ -72,13 +85,13 @@ CCefManager::uninitializeCef()
   if (--nBrowserRefCount_ > 0)
     return;
 
+  // Destroy the application
+  app_ = nullptr;
+
   // The last time release
   // TO-DO (sheen) when we reach here, it is possible there are pending
   // IO requests, and they will fire the DCHECK when complete or aborted
   releaseCef();
-
-  // Destroy te application
-  app_ = nullptr;
 }
 
 void

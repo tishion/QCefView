@@ -21,7 +21,7 @@ public:
   /// <summary>
   ///
   /// </summary>
-  QCefViewRenderApp();
+  QCefViewRenderApp(const CefString& name);
 
   /// <summary>
   ///
@@ -161,7 +161,7 @@ private:
   ///
   /// </summary>
   /// <param name="delegates"></param>
-  static void CreateRenderDelegates(RenderDelegateSet& delegates);
+  static void CreateRenderDelegates(RenderDelegateSet& delegates, const CefString& name);
 
 #pragma region CefApp
 
@@ -294,6 +294,11 @@ private:
 #pragma endregion CefRenderProcessHandler
 
 private:
+  /// <summary>
+  ///
+  /// </summary>
+  CefString bridge_object_name_;
+
   // Set of supported RenderDelegates. Only used in the renderer process.
   /// <summary>
   ///

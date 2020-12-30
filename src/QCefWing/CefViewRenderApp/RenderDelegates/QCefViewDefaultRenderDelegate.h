@@ -17,7 +17,7 @@ namespace QCefViewDefaultRenderDelegate {
 ///
 /// </summary>
 void
-CreateBrowserDelegate(QCefViewRenderApp::RenderDelegateSet& delegates);
+CreateBrowserDelegate(QCefViewRenderApp::RenderDelegateSet& delegates, const CefString& name);
 
 /// <summary>
 ///
@@ -33,7 +33,7 @@ public:
   /// <summary>
   ///
   /// </summary>
-  RenderDelegate();
+  RenderDelegate(const CefString& name);
 
   /// <summary>
   ///
@@ -106,6 +106,11 @@ protected:
                             CefRefPtr<CefDictionaryValue> dict);
 
 private:
+  /// <summary>
+  ///
+  /// </summary>
+  CefString bridge_object_name_;
+
   /// <summary>
   ///
   /// </summary>

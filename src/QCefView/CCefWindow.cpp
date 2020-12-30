@@ -32,8 +32,6 @@ CCefWindow::CCefWindow(QWindow* parent /*= 0*/)
 
 CCefWindow::~CCefWindow()
 {
-  destroy();
-
   if (hwndCefBrowser_)
     hwndCefBrowser_ = nullptr;
 

@@ -94,6 +94,18 @@ userDataPath();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
+setBridgeObjectName(const QString& name);
+
+/// <summary>
+///
+/// </summary>
+const QCEFVIEW_EXPORT QString
+bridgeObjectName();
+
+/// <summary>
+///
+/// </summary>
+void QCEFVIEW_EXPORT
 setPersistSessionCookies(bool enabled);
 
 /// <summary>

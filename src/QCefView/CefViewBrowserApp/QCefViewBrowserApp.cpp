@@ -8,9 +8,13 @@
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
 
+#include <QCefProtocol.h>
+
 #include "QCefViewBrowserApp.h"
 
-QCefViewBrowserApp::QCefViewBrowserApp() {}
+QCefViewBrowserApp::QCefViewBrowserApp(const CefString& name)
+  : bridge_object_name_(name)
+{}
 
 QCefViewBrowserApp::~QCefViewBrowserApp() {}
 
@@ -81,6 +85,10 @@ QCefViewBrowserApp::OnContextInitialized()
 void
 QCefViewBrowserApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
 {
+  if (bridge_object_name_.empty())
+    bridge_object_name_ = QCEF_OBJECT_NAME;
+
+  command_line->AppendSwitchWithValue(QCEF_BRIDGE_OBJ_NAME_KEY, bridge_object_name_);
   BrowserDelegateSet::iterator it = browser_delegates_.begin();
   for (; it != browser_delegates_.end(); ++it)
     (*it)->OnBeforeChildProcessLaunch(this, command_line);

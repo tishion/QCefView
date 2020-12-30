@@ -15,7 +15,7 @@ class QCefViewBrowserApp
   , public CefBrowserProcessHandler
 {
 public:
-  QCefViewBrowserApp();
+  QCefViewBrowserApp(const CefString& name);
   ~QCefViewBrowserApp();
 
   class BrowserDelegate : public virtual CefBaseRefCounted
@@ -74,6 +74,8 @@ private:
 #pragma endregion CefBrowserProcessHandler
 
 private:
+  CefString bridge_object_name_;
+
   // Set of supported BrowserDelegates. Only used in the browser process.
   BrowserDelegateSet browser_delegates_;
 

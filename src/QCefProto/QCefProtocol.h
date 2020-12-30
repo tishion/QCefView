@@ -25,6 +25,11 @@
 #define QCEF_OBJECT_NAME "QCefClient"
 
 /// <summary>
+///
+/// </summary>
+#define QCEF_BRIDGE_OBJ_NAME_KEY "bridge-obj-name"
+
+/// <summary>
 /// QCefClient.invokeMethod("method_name", ...)
 /// </summary>
 #define QCEF_INVOKEMETHOD "invokeMethod"
@@ -81,6 +86,6 @@
 /// <summary>
 ///
 /// </summary>
-#define QCEF_USER_AGENT "QCefView/1.0 (Windows; en-us)"
+#define QCEF_USER_AGENT "START/1.0 (Windows; en-us)"
 
 #endif

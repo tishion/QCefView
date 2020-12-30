@@ -88,6 +88,20 @@ QCefSetting::userDataPath()
 }
 
 void
+QCefSetting::setBridgeObjectName(const QString& name)
+{
+  CCefSetting::initializeInstance();
+  CCefSetting::bridge_object_name.FromString(name.toStdString());
+}
+
+const QString
+QCefSetting::bridgeObjectName()
+{
+  CCefSetting::initializeInstance();
+  return QString::fromStdString(CCefSetting::bridge_object_name);
+}
+
+void
 QCefSetting::setPersistSessionCookies(bool enabled)
 {
   CCefSetting::initializeInstance();

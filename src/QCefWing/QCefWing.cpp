@@ -10,6 +10,7 @@
 #pragma endregion cef_headers
 
 #pragma region project_heasers
+#include <QCefProtocol.h>
 #include "CefViewRenderApp/QCefViewRenderApp.h"
 #include "QCefWing.h"
 #pragma endregion project_heasers
@@ -23,7 +24,16 @@ _tWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTST
 
   CefEnableHighDPISupport();
 
-  CefRefPtr<QCefViewRenderApp> app(new QCefViewRenderApp);
+  CefString bridgeObjectName = QCEF_OBJECT_NAME;
+  CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
+  command_line->InitFromString(lpCmdLine);
+  if (command_line->HasSwitch(QCEF_BRIDGE_OBJ_NAME_KEY)) {
+    bridgeObjectName = command_line->GetSwitchValue(QCEF_BRIDGE_OBJ_NAME_KEY);
+    if (bridgeObjectName.empty())
+      bridgeObjectName = QCEF_OBJECT_NAME;
+  }
+
+  CefRefPtr<QCefViewRenderApp> app(new QCefViewRenderApp(bridgeObjectName));
   CefMainArgs main_args(hInstance);
   void* sandboxInfo = nullptr;
   return CefExecuteProcess(main_args, app, sandboxInfo);

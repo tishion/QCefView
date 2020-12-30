@@ -13,14 +13,16 @@
 #include "RenderDelegates/QCefViewDefaultRenderDelegate.h"
 #pragma endregion project_headers
 
-QCefViewRenderApp::QCefViewRenderApp() {}
+QCefViewRenderApp::QCefViewRenderApp(const CefString& name)
+  : bridge_object_name_(name)
+{}
 
 QCefViewRenderApp::~QCefViewRenderApp() {}
 
 void
-QCefViewRenderApp::CreateRenderDelegates(RenderDelegateSet& delegates)
+QCefViewRenderApp::CreateRenderDelegates(RenderDelegateSet& delegates, const CefString& name)
 {
-  QCefViewDefaultRenderDelegate::CreateBrowserDelegate(delegates);
+  QCefViewDefaultRenderDelegate::CreateBrowserDelegate(delegates, name);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,7 +58,7 @@ QCefViewRenderApp::OnRenderThreadCreated(CefRefPtr<CefListValue> extra_info)
 {
   CEF_REQUIRE_RENDERER_THREAD();
 
-  CreateRenderDelegates(render_delegates_);
+  CreateRenderDelegates(render_delegates_, bridge_object_name_);
 
   RenderDelegateSet::iterator it = render_delegates_.begin();
   for (; it != render_delegates_.end(); ++it)

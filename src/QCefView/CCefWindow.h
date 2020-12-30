@@ -88,6 +88,13 @@ signals:
   /// <summary>
   ///
   /// </summary>
+  /// <param name="message"></param>
+  /// <param name="level"></param>
+  void consoleMessage(const QString& message, int level);
+
+  /// <summary>
+  ///
+  /// </summary>
   /// <param name="regions"></param>
   void draggableRegionChanged(const QRegion& region);
 

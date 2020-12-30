@@ -264,7 +264,12 @@ public:
 
   CefRefPtr<CefBrowser> GetBrowser() const;
 
-  int GetBrowserId() const;
+  void AddLocalDirectoryResourceProvider(const std::string& dir_path, const std::string& url, int priority = 0);
+
+  void AddArchiveResourceProvider(const std::string& archive_path,
+                                  const std::string& url,
+                                  const std::string& password,
+                                  int priority = 0);
 
   // Request that all existing browser windows close.
   void CloseAllBrowsers(bool force_close);

@@ -92,16 +92,15 @@ QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
                                          int line)
 {
   CEF_REQUIRE_UI_THREAD();
-  if (source.empty() || message.empty())
-    return false;
 
-  std::string src = source.ToString();
-  std::size_t found = src.find_last_of("/\\");
-  if (found != std::string::npos && found < src.length() - 1)
-    src = src.substr(found + 1);
+  if (pQCefWindow_)
+    pQCefWindow_->consoleMessage(QString::fromStdString(message.ToString()), level);
 
-  __noop(src, message.ToString());
+#if (defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG))
   return false;
+#else
+  return true;
+#endif
 }
 
 bool
@@ -207,9 +206,6 @@ QCefViewBrowserHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
   // If the browser is closing, block the popup
   if (is_closing_)
     return true;
-
-  // Allow the popup
-  return false;
 
   // Redirect all popup page into the source frame forcefully
   frame->LoadURL(target_url);
@@ -490,26 +486,56 @@ QCefViewBrowserHandler::GetBrowser() const
 }
 
 void
+QCefViewBrowserHandler::AddLocalDirectoryResourceProvider(const std::string& dir_path,
+                                                          const std::string& url,
+                                                          int priority /* = 0*/)
+{
+  if (dir_path.empty() || url.empty())
+    return;
+
+  std::string identifier;
+  resource_manager_->AddDirectoryProvider(url, dir_path, priority, identifier);
+}
+
+void
+QCefViewBrowserHandler::AddArchiveResourceProvider(const std::string& archive_path,
+                                                   const std::string& url,
+                                                   const std::string& password,
+                                                   int priority /* = 0*/)
+{
+  if (archive_path.empty() || url.empty())
+    return;
+
+  std::string identifier;
+  resource_manager_->AddArchiveProvider(url, archive_path, password, 0, identifier);
+}
+
+void
 QCefViewBrowserHandler::CloseAllBrowsers(bool force_close)
 {
   // If all browsers had been closed, then return
   std::unique_lock<std::mutex> lock(mtx_);
-  if (!browser_count_) {
+  if (!browser_count_)
     return;
-  }
 
   // Flip the closing flag
   is_closing_ = true;
 
   // Close all popup browsers if any
   if (!popup_browser_list_.empty()) {
-    for (auto it = popup_browser_list_.begin(); it != popup_browser_list_.end(); ++it)
+    for (auto it = popup_browser_list_.begin(); it != popup_browser_list_.end(); ++it) {
+      ::SetParent((*it)->GetHost()->GetWindowHandle(), NULL);
       (*it)->GetHost()->CloseBrowser(force_close);
+      //::PostMessage((*it)->GetHost()->GetWindowHandle(), WM_CLOSE, 0, 0);
+    }
   }
 
-  if (main_browser_)
+  if (main_browser_) {
     // Request that the main browser close.
+    ::SetParent(main_browser_->GetHost()->GetWindowHandle(), NULL);
     main_browser_->GetHost()->CloseBrowser(force_close);
+    //::PostMessage(main_browser_->GetHost()->GetWindowHandle(), WM_CLOSE, 0, 0);
+  }
 
   // Wait for the browser to be closed
   close_cv_.wait(lock);
