@@ -13,42 +13,42 @@ QCefEvent::QCefEvent()
   : QObject(nullptr)
 {}
 
-QCefEvent::QCefEvent(const char* name)
+QCefEvent::QCefEvent(const QString& name)
   : QObject()
 {
   setObjectName(name);
 }
 
 void
-QCefEvent::setEventName(const char* name)
+QCefEvent::setEventName(const QString& name)
 {
   setObjectName(name);
 }
 
 void
-QCefEvent::setIntProperty(const char* key, int value)
+QCefEvent::setIntProperty(const QString& key, int value)
 {
   Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
-  setProperty(key, QVariant::fromValue(value));
+  setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
 }
 
 void
-QCefEvent::setDoubleProperty(const char* key, double value)
+QCefEvent::setDoubleProperty(const QString& key, double value)
 {
   Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
-  setProperty(key, QVariant::fromValue(value));
+  setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
 }
 
 void
-QCefEvent::setStringProperty(const char* key, QString value)
+QCefEvent::setStringProperty(const QString& key, const QString& value)
 {
   Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
-  setProperty(key, QVariant::fromValue(value));
+  setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
 }
 
 void
-QCefEvent::setBoolProperty(const char* key, bool value)
+QCefEvent::setBoolProperty(const QString& key, bool value)
 {
   Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
-  setProperty(key, QVariant::fromValue(value));
+  setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
 }

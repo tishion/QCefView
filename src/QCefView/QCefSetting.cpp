@@ -184,3 +184,11 @@ QCefSetting::acceptLanguageList()
   CCefSetting::initializeInstance();
   return QString::fromStdString(CCefSetting::accept_language_list.ToString());
 }
+
+void QCEFVIEW_EXPORT
+QCefSetting::setGlobalCookie(const QString& name, const QString& value, const QString& domain, const QString& url)
+{
+  CCefSetting::initializeInstance();
+  CCefSetting::global_cookie_list.push_back(
+    { name.toStdString(), value.toStdString(), domain.toStdString(), url.toStdString() });
+}

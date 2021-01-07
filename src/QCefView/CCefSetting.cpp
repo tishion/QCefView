@@ -31,6 +31,8 @@ cef_color_t CCefSetting::background_color;
 
 CefString CCefSetting::accept_language_list;
 
+std::list<CCefSetting::CookieItem> CCefSetting::global_cookie_list;
+
 void
 CCefSetting::initializeInstance()
 {

@@ -34,41 +34,41 @@ public:
   ///
   /// </summary>
   /// <param name="name"></param>
-  QCefEvent(const char* name);
+  QCefEvent(const QString& name);
 
   /// <summary>
   ///
   /// </summary>
   /// <param name="name"></param>
-  void setEventName(const char* name);
+  void setEventName(const QString& name);
 
   /// <summary>
   ///
   /// </summary>
   /// <param name="key"></param>
   /// <param name="value"></param>
-  void setIntProperty(const char* key, int value);
+  void setIntProperty(const QString& key, int value);
 
   /// <summary>
   ///
   /// </summary>
   /// <param name="key"></param>
   /// <param name="value"></param>
-  void setDoubleProperty(const char* key, double value);
+  void setDoubleProperty(const QString& key, double value);
 
   /// <summary>
   ///
   /// </summary>
   /// <param name="key"></param>
   /// <param name="value"></param>
-  void setStringProperty(const char* key, QString value);
+  void setStringProperty(const QString& key, const QString& value);
 
   /// <summary>
   ///
   /// </summary>
   /// <param name="key"></param>
   /// <param name="value"></param>
-  void setBoolProperty(const char* key, bool value);
+  void setBoolProperty(const QString& key, bool value);
 };
 
 #endif // QCEFEVENT_H

@@ -103,7 +103,7 @@ public:
   /// <param name="value"></param>
   /// <param name="domain"></param>
   /// <param name="url"></param>
-  static void addCookie(const QString& name, const QString& value, const QString& domain, const QString& url);
+  void addCookie(const QString& name, const QString& value, const QString& domain, const QString& url);
 
   /// <summary>
   ///
@@ -168,7 +168,7 @@ public:
   /// <param name="event"></param>
   /// <param name="frameId"></param>
   /// <returns></returns>
-  bool triggerEvent(const QString& name, const QCefEvent& event);
+  bool triggerEvent(const QCefEvent& event);
 
   /// <summary>
   ///
@@ -177,7 +177,7 @@ public:
   /// <param name="event"></param>
   /// <param name="frameId"></param>
   /// <returns></returns>
-  bool triggerEvent(const QString& name, const QCefEvent& event, int frameId);
+  bool triggerEvent(const QCefEvent& event, int frameId);
 
   /// <summary>
   ///
@@ -185,7 +185,7 @@ public:
   /// <param name="name"></param>
   /// <param name="event"></param>
   /// <returns></returns>
-  bool broadcastEvent(const QString& name, const QCefEvent& event);
+  bool broadcastEvent(const QCefEvent& event);
 
   /// <summary>
   ///

@@ -20,6 +20,7 @@
 #include "Include/QCefEvent.h"
 #include "CCefManager.h"
 #include "CCefWindow.h"
+#include "CCefSetting.h"
 #include "CefViewBrowserApp/QCefViewBrowserHandler.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,11 +40,8 @@ public:
     RECT rc = { 0 };
     window_info.SetAsChild((HWND)pCefWindow_->winId(), rc);
 
-    for (auto cookieItem : cookieItemList_) {
-      CCefManager::getInstance().addCookie(cookieItem.name.toStdString(),
-                                           cookieItem.value.toStdString(),
-                                           cookieItem.domain.toStdString(),
-                                           cookieItem.url.toStdString());
+    for (auto cookieItem : CCefSetting::global_cookie_list) {
+      CCefManager::getInstance().addCookie(cookieItem.name, cookieItem.value, cookieItem.domain, cookieItem.url);
     }
 
     CefBrowserSettings browserSettings;
@@ -224,7 +222,7 @@ public:
     CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
 
     CefString cefStr;
-    cefStr.FromWString(event.objectName().toStdWString());
+    cefStr.FromString(event.objectName().toUtf8().constData());
     dict->SetString("name", cefStr);
 
     QList<QByteArray> keys = event.dynamicPropertyNames();
@@ -237,7 +235,7 @@ public:
       else if (value.type() == QMetaType::Double)
         dict->SetDouble(key.data(), value.toDouble());
       else if (value.type() == QMetaType::QString) {
-        cefStr.FromWString(value.toString().toStdWString());
+        cefStr.FromString(value.toString().toUtf8().constData());
         dict->SetString(key.data(), cefStr);
       } else {
       }
@@ -309,15 +307,6 @@ public:
   } ArchiveMapping;
   static QList<ArchiveMapping> archiveMappingList_;
 
-  typedef struct CookieItem
-  {
-    QString name;
-    QString value;
-    QString domain;
-    QString url;
-  } CookieItem;
-  static QList<CookieItem> cookieItemList_;
-
 private:
   /// <summary>
   ///
@@ -332,7 +321,6 @@ private:
 
 QList<QCefView::Implementation::FolderMapping> QCefView::Implementation::folderMappingList_;
 QList<QCefView::Implementation::ArchiveMapping> QCefView::Implementation::archiveMappingList_;
-QList<QCefView::Implementation::CookieItem> QCefView::Implementation::cookieItemList_;
 
 QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
   : QWidget(parent)
@@ -340,11 +328,12 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 {
   pImpl_ = std::make_unique<Implementation>(url, windowHandle());
 
-  QGridLayout* layout = new QGridLayout();
+  QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
+  setLayout(layout);
+
   QWidget* windowContainer = createWindowContainer(pImpl_->cefWindow(), this);
   layout->addWidget(windowContainer);
-  setLayout(layout);
 
   /* clang-format off */
   connect(pImpl_->cefWindow(), SIGNAL(loadingStateChanged(bool, bool, bool)),
@@ -405,13 +394,14 @@ QCefView::addLocalFolderResource(const QString& path, const QString& url, int pr
 void
 QCefView::addArchiveResource(const QString& path, const QString& url, const QString& password /* = ""*/)
 {
-  Implementation::archiveMappingList_.push_back({ password, url, password });
+  Implementation::archiveMappingList_.push_back({ path, url, password });
 }
 
 void
 QCefView::addCookie(const QString& name, const QString& value, const QString& domain, const QString& url)
 {
-  Implementation::cookieItemList_.push_back({ name, value, domain, url });
+  CCefManager::getInstance().addCookie(
+    name.toStdString(), value.toStdString(), domain.toStdString(), url.toStdString());
 }
 
 WId
@@ -493,28 +483,28 @@ QCefView::browserStopLoad()
 }
 
 bool
-QCefView::triggerEvent(const QString& name, const QCefEvent& event)
+QCefView::triggerEvent(const QCefEvent& event)
 {
   if (pImpl_)
-    return pImpl_->triggerEvent(name, event, QCefViewBrowserHandler::MAIN_FRAME);
+    return pImpl_->triggerEvent(event.objectName(), event, QCefViewBrowserHandler::MAIN_FRAME);
 
   return false;
 }
 
 bool
-QCefView::triggerEvent(const QString& name, const QCefEvent& event, int frameId)
+QCefView::triggerEvent(const QCefEvent& event, int frameId)
 {
   if (pImpl_)
-    return pImpl_->triggerEvent(name, event, frameId);
+    return pImpl_->triggerEvent(event.objectName(), event, frameId);
 
   return false;
 }
 
 bool
-QCefView::broadcastEvent(const QString& name, const QCefEvent& event)
+QCefView::broadcastEvent(const QCefEvent& event)
 {
   if (pImpl_)
-    return pImpl_->triggerEvent(name, event, QCefViewBrowserHandler::ALL_FRAMES);
+    return pImpl_->triggerEvent(event.objectName(), event, QCefViewBrowserHandler::ALL_FRAMES);
 
   return false;
 }

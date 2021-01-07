@@ -1,23 +1,25 @@
 #include <windows.h>
 #include <QMessageBox>
 #include <QColor>
+#include <QRandomGenerator>
+
 #include "customcefview.h"
-CustomCefView::CustomCefView(const QString& url, QWidget* parent)
-  : QCefView(url, parent)
-{}
 
 CustomCefView::~CustomCefView() {}
 
 void
 CustomCefView::changeColor()
 {
-  qsrand(::GetTickCount());
-  QColor color(qrand());
+  QColor color(QRandomGenerator::global()->generate());
 
-  QCefEvent event("colorChangedEvent");
+  QCefEvent event("colorChange");
   event.setStringProperty("color", color.name());
-  broadcastEvent("colorChange", event);
+  broadcastEvent(event);
 }
+
+void
+CustomCefView::onDraggableRegionChanged(const QRegion& region)
+{}
 
 void
 CustomCefView::onQCefUrlRequest(const QString& url)

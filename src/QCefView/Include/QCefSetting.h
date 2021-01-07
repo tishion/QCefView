@@ -173,6 +173,13 @@ setAcceptLanguageList(const QString& languages);
 /// </summary>
 const QCEFVIEW_EXPORT QString
 acceptLanguageList();
+
+/// <summary>
+///
+/// </summary>
+void QCEFVIEW_EXPORT
+setGlobalCookie(const QString& name, const QString& value, const QString& domain, const QString& url);
+
 };
 
 #endif

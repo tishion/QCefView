@@ -203,6 +203,9 @@ QCefViewBrowserHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
 {
   CEF_REQUIRE_UI_THREAD();
 
+  // cancel all popup
+  return true;
+
   // If the browser is closing, block the popup
   if (is_closing_)
     return true;

@@ -91,4 +91,16 @@ public:
   ///
   /// </summary>
   static CefString accept_language_list;
+
+  /// <summary>
+  ///
+  /// </summary>
+  typedef struct CookieItem
+  {
+    std::string name;
+    std::string value;
+    std::string domain;
+    std::string url;
+  } CookieItem;
+  static std::list<CookieItem> global_cookie_list;
 };

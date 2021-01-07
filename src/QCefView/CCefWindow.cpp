@@ -3,6 +3,7 @@
 #include <QResizeEvent>
 #include <QPaintDevice>
 #include <QPainter>
+#include <QDebug>
 #pragma endregion qt_headers
 
 #include "CCefWindow.h"
@@ -53,8 +54,10 @@ CCefWindow::setCefBrowserWindow(CefWindowHandle wnd)
 void
 CCefWindow::syncCefBrowserWindow()
 {
+  double w = width() * devicePixelRatio();
+  double h = height() * devicePixelRatio();
   if (hwndCefBrowser_)
-    ::MoveWindow(hwndCefBrowser_, 0, 0, width(), height(), TRUE);
+    ::SetWindowPos(hwndCefBrowser_, NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_DEFERERASE);
 }
 
 void
@@ -68,5 +71,7 @@ void
 CCefWindow::resizeEvent(QResizeEvent* e)
 {
   syncCefBrowserWindow();
-  return __super::resizeEvent(e);
+  __super::resizeEvent(e);
+
+  return;
 }
