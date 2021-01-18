@@ -2,12 +2,9 @@
 
 #pragma region std_headers
 #include <vector>
+#include <map>
+#include <mutex>
 #pragma endregion std_headers
-
-#pragma region qt_headers
-#include <QObject>
-#include <QPointer>
-#pragma endregion qt_headers
 
 #pragma region cef_headers
 #include <include/cef_base.h>
@@ -17,7 +14,7 @@
 
 #include <QCefProtocol.h>
 
-#include "../../CCefWindow.h"
+#include "../QCefViewDelegate.h"
 
 namespace QCefViewDefaultSchemeHandler {
 static char* scheme_name = QCEF_SCHEMA;
@@ -31,7 +28,7 @@ RegisterScheme(CefRawPtr<CefSchemeRegistrar> registrar);
 class SchemeHandler : public CefResourceHandler
 {
 public:
-  SchemeHandler(CCefWindow* pQCefWin);
+  SchemeHandler(QCefViewDelegate* pDelegate);
 
   virtual bool Open(CefRefPtr<CefRequest> request, bool& handle_request, CefRefPtr<CefCallback> callback) override;
 
@@ -55,7 +52,7 @@ public:
   virtual void Cancel() override;
 
 private:
-  QPointer<CCefWindow> pQCefWindow_;
+  QCefViewDelegate* pQCefViewDelegate_;
   std::string data_;
   std::string mime_type_;
   int offset_;
@@ -67,11 +64,29 @@ private:
 class SchemeHandlerFactory : public CefSchemeHandlerFactory
 {
 
+public:
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="browser"></param>
+  /// <param name="pDelegate"></param>
+  static void recordBrowserAndDelegate(CefRefPtr<CefBrowser> browser, QCefViewDelegate* pDelegate);
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="browser"></param>
+  static void removeBrowserAndDelegate(CefRefPtr<CefBrowser> browser);
+
   // Return a new scheme handler instance to handle the request.
   virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
                                                CefRefPtr<CefFrame> frame,
                                                const CefString& scheme_name,
                                                CefRefPtr<CefRequest> request);
+
+private:
+  static std::map<void*, QCefViewDelegate*> mapBrowser2Delegate_;
+  static std::mutex mtxMap_;
 
 private:
   IMPLEMENT_REFCOUNTING(SchemeHandlerFactory);

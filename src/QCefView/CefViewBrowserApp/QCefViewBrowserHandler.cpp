@@ -10,22 +10,16 @@
 #include <include/wrapper/cef_helpers.h>
 #pragma endregion cef_headers
 
-#pragma region qt_headers
-#include <QRect>
-#include <QWindow>
-#include <QVariant>
-#include <QRegion>
-#pragma endregion qt_headers
-
 #include <QCefProtocol.h>
 
 #include "QCefViewBrowserHandler.h"
+#include "SchemeHandlers/QCefViewDefaultSchemeHandler.h"
 
-QCefViewBrowserHandler::QCefViewBrowserHandler(CCefWindow* pQCefWin)
+QCefViewBrowserHandler::QCefViewBrowserHandler(QCefViewDelegate* pDelegate)
   : is_closing_(false)
   , initial_navigation_(false)
-  , pQCefWindow_(pQCefWin)
-  , cefquery_handler_(new QCefQueryHandler(pQCefWin))
+  , pQCefViewDelegate_(pDelegate)
+  , cefquery_handler_(new QCefQueryHandler(pDelegate))
   , resource_manager_(new CefResourceManager())
   , message_router_(nullptr)
   , browser_count_(0)
@@ -93,8 +87,8 @@ QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 {
   CEF_REQUIRE_UI_THREAD();
 
-  if (pQCefWindow_)
-    pQCefWindow_->consoleMessage(QString::fromStdString(message.ToString()), level);
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onConsoleMessage(message, level);
 
 #if (defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG))
   return false;
@@ -245,8 +239,8 @@ QCefViewBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     }
 
     // Set the cef window handle to the QcefWindow
-    if (pQCefWindow_)
-      pQCefWindow_->setCefBrowserWindow(browser->GetHost()->GetWindowHandle());
+    if (pQCefViewDelegate_)
+      pQCefViewDelegate_->setCefBrowserWindow(browser->GetHost()->GetWindowHandle());
   } else if (browser->IsPopup()) {
     // Add to the list of popup browsers.
     popup_browser_list_.push_back(browser);
@@ -255,6 +249,8 @@ QCefViewBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     // parent window may attempt to keep focus after launching the popup.
     CefPostTask(TID_UI, CefCreateClosureTask(base::Bind(&CefBrowserHost::SetFocus, browser->GetHost().get(), true)));
   }
+
+  QCefViewDefaultSchemeHandler::SchemeHandlerFactory::recordBrowserAndDelegate(browser, pQCefViewDelegate_);
 
   // Increase the browser count
   {
@@ -310,6 +306,8 @@ QCefViewBrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
     }
   }
 
+  QCefViewDefaultSchemeHandler::SchemeHandlerFactory::removeBrowserAndDelegate(browser);
+
   // Decrease the browser count
   {
     std::unique_lock<std::mutex> lock(mtx_);
@@ -336,8 +334,8 @@ QCefViewBrowserHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
     initial_navigation_ = false;
   }
 
-  if (pQCefWindow_)
-    pQCefWindow_->loadingStateChanged(isLoading, canGoBack, canGoForward);
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onLoadingStateChanged(isLoading, canGoBack, canGoForward);
 }
 
 void
@@ -346,8 +344,8 @@ QCefViewBrowserHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
                                     TransitionType transition_type)
 {
   CEF_REQUIRE_UI_THREAD();
-  if (pQCefWindow_) {
-    pQCefWindow_->loadStart();
+  if (pQCefViewDelegate_) {
+    pQCefViewDelegate_->onLoadStart();
   }
 }
 
@@ -355,8 +353,8 @@ void
 QCefViewBrowserHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode)
 {
   CEF_REQUIRE_UI_THREAD();
-  if (pQCefWindow_)
-    pQCefWindow_->loadEnd(httpStatusCode);
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onLoadEnd(httpStatusCode);
 }
 
 void
@@ -371,11 +369,8 @@ QCefViewBrowserHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
     return;
 
   bool handled = false;
-  if (pQCefWindow_) {
-    auto msg = QString::fromStdString(errorText.ToString());
-    auto url = QString::fromStdString(failedUrl.ToString());
-    pQCefWindow_->loadError(errorCode, msg, url, handled);
-  }
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onLoadError(errorCode, errorText, failedUrl, handled);
 
   if (handled)
     return;
@@ -585,57 +580,12 @@ QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser,
                                               CefProcessId source_process,
                                               CefRefPtr<CefProcessMessage> message)
 {
-  if (pQCefWindow_ && message->GetName() == INVOKEMETHOD_NOTIFY_MESSAGE) {
+  if (pQCefViewDelegate_ && message->GetName() == INVOKEMETHOD_NOTIFY_MESSAGE) {
+    int browserId = browser->GetIdentifier();
+
     CefRefPtr<CefListValue> messageArguments = message->GetArgumentList();
-    if (messageArguments && (messageArguments->GetSize() >= 2)) {
-      int idx = 0;
-      if (CefValueType::VTYPE_INT == messageArguments->GetType(idx)) {
-        int browserId = browser->GetIdentifier();
-        int frameId = messageArguments->GetInt(idx++);
-
-        if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx)) {
-          CefString functionName = messageArguments->GetString(idx++);
-          if (functionName == QCEF_INVOKEMETHOD) {
-            QString method;
-            if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx)) {
-#if defined(CEF_STRING_TYPE_UTF16)
-              method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
-#elif defined(CEF_STRING_TYPE_UTF8)
-              method = QString::fromUtf8(messageArguments->GetString(idx++).c_str());
-#elif defined(CEF_STRING_TYPE_WIDE)
-              method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
-#endif
-            }
-
-            QVariantList arguments;
-            QString qStr;
-            for (idx; idx < messageArguments->GetSize(); idx++) {
-              if (CefValueType::VTYPE_NULL == messageArguments->GetType(idx))
-                arguments.push_back(0);
-              else if (CefValueType::VTYPE_BOOL == messageArguments->GetType(idx))
-                arguments.push_back(QVariant::fromValue(messageArguments->GetBool(idx)));
-              else if (CefValueType::VTYPE_INT == messageArguments->GetType(idx))
-                arguments.push_back(QVariant::fromValue(messageArguments->GetInt(idx)));
-              else if (CefValueType::VTYPE_DOUBLE == messageArguments->GetType(idx))
-                arguments.push_back(QVariant::fromValue(messageArguments->GetDouble(idx)));
-              else if (CefValueType::VTYPE_STRING == messageArguments->GetType(idx)) {
-#if defined(CEF_STRING_TYPE_UTF16)
-                qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
-#elif defined(CEF_STRING_TYPE_UTF8)
-                qStr = QString::fromUtf8(messageArguments->GetString(idx).c_str());
-#elif defined(CEF_STRING_TYPE_WIDE)
-                qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
-#endif
-                arguments.push_back(qStr);
-              } else {
-              }
-            }
-            pQCefWindow_->invokeMethodNotify(browserId, frameId, method, arguments);
-            return true;
-          }
-        }
-      }
-    }
+    if (pQCefViewDelegate_)
+      pQCefViewDelegate_->onInvokeMethodNotify(browserId, messageArguments);
   }
 
   return false;
@@ -650,8 +600,8 @@ QCefViewBrowserHandler::NotifyTakeFocus(bool next)
     return;
   }
 
-  if (pQCefWindow_)
-    pQCefWindow_->takeFocus(next);
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onTakeFocus(next);
 }
 
 void
@@ -663,13 +613,6 @@ QCefViewBrowserHandler::NotifyDragRegion(const std::vector<CefDraggableRegion> r
     return;
   }
 
-  // Determine new draggable region.
-  QRegion region;
-  std::vector<CefDraggableRegion>::const_iterator it = regions.begin();
-  for (; it != regions.end(); ++it) {
-    region += QRegion(it->bounds.x, it->bounds.y, it->bounds.width, it->bounds.height);
-  }
-
-  if (pQCefWindow_)
-    pQCefWindow_->draggableRegionChanged(region);
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onDraggableRegionChanged(regions);
 }

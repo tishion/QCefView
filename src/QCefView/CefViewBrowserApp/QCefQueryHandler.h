@@ -1,3 +1,5 @@
+#ifndef QCEFQUERYHANDLER_H_
+#define QCEFQUERYHANDLER_H_
 #pragma once
 #pragma region std_headers
 #include <map>
@@ -10,14 +12,14 @@
 #include <include/wrapper/cef_message_router.h>
 #pragma endregion cef_headers
 
-#include "CCefWindow.h"
+#include "QCefViewDelegate.h"
 
 class QCefQueryHandler
   : public CefBaseRefCounted
   , public CefMessageRouterBrowserSide::Handler
 {
 public:
-  QCefQueryHandler(CCefWindow* pQCefWin);
+  QCefQueryHandler(QCefViewDelegate* pDelegate);
   ~QCefQueryHandler();
 
   virtual bool OnQuery(CefRefPtr<CefBrowser> browser,
@@ -32,10 +34,12 @@ public:
   bool Response(int64_t query, bool success, const CefString& response, int error);
 
 private:
-  QPointer<CCefWindow> pQCefWindow_;
+  QCefViewDelegate* pQcefViewDelegate_;
   std::map<int64, CefRefPtr<Callback>> mapCallback_;
   std::mutex mtxCallbackMap_;
 
 private:
   IMPLEMENT_REFCOUNTING(QCefQueryHandler);
 };
+
+#endif

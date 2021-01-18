@@ -19,8 +19,8 @@
 namespace QCefViewDefaultSchemeHandler {
 //////////////////////////////////////////////////////////////////////////
 // handler
-SchemeHandler::SchemeHandler(CCefWindow* pQCefWin)
-  : pQCefWindow_(pQCefWin)
+SchemeHandler::SchemeHandler(QCefViewDelegate* pDelegate)
+  : pQCefViewDelegate_(pDelegate)
   , offset_(0)
 {}
 
@@ -28,10 +28,9 @@ bool
 SchemeHandler::Open(CefRefPtr<CefRequest> request, bool& handle_request, CefRefPtr<CefCallback> callback)
 {
   handle_request = false;
-  if (pQCefWindow_) {
+  if (pQCefViewDelegate_) {
     CefString cefStrUrl = request->GetURL();
-    QString url = QString::fromStdString(cefStrUrl.ToString());
-    pQCefWindow_->processUrlRequest(url);
+    pQCefViewDelegate_->onQCefUrlRequest(cefStrUrl);
   }
 
   // no matter whether we have found the handler or not,
@@ -42,10 +41,9 @@ SchemeHandler::Open(CefRefPtr<CefRequest> request, bool& handle_request, CefRefP
 bool
 SchemeHandler::ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
 {
-  if (pQCefWindow_) {
+  if (pQCefViewDelegate_) {
     CefString cefStrUrl = request->GetURL();
-    QString url = QString::fromStdString(cefStrUrl.ToString());
-    pQCefWindow_->processUrlRequest(url);
+    pQCefViewDelegate_->onQCefUrlRequest(cefStrUrl);
   }
 
   return false;
@@ -95,6 +93,28 @@ void
 SchemeHandler::Cancel()
 {}
 
+std::map<void*, QCefViewDelegate*> SchemeHandlerFactory::mapBrowser2Delegate_;
+
+std::mutex SchemeHandlerFactory::mtxMap_;
+
+void
+SchemeHandlerFactory::recordBrowserAndDelegate(CefRefPtr<CefBrowser> browser, QCefViewDelegate* pDelegate)
+{
+  if (!browser)
+    return;
+
+  std::lock_guard<std::mutex> lock(mtxMap_);
+  mapBrowser2Delegate_[browser.get()] = pDelegate;
+}
+
+void
+SchemeHandlerFactory::removeBrowserAndDelegate(CefRefPtr<CefBrowser> browser)
+{
+  std::lock_guard<std::mutex> lock(mtxMap_);
+  if (mapBrowser2Delegate_.count(browser.get()))
+    mapBrowser2Delegate_.erase(browser.get());
+}
+
 //////////////////////////////////////////////////////////////////////////
 // handler factory
 //
@@ -105,13 +125,18 @@ SchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
                              const CefString& scheme_name,
                              CefRefPtr<CefRequest> request)
 {
-  //
-  // TO DO (Get the correct SchemeHandler corresponding to the browser)
-  //
-  // we must find corresponding QWidget
-  auto hostWnd = browser->GetHost()->GetWindowHandle();
-  auto cefWnd = CCefWindow::lookupInstance(hostWnd);
-  return new SchemeHandler(cefWnd);
+  QCefViewDelegate* pDelegate = nullptr;
+
+  {
+    std::lock_guard<std::mutex> lock(mtxMap_);
+    if (mapBrowser2Delegate_.count(browser.get()))
+      pDelegate = mapBrowser2Delegate_[browser.get()];
+  }
+
+  if (pDelegate)
+    return new SchemeHandler(pDelegate);
+  else
+    return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////

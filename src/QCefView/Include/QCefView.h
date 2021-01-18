@@ -230,22 +230,6 @@ public:
   /// <param name="handler"></param>
   void setKeyboardHandler(CefKeyboardHandler* handler);
 
-protected:
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="event"></param>
-  virtual void changeEvent(QEvent* event) override;
-
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="watched"></param>
-  /// <param name="event"></param>
-  /// <returns></returns>
-  virtual bool eventFilter(QObject* watched, QEvent* event) override;
-
-protected slots:
   /// <summary>
   ///
   /// </summary>
@@ -313,6 +297,21 @@ protected slots:
   /// <param name="method"></param>
   /// <param name="arguments"></param>
   virtual void onInvokeMethodNotify(int browserId, int frameId, const QString& method, const QVariantList& arguments);
+
+protected:
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="event"></param>
+  virtual void changeEvent(QEvent* event) override;
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="watched"></param>
+  /// <param name="event"></param>
+  /// <returns></returns>
+  virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
   /// <summary>

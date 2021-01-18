@@ -1,11 +1,15 @@
-#include "Include/QCefQuery.h"
 #include "QCefQueryHandler.h"
 
-QCefQueryHandler::QCefQueryHandler(CCefWindow* pQCefWin)
-  : pQCefWindow_(pQCefWin)
+#include "Include/QCefQuery.h"
+
+QCefQueryHandler::QCefQueryHandler(QCefViewDelegate* pDelegate)
+  : pQcefViewDelegate_(pDelegate)
 {}
 
-QCefQueryHandler::~QCefQueryHandler() {}
+QCefQueryHandler::~QCefQueryHandler()
+{
+  pQcefViewDelegate_ = nullptr;
+}
 
 bool
 QCefQueryHandler::OnQuery(CefRefPtr<CefBrowser> browser,
@@ -15,13 +19,12 @@ QCefQueryHandler::OnQuery(CefRefPtr<CefBrowser> browser,
                           bool persistent,
                           CefRefPtr<Callback> callback)
 {
-  if (pQCefWindow_) {
+  if (pQcefViewDelegate_) {
     mtxCallbackMap_.lock();
     mapCallback_[query_id] = callback;
     mtxCallbackMap_.unlock();
 
-    QString strRequest = QString::fromStdString(request.ToString());
-    pQCefWindow_->processQueryRequest(QCefQuery(strRequest, query_id));
+    pQcefViewDelegate_->onQCefQueryRequest(request, query_id);
 
     return true;
   }

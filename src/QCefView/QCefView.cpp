@@ -27,12 +27,12 @@
 class QCefView::Implementation
 {
 public:
-  explicit Implementation(const QString& url, QWindow* parent)
+  explicit Implementation(const QString& url, QCefView* view)
     : pCefWindow_(nullptr)
     , pQCefViewHandler_(nullptr)
   {
     // Here we must create a QWidget as a wrapper to encapsulate the QWindow
-    pCefWindow_ = new CCefWindow(parent);
+    pCefWindow_ = new CCefWindow(view);
     pCefWindow_->create();
 
     // Set window info
@@ -326,7 +326,7 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
   : QWidget(parent)
   , pImpl_(nullptr)
 {
-  pImpl_ = std::make_unique<Implementation>(url, windowHandle());
+  pImpl_ = std::make_unique<Implementation>(url, this);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -334,38 +334,6 @@ QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
 
   QWidget* windowContainer = createWindowContainer(pImpl_->cefWindow(), this);
   layout->addWidget(windowContainer);
-
-  /* clang-format off */
-  connect(pImpl_->cefWindow(), SIGNAL(loadingStateChanged(bool, bool, bool)),
-      this, SLOT(onLoadingStateChanged(bool, bool, bool)));
-
-  connect(pImpl_->cefWindow(), SIGNAL(loadStart()), 
-      this, SLOT(onLoadStart()));
-
-  connect(pImpl_->cefWindow(), SIGNAL(loadEnd(int)), 
-      this, SLOT(onLoadEnd(int)));
-
-  connect(pImpl_->cefWindow(), SIGNAL(loadError(int, const QString&, const QString&, bool&)),
-      this, SLOT(onLoadError(int, const QString&, const QString&, bool&)));
-
-  connect(pImpl_->cefWindow(), SIGNAL(draggableRegionChanged(const QRegion&)),
-      this, SLOT(onDraggableRegionChanged(const QRegion&)));
-
-  connect(pImpl_->cefWindow(), SIGNAL(consoleMessage(const QString&, int)),
-      this, SLOT(onConsoleMessage(const QString&, int)));
-
-  connect(pImpl_->cefWindow(), SIGNAL(takeFocus(bool)), 
-      this, SLOT(onTakeFocus(bool)));
-
-  connect(pImpl_->cefWindow(), SIGNAL(processUrlRequest(const QString&)), 
-      this, SLOT(onQCefUrlRequest(const QString&)));
-
-  connect(pImpl_->cefWindow(), SIGNAL(processQueryRequest(const QCefQuery&)),
-      this, SLOT(onQCefQueryRequest(const QCefQuery&)));
-
-  connect(pImpl_->cefWindow(), SIGNAL(invokeMethodNotify(int, int, const QString&, const QVariantList&)),
-      this, SLOT(onInvokeMethodNotify(int, int, const QString&, const QVariantList&)));
-  /* clang-format on */
 
   // If we're already part of a window, we'll install our event handler
   // If our parent changes later, this will be handled in QCefView::changeEvent()
@@ -561,29 +529,6 @@ QCefView::setKeyboardHandler(CefKeyboardHandler* handler)
 }
 
 void
-QCefView::changeEvent(QEvent* event)
-{
-  if (QEvent::ParentAboutToChange == event->type()) {
-    if (this->window())
-      this->window()->removeEventFilter(this);
-  } else if (QEvent::ParentChange == event->type()) {
-    if (this->window())
-      this->window()->installEventFilter(this);
-  }
-  QWidget::changeEvent(event);
-}
-
-bool
-QCefView::eventFilter(QObject* watched, QEvent* event)
-{
-  if (pImpl_ && watched == this->window()) {
-    if (QEvent::Resize == event->type() || QEvent::Move == event->type())
-      pImpl_->onToplevelWidgetMoveOrResize();
-  }
-  return QWidget::eventFilter(watched, event);
-}
-
-void
 QCefView::onLoadingStateChanged(bool isLoading, bool canGoBack, bool canGoForward)
 {}
 
@@ -622,3 +567,26 @@ QCefView::onQCefQueryRequest(const QCefQuery& query)
 void
 QCefView::onInvokeMethodNotify(int browserId, int frameId, const QString& method, const QVariantList& arguments)
 {}
+
+void
+QCefView::changeEvent(QEvent* event)
+{
+  if (QEvent::ParentAboutToChange == event->type()) {
+    if (this->window())
+      this->window()->removeEventFilter(this);
+  } else if (QEvent::ParentChange == event->type()) {
+    if (this->window())
+      this->window()->installEventFilter(this);
+  }
+  QWidget::changeEvent(event);
+}
+
+bool
+QCefView::eventFilter(QObject* watched, QEvent* event)
+{
+  if (pImpl_ && watched == this->window()) {
+    if (QEvent::Resize == event->type() || QEvent::Move == event->type())
+      pImpl_->onToplevelWidgetMoveOrResize();
+  }
+  return QWidget::eventFilter(watched, event);
+}

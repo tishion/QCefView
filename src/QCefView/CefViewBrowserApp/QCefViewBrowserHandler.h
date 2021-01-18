@@ -10,10 +10,6 @@
 #include <mutex>
 #pragma endregion std_headers
 
-#pragma region qt_headers
-#include <QPointer>
-#pragma endregion qt_headers
-
 #pragma region cef_headers
 #include <include/cef_client.h>
 #include <include/wrapper/cef_message_router.h>
@@ -22,6 +18,7 @@
 
 #include "../CCefWindow.h"
 #include "QCefQueryHandler.h"
+#include "QCefViewDelegate.h"
 
 class QCefViewBrowserHandler
   : public CefClient
@@ -50,7 +47,7 @@ public:
   ///
   /// </summary>
   /// <param name="host"></param>
-  QCefViewBrowserHandler(CCefWindow* pQCefWin);
+  QCefViewBrowserHandler(QCefViewDelegate* pDelegate);
 
   /// <summary>
   ///
@@ -302,7 +299,7 @@ private:
   /// <summary>
   ///
   /// </summary>
-  QPointer<CCefWindow> pQCefWindow_;
+  QCefViewDelegate* pQCefViewDelegate_;
 
   /// <summary>
   ///

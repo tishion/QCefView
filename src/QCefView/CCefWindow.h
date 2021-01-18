@@ -13,117 +13,62 @@
 #include <include/cef_app.h>
 #pragma endregion cef_headers
 
+#include <QCefProtocol.h>
+#include "CefViewBrowserApp/QCefViewDelegate.h"
+
 #include "Include/QCefQuery.h"
+#include "Include/QCefView.h"
 
 /// <summary>
 ///
 /// </summary>
-class CCefWindow : public QWindow
+class CCefWindow
+  : public QWindow
+  , public QCefViewDelegate
 {
   Q_OBJECT
-
-  /// <summary>
-  ///
-  /// </summary>
-  static QHash<CefWindowHandle, CCefWindow*> instanceMap_;
-
-  /// <summary>
-  ///
-  /// </summary>
-  static QMutex instanceMtx_;
-  ;
 
 public:
   /// <summary>
   ///
   /// </summary>
-  static CCefWindow* lookupInstance(CefWindowHandle wnd);
 
 public:
   /// <summary>
   ///
   /// </summary>
   /// <param name="parent"></param>
-  explicit CCefWindow(QWindow* parent = 0);
+  explicit CCefWindow(QCefView* view = 0);
 
   /// <summary>
   ///
   /// </summary>
   ~CCefWindow();
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="wnd"></param>
-  void setCefBrowserWindow(CefWindowHandle wnd);
+  virtual void setCefBrowserWindow(CefWindowHandle hwnd) override;
 
-signals:
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="isLoading"></param>
-  /// <param name="canGoBack"></param>
-  /// <param name="canGoForward"></param>
-  void loadingStateChanged(bool isLoading, bool canGoBack, bool canGoForward);
+  virtual void onLoadingStateChanged(bool isLoading, bool canGoBack, bool canGoForward) override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  void loadStart();
+  virtual void onLoadStart() override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="httpStatusCode"></param>
-  void loadEnd(int httpStatusCode);
+  virtual void onLoadEnd(int httpStatusCode) override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="errorCode"></param>
-  /// <param name="errorMsg"></param>
-  /// <param name="failedUrl"></param>
-  void loadError(int errorCode, const QString& errorMsg, const QString& failedUrl, bool& handled);
+  virtual void onLoadError(int errorCode,
+                           const CefString& errorMsg,
+                           const CefString& failedUrl,
+                           bool& handled) override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="message"></param>
-  /// <param name="level"></param>
-  void consoleMessage(const QString& message, int level);
+  virtual void onDraggableRegionChanged(const std::vector<CefDraggableRegion> regions) override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="regions"></param>
-  void draggableRegionChanged(const QRegion& region);
+  virtual void onConsoleMessage(const CefString& message, int level) override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="next"></param>
-  void takeFocus(bool next);
+  virtual void onTakeFocus(bool next) override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="url"></param>
-  void processUrlRequest(const QString& url);
+  virtual void onQCefUrlRequest(const CefString& url) override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="query"></param>
-  void processQueryRequest(const QCefQuery& query);
+  virtual void onQCefQueryRequest(const CefString& request, int64 query_id) override;
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="browserId"></param>
-  /// <param name="frameId"></param>
-  /// <param name="method"></param>
-  /// <param name="arguments"></param>
-  void invokeMethodNotify(int browserId, int frameId, const QString method, const QVariantList arguments);
+  virtual void onInvokeMethodNotify(int browserId, const CefRefPtr<CefListValue>& arguments) override;
 
 public:
   /// <summary>
@@ -144,6 +89,11 @@ public:
   virtual void resizeEvent(QResizeEvent* e);
 
 private:
+  /// <summary>
+  ///
+  /// </summary>
+  QCefView* view_;
+
   /// <summary>
   ///
   /// </summary>
