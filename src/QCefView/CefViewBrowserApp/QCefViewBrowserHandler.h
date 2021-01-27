@@ -80,6 +80,7 @@ public:
   {
     return pKeyboardHandler_ ? pKeyboardHandler_ : this;
   }
+  virtual CefRefPtr<CefFocusHandler> GetFocusHandler() override { return this; }
   virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
   virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
   virtual CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
@@ -157,6 +158,8 @@ public:
   virtual void OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next) override;
 
   virtual bool OnSetFocus(CefRefPtr<CefBrowser> browser, FocusSource source) override;
+
+  virtual void OnGotFocus(CefRefPtr<CefBrowser> browser) override;
 
 #pragma endregion CefFocusHandler
 

@@ -33,6 +33,7 @@ QCefViewBrowserApp::OnBeforeCommandLineProcessing(const CefString& process_type,
   command_line->AppendSwitch("disable-direct-composition");
   command_line->AppendSwitchWithValue("disable-features", "NetworkService");
   command_line->AppendSwitchWithValue("renderer-process-limit", "1");
+  command_line->AppendSwitchWithValue("disable-usb-keyboard-detect", "1");
 }
 
 void
