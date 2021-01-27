@@ -170,6 +170,17 @@ QCefViewBrowserHandler::OnSetFocus(CefRefPtr<CefBrowser> browser, FocusSource so
   return false;
 }
 
+void
+QCefViewBrowserHandler::OnGotFocus(CefRefPtr<CefBrowser> browser)
+{
+  CEF_REQUIRE_UI_THREAD();
+
+  auto host = main_browser_->GetHost();
+  if (host != nullptr) {
+    host->SetFocus(true);
+  }
+}
+
 bool
 QCefViewBrowserHandler::OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
                                       const CefKeyEvent& event,
