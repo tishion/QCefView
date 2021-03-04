@@ -41,7 +41,7 @@ CCefSetting::initializeInstance()
 
 CCefSetting::CCefSetting()
 {
-  QDir ExeDir = QDir::current();
+  QDir ExeDir = qApp->applicationDirPath();
 
   QString strExePath = ExeDir.filePath(RENDER_PROCESS_NAME);
   browser_sub_process_path.FromString(QDir::toNativeSeparators(strExePath).toStdString());

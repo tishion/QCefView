@@ -2,8 +2,29 @@
 #include <QMessageBox>
 #include <QColor>
 #include <QRandomGenerator>
+#include <functional>
+#include <qtimer>
+#include <QCoreApplication>
 
 #include "customcefview.h"
+
+
+namespace {
+  void dispatchToMainThread(std::function<void()> callback)
+  {
+      // any thread
+      QTimer* timer = new QTimer();
+      timer->moveToThread(qApp->thread());
+      timer->setSingleShot(true);
+      QObject::connect(timer, &QTimer::timeout, [=]()
+      {
+          // main thread
+          callback();
+          timer->deleteLater();
+      });
+      QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection, Q_ARG(int, 0));
+  }
+}
 
 CustomCefView::~CustomCefView() {}
 
@@ -29,7 +50,9 @@ CustomCefView::onQCefUrlRequest(const QString& url)
                          "Url: %1")
                    .arg(url);
 
-  QMessageBox::information(this->window(), title, text);
+  dispatchToMainThread([=]() {
+      QMessageBox::information(this->window(), title, text);
+  });
 }
 
 void
@@ -40,7 +63,9 @@ CustomCefView::onQCefQueryRequest(const QCefQuery& query)
                          "Query: %1")
                    .arg(query.reqeust());
 
-  QMessageBox::information(this->window(), title, text);
+  dispatchToMainThread([=]() {
+    QMessageBox::information(this->window(), title, text);
+  });
 
   QString response = query.reqeust().toUpper();
   query.setResponseResult(true, response);
@@ -71,5 +96,7 @@ CustomCefView::onInvokeMethodNotify(int browserId, int frameId, const QString& m
                          "Arguments: ...")
                    .arg(method);
 
-  QMessageBox::information(this->window(), title, text);
+  dispatchToMainThread([=]() {
+    QMessageBox::information(this->window(), title, text);
+  });
 }
