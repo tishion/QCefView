@@ -8,24 +8,6 @@
 
 #include "customcefview.h"
 
-
-namespace {
-  void dispatchToMainThread(std::function<void()> callback)
-  {
-      // any thread
-      QTimer* timer = new QTimer();
-      timer->moveToThread(qApp->thread());
-      timer->setSingleShot(true);
-      QObject::connect(timer, &QTimer::timeout, [=]()
-      {
-          // main thread
-          callback();
-          timer->deleteLater();
-      });
-      QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection, Q_ARG(int, 0));
-  }
-}
-
 CustomCefView::~CustomCefView() {}
 
 void
@@ -50,9 +32,9 @@ CustomCefView::onQCefUrlRequest(const QString& url)
                          "Url: %1")
                    .arg(url);
 
-  dispatchToMainThread([=]() {
+  QMetaObject::invokeMethod(this, [=]() {
       QMessageBox::information(this->window(), title, text);
-  });
+  }, Qt::QueuedConnection);
 }
 
 void
@@ -63,9 +45,9 @@ CustomCefView::onQCefQueryRequest(const QCefQuery& query)
                          "Query: %1")
                    .arg(query.reqeust());
 
-  dispatchToMainThread([=]() {
+  QMetaObject::invokeMethod(this, [=]() {
     QMessageBox::information(this->window(), title, text);
-  });
+  }, Qt::QueuedConnection);
 
   QString response = query.reqeust().toUpper();
   query.setResponseResult(true, response);
@@ -96,7 +78,7 @@ CustomCefView::onInvokeMethodNotify(int browserId, int frameId, const QString& m
                          "Arguments: ...")
                    .arg(method);
 
-  dispatchToMainThread([=]() {
+  QMetaObject::invokeMethod(this, [=]() {
     QMessageBox::information(this->window(), title, text);
-  });
+  }, Qt::QueuedConnection);
 }
