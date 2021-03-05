@@ -2,9 +2,6 @@
 #include <QMessageBox>
 #include <QColor>
 #include <QRandomGenerator>
-#include <functional>
-#include <qtimer>
-#include <QCoreApplication>
 
 #include "customcefview.h"
 
