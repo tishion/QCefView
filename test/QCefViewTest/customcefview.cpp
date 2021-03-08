@@ -29,7 +29,9 @@ CustomCefView::onQCefUrlRequest(const QString& url)
                          "Url: %1")
                    .arg(url);
 
-  QMessageBox::information(this->window(), title, text);
+  QMetaObject::invokeMethod(this, [=]() {
+      QMessageBox::information(this->window(), title, text);
+  }, Qt::QueuedConnection);
 }
 
 void
@@ -40,7 +42,9 @@ CustomCefView::onQCefQueryRequest(const QCefQuery& query)
                          "Query: %1")
                    .arg(query.reqeust());
 
-  QMessageBox::information(this->window(), title, text);
+  QMetaObject::invokeMethod(this, [=]() {
+    QMessageBox::information(this->window(), title, text);
+  }, Qt::QueuedConnection);
 
   QString response = query.reqeust().toUpper();
   query.setResponseResult(true, response);
@@ -71,5 +75,7 @@ CustomCefView::onInvokeMethodNotify(int browserId, int frameId, const QString& m
                          "Arguments: ...")
                    .arg(method);
 
-  QMessageBox::information(this->window(), title, text);
+  QMetaObject::invokeMethod(this, [=]() {
+    QMessageBox::information(this->window(), title, text);
+  }, Qt::QueuedConnection);
 }
