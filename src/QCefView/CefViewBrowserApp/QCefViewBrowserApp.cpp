@@ -95,15 +95,6 @@ QCefViewBrowserApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command
     (*it)->OnBeforeChildProcessLaunch(this, command_line);
 }
 
-void
-QCefViewBrowserApp::OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_info)
-{
-  CEF_REQUIRE_IO_THREAD();
-  BrowserDelegateSet::iterator it = browser_delegates_.begin();
-  for (; it != browser_delegates_.end(); ++it)
-    (*it)->OnRenderProcessThreadCreated(this, extra_info);
-}
-
 CefRefPtr<CefPrintHandler>
 QCefViewBrowserApp::GetPrintHandler()
 {
