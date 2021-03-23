@@ -203,13 +203,6 @@ private:
 
 #pragma region CefRenderProcessHandler
 
-  // CefRenderProcessHandler methods:
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="extra_info"></param>
-  virtual void OnRenderThreadCreated(CefRefPtr<CefListValue> extra_info) override;
-
   /// <summary>
   ///
   /// </summary>

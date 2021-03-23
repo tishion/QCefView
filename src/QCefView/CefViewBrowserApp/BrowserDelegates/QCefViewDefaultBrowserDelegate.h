@@ -20,9 +20,6 @@ public:
   virtual void OnBeforeChildProcessLaunch(CefRefPtr<QCefViewBrowserApp> app,
                                           CefRefPtr<CefCommandLine> command_line) override;
 
-  virtual void OnRenderProcessThreadCreated(CefRefPtr<QCefViewBrowserApp> app,
-                                            CefRefPtr<CefListValue> extra_info) override;
-
 private:
   IMPLEMENT_REFCOUNTING(BrowserDelegate);
 };

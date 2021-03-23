@@ -54,18 +54,6 @@ QCefViewRenderApp::GetBrowserProcessHandler()
 
 //////////////////////////////////////////////////////////////////////////
 void
-QCefViewRenderApp::OnRenderThreadCreated(CefRefPtr<CefListValue> extra_info)
-{
-  CEF_REQUIRE_RENDERER_THREAD();
-
-  CreateRenderDelegates(render_delegates_, bridge_object_name_);
-
-  RenderDelegateSet::iterator it = render_delegates_.begin();
-  for (; it != render_delegates_.end(); ++it)
-    (*it)->OnRenderThreadCreated(this, extra_info);
-}
-
-void
 QCefViewRenderApp::OnWebKitInitialized()
 {
   CEF_REQUIRE_RENDERER_THREAD();
