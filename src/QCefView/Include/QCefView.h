@@ -126,6 +126,12 @@ public:
   /// <summary>
   ///
   /// </summary>
+  /// <param name="scriptSource"></param>
+  void runJavaScript(const QString& scriptSource);
+
+  /// <summary>
+  ///
+  /// </summary>
   /// <returns></returns>
   bool browserCanGoBack();
 

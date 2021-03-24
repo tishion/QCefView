@@ -131,6 +131,18 @@ public:
     }
   }
 
+  void runJavaScript(const QString& scriptSource)
+  {
+    if (pQCefViewHandler_ && pQCefViewHandler_->GetBrowser() && pQCefViewHandler_->GetBrowser()->GetMainFrame()) {
+      CefString strScriptSource;
+      strScriptSource.FromString(scriptSource.toStdString());
+      CefString strScriptSourceFile;
+      strScriptSourceFile.FromASCII("");
+
+      pQCefViewHandler_->GetBrowser()->GetMainFrame()->ExecuteJavaScript(strScriptSource, strScriptSourceFile, 1);
+    }
+  }
+
   bool browserCanGoBack()
   {
     if (pQCefViewHandler_)
@@ -393,6 +405,13 @@ QCefView::navigateToUrl(const QString& url)
 {
   if (pImpl_)
     pImpl_->navigateToUrl(url);
+}
+
+void
+QCefView::runJavaScript(const QString& script)
+{
+  if (pImpl_)
+    pImpl_->runJavaScript(script);
 }
 
 bool
