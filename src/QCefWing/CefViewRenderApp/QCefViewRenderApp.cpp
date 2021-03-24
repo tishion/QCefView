@@ -15,14 +15,16 @@
 
 QCefViewRenderApp::QCefViewRenderApp(const CefString& name)
   : bridge_object_name_(name)
-{}
+{
+  CreateRenderDelegates(render_delegates_, bridge_object_name_);
+}
 
 QCefViewRenderApp::~QCefViewRenderApp() {}
 
 void
 QCefViewRenderApp::CreateRenderDelegates(RenderDelegateSet& delegates, const CefString& name)
 {
-  QCefViewDefaultRenderDelegate::CreateBrowserDelegate(delegates, name);
+  QCefViewDefaultRenderDelegate::CreateRenderDelegate(delegates, name);
 }
 
 //////////////////////////////////////////////////////////////////////////
