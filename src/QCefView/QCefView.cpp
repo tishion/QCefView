@@ -568,7 +568,7 @@ QCefView::onDraggableRegionChanged(const QRegion& region)
 {}
 
 void
-QCefView::onConsoleMessage(const QString& message, int level)
+QCefView::onConsoleMessage(const QString& message, int level, const QString& source, int line)
 {}
 
 void

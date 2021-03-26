@@ -60,7 +60,7 @@ public:
 
   virtual void onDraggableRegionChanged(const std::vector<CefDraggableRegion> regions) override;
 
-  virtual void onConsoleMessage(const CefString& message, int level) override;
+  virtual void onAddressChange(int browserId, int frameId, const CefString& url) override;
 
   virtual void onTakeFocus(bool next) override;
 

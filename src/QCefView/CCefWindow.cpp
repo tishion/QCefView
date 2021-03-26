@@ -80,11 +80,12 @@ CCefWindow::onDraggableRegionChanged(const std::vector<CefDraggableRegion> regio
 }
 
 void
-CCefWindow::onConsoleMessage(const CefString& message, int level)
+CCefWindow::onConsoleMessage(const CefString& message, int level, const CefString& source, int line)
 {
   if (view_) {
     auto msg = QString::fromStdString(message.ToString());
-    view_->onConsoleMessage(msg, level);
+    auto src = QString::fromStdString(source.ToString());
+    view_->onConsoleMessage(msg, level, src, line);
   }
 }
 

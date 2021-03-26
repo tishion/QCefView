@@ -88,7 +88,7 @@ QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
   CEF_REQUIRE_UI_THREAD();
 
   if (pQCefViewDelegate_)
-    pQCefViewDelegate_->onConsoleMessage(message, level);
+    pQCefViewDelegate_->onConsoleMessage(message, level, source, line);
 
 #if (defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG))
   return false;

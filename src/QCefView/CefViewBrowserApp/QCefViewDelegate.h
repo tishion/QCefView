@@ -23,7 +23,7 @@ public:
 
   virtual void onDraggableRegionChanged(const std::vector<CefDraggableRegion> regions) = 0;
 
-  virtual void onConsoleMessage(const CefString& message, int level) = 0;
+  virtual void onConsoleMessage(const CefString& message, int level, const CefString& source, int line) = 0;
 
   virtual void onTakeFocus(bool next) = 0;
 
