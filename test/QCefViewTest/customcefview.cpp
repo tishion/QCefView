@@ -18,6 +18,18 @@ CustomCefView::changeColor()
 }
 
 void
+CustomCefView::onConsoleMessage(const QString& message, int level, const QString& source, int line)
+{
+  QString title("JS Console Message");
+  QString text = QString("Current Thread: QT_UI\r\n"
+                         "Message: %1")
+                   .arg(message);
+
+  QMetaObject::invokeMethod(
+    this, [=]() { QMessageBox::information(this->window(), title, text); }, Qt::QueuedConnection);
+}
+
+void
 CustomCefView::onDraggableRegionChanged(const QRegion& region)
 {}
 

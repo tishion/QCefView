@@ -14,6 +14,8 @@ public:
   void changeColor();
 
 protected:
+  virtual void onConsoleMessage(const QString& message, int level, const QString& source, int line) override;
+
   virtual void onDraggableRegionChanged(const QRegion& region) override;
 
   virtual void onQCefUrlRequest(const QString& url) override;
