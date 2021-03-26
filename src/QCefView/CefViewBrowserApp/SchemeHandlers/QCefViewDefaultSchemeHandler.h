@@ -85,7 +85,7 @@ public:
                                                CefRefPtr<CefRequest> request);
 
 private:
-  static std::map<void*, QCefViewDelegate*> mapBrowser2Delegate_;
+  static std::map<int, QCefViewDelegate*> mapBrowser2Delegate_;
   static std::mutex mtxMap_;
 
 private:
