@@ -80,6 +80,24 @@ CCefWindow::onDraggableRegionChanged(const std::vector<CefDraggableRegion> regio
 }
 
 void
+CCefWindow::onAddressChange(int browserId, int frameId, const CefString& url)
+{
+  if (view_) {
+    auto urlStr = QString::fromStdString(url.ToString());
+    view_->onAddressChange(browserId, frameId, urlStr);
+  }
+}
+
+void
+CCefWindow::onTitleChange(int browserId, const CefString& title)
+{
+  if (view_) {
+    auto titleStr = QString::fromStdString(title.ToString());
+    view_->onTitleChange(browserId, titleStr);
+  }
+}
+
+void
 CCefWindow::onConsoleMessage(const CefString& message, int level, const CefString& source, int line)
 {
   if (view_) {

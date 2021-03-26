@@ -279,6 +279,16 @@ public:
   /// <summary>
   ///
   /// </summary>
+  virtual void onAddressChange(int browserId, int frameId, const QString& url);
+
+  /// <summary>
+  ///
+  /// </summary>
+  virtual void onTitleChange(int browserId, const QString& title);
+
+  /// <summary>
+  ///
+  /// </summary>
   /// <param name="message"></param>
   /// <param name="level"></param>
   virtual void onConsoleMessage(const QString& message, int level, const QString& source, int line);

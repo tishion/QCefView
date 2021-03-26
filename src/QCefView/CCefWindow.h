@@ -62,6 +62,10 @@ public:
 
   virtual void onAddressChange(int browserId, int frameId, const CefString& url) override;
 
+  virtual void onTitleChange(int browserId, const CefString& title) override;
+
+  virtual void onConsoleMessage(const CefString& message, int level, const CefString& source, int line) override;
+
   virtual void onTakeFocus(bool next) override;
 
   virtual void onQCefUrlRequest(const CefString& url) override;

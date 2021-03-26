@@ -23,6 +23,10 @@ public:
 
   virtual void onDraggableRegionChanged(const std::vector<CefDraggableRegion> regions) = 0;
 
+  virtual void onAddressChange(int browserId, int frameId, const CefString& url) = 0;
+
+  virtual void onTitleChange(int browserId, const CefString& title) = 0;
+
   virtual void onConsoleMessage(const CefString& message, int level, const CefString& source, int line) = 0;
 
   virtual void onTakeFocus(bool next) = 0;

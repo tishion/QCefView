@@ -70,12 +70,20 @@ void
 QCefViewBrowserHandler::OnAddressChange(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& url)
 {
   CEF_REQUIRE_UI_THREAD();
+  int browserId = browser->GetIdentifier();
+  int frameID = frame->GetIdentifier();
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onAddressChange(browserId, frameID, url);
 }
 
 void
 QCefViewBrowserHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
 {
   CEF_REQUIRE_UI_THREAD();
+  int browserId = browser->GetIdentifier();
+
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onTitleChange(browserId, title);
 }
 
 bool
