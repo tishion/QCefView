@@ -14,6 +14,7 @@
 
 #include "QCefQuery.h"
 #include "QCefEvent.h"
+#include "QCefSchemeHandler.h"
 
 #ifdef QCEFVIEW_LIB
 #define QCEFVIEW_EXPORT Q_DECL_EXPORT
@@ -128,6 +129,11 @@ public:
   /// </summary>
   /// <param name="scriptSource"></param>
   void runJavaScript(const QString& scriptSource);
+
+  /// <summary>
+  ///
+  /// </summary>
+  void registerSchemeHandler(const QString& scheme, QCefSchemeHandler::SchemeHandlerCreator handlerCreator);
 
   /// <summary>
   ///

@@ -22,6 +22,7 @@
 #include "CCefWindow.h"
 #include "CCefSetting.h"
 #include "CefViewBrowserApp/QCefViewBrowserHandler.h"
+#include "CefViewBrowserApp/SchemeHandlers/QCefViewDelegatedSchemeHandler.h"
 
 //////////////////////////////////////////////////////////////////////////
 class QCefView::Implementation
@@ -141,6 +142,14 @@ public:
 
       pQCefViewHandler_->GetBrowser()->GetMainFrame()->ExecuteJavaScript(strScriptSource, strScriptSourceFile, 1);
     }
+  }
+
+  void registerSchemeHandler(const QString& scheme, QCefSchemeHandler::SchemeHandlerCreator creator)
+  {
+    CefString strScheme;
+    strScheme.FromString(scheme.toStdString());
+
+    QCefViewDelegatedSchemeHandler::RegisterSchemeHandlerFactory(strScheme, creator);
   }
 
   bool browserCanGoBack()
@@ -412,6 +421,13 @@ QCefView::runJavaScript(const QString& script)
 {
   if (pImpl_)
     pImpl_->runJavaScript(script);
+}
+
+void
+QCefView::registerSchemeHandler(const QString& scheme, QCefSchemeHandler::SchemeHandlerCreator handlerCreator)
+{
+  if (pImpl_)
+    pImpl_->registerSchemeHandler(scheme, handlerCreator);
 }
 
 bool

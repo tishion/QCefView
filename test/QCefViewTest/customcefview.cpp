@@ -4,6 +4,13 @@
 #include <QRandomGenerator>
 
 #include "customcefview.h"
+#include "customschemehandler.h"
+
+CustomCefView::CustomCefView(const QString url, QWidget* parent)
+  : QCefView(url, parent)
+{
+  registerSchemeHandler("myscheme", CustomSchemeHandler::Creator);
+}
 
 CustomCefView::~CustomCefView() {}
 

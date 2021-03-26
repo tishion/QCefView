@@ -8,7 +8,7 @@ class CustomCefView : public QCefView
   Q_OBJECT
 
 public:
-  using QCefView::QCefView;
+  CustomCefView(const QString url, QWidget* parent = 0);
   ~CustomCefView();
 
   void changeColor();
