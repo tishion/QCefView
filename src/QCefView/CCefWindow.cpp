@@ -53,8 +53,10 @@ CCefWindow::onLoadStart()
 void
 CCefWindow::onLoadEnd(int httpStatusCode)
 {
-  if (view_)
+  if (view_) {
+    view_->onLoadEndInternal(httpStatusCode);
     view_->onLoadEnd(httpStatusCode);
+  }
 }
 
 void

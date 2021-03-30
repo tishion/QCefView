@@ -116,7 +116,7 @@ public:
 
   void navigateToString(const QString& content)
   {
-    if (pQCefViewHandler_) {
+    if (pQCefViewHandler_ && pQCefViewHandler_->GetBrowser() && pQCefViewHandler_->GetBrowser()->GetMainFrame()) {
       std::string data = content.toStdString();
       data = CefURIEncode(CefBase64Encode(data.c_str(), data.size()), false).ToString();
       data = "data:text/html;base64," + data;
@@ -126,7 +126,7 @@ public:
 
   void navigateToUrl(const QString& url)
   {
-    if (pQCefViewHandler_) {
+    if (pQCefViewHandler_ && pQCefViewHandler_->GetBrowser() && pQCefViewHandler_->GetBrowser()->GetMainFrame()) {
       CefString strUrl;
       strUrl.FromString(url.toStdString());
       pQCefViewHandler_->GetBrowser()->GetMainFrame()->LoadURL(strUrl);
@@ -386,6 +386,7 @@ QList<QCefView::Implementation::ArchiveMapping> QCefView::Implementation::archiv
 QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
   : QWidget(parent)
   , pImpl_(nullptr)
+  , initSemaphore_(new QSemaphore())
 {
   pImpl_ = std::make_unique<Implementation>(url, this);
 
@@ -445,6 +446,8 @@ QCefView::getCefWinId()
 void
 QCefView::navigateToString(const QString& content)
 {
+  if (!waitForInit())
+    return;
   if (pImpl_)
     pImpl_->navigateToString(content);
 }
@@ -452,6 +455,8 @@ QCefView::navigateToString(const QString& content)
 void
 QCefView::navigateToUrl(const QString& url)
 {
+  if (!waitForInit())
+    return;
   if (pImpl_)
     pImpl_->navigateToUrl(url);
 }
@@ -477,6 +482,8 @@ QCefView::setZoomLevel(qreal zoomLevel)
 void
 QCefView::runJavaScript(const QString& script)
 {
+  if (!waitForInit())
+    return;
   if (pImpl_)
     pImpl_->runJavaScript(script);
 }
@@ -673,6 +680,12 @@ void
 QCefView::onInvokeMethodNotify(int browserId, int frameId, const QString& method, const QVariantList& arguments)
 {}
 
+bool
+QCefView::isInitialized(int timeout)
+{
+  return !initSemaphore_ || waitForInit(timeout);
+}
+
 void
 QCefView::changeEvent(QEvent* event)
 {
@@ -694,4 +707,25 @@ QCefView::eventFilter(QObject* watched, QEvent* event)
       pImpl_->onToplevelWidgetMoveOrResize();
   }
   return QWidget::eventFilter(watched, event);
+}
+
+void
+QCefView::onLoadEndInternal(int httpStatusCode)
+{
+  if (initSemaphore_) {
+    initSemaphore_->release();
+  }
+}
+
+bool
+QCefView::waitForInit(int timeOut)
+{
+  if (initSemaphore_) {
+    if (!initSemaphore_->tryAcquire(1, timeOut)) {
+      return false;
+    }
+    delete initSemaphore_;
+    initSemaphore_ = nullptr;
+  }
+  return true;
 }

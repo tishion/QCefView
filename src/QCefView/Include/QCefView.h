@@ -8,6 +8,7 @@
 
 #pragma region qt_headers
 #include <QtCore/qglobal.h>
+#include <QSemaphore>
 #include <QWidget>
 #include <QVariantList>
 #pragma endregion qt_headers
@@ -342,6 +343,11 @@ public:
   /// <param name="arguments"></param>
   virtual void onInvokeMethodNotify(int browserId, int frameId, const QString& method, const QVariantList& arguments);
 
+  /// <summary>
+  ///
+  /// </summary>
+  virtual bool isInitialized(int timeout = 50);
+
 protected:
   /// <summary>
   ///
@@ -357,12 +363,21 @@ protected:
   /// <returns></returns>
   virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="httpStatusCode"></param>
+  virtual void onLoadEndInternal(int httpStatusCode);
+
 private:
+  bool waitForInit(int timeOut = 50);
+
   /// <summary>
   ///
   /// </summary>
   class Implementation;
   std::unique_ptr<Implementation> pImpl_;
+  QSemaphore* initSemaphore_;
 };
 
 #endif // QCEFVIEW_H
