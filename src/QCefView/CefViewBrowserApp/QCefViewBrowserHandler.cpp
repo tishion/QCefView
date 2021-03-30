@@ -200,6 +200,20 @@ QCefViewBrowserHandler::OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
   return false;
 }
 
+void
+QCefViewBrowserHandler::OnFindResult(CefRefPtr<CefBrowser> browser,
+                                     int identifier,
+                                     int count,
+                                     const CefRect& selectionRect,
+                                     int activeMatchOrdinal,
+                                     bool finalUpdate)
+{
+  int browserId = browser->GetIdentifier();
+  CEF_REQUIRE_UI_THREAD();
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->OnFindResult(browserId, identifier, count, selectionRect, activeMatchOrdinal, finalUpdate);
+}
+
 bool
 QCefViewBrowserHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
                                       CefRefPtr<CefFrame> frame,

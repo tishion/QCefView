@@ -36,6 +36,8 @@ public:
   virtual void onQCefQueryRequest(const CefString& request, int64 query_id) = 0;
 
   virtual void onInvokeMethodNotify(int browserId, const CefRefPtr<CefListValue>& arguments) = 0;
+
+  virtual void OnFindResult(int browserId, int identifier, int count, const CefRect& selectionRect, int activeMatchOrdinal, bool finalUpdate) = 0;
 };
 
 #endif

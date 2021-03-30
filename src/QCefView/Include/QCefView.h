@@ -138,6 +138,11 @@ public:
   /// <summary>
   ///
   /// </summary>
+  int findText(const QString& text, bool forward = true, bool matchCase = false, int previousId = 0);
+
+  /// <summary>
+  ///
+  /// </summary>
   /// <returns></returns>
   bool browserCanGoBack();
 
@@ -298,6 +303,11 @@ public:
   /// </summary>
   /// <param name="next"></param>
   virtual void onTakeFocus(bool next);
+
+  /// <summary>
+  ///
+  /// </summary>
+  virtual void onFindResult(int browserId, int identifier, int count, const QRect& selectionRect, int activeMatchOrdinal, bool finalUpdate);
 
   /// <summary>
   ///

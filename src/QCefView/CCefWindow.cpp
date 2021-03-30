@@ -189,6 +189,20 @@ CCefWindow::onInvokeMethodNotify(int browserId, const CefRefPtr<CefListValue>& a
 }
 
 void
+CCefWindow::OnFindResult(int browserId,
+                         int identifier,
+                         int count,
+                         const CefRect& selectionRect,
+                         int activeMatchOrdinal,
+                         bool finalUpdate)
+{
+  if (!view_)
+    return;
+  QRect rect(selectionRect.x, selectionRect.y, selectionRect.width, selectionRect.height);
+  view_->onFindResult(browserId, identifier, count, rect, activeMatchOrdinal, finalUpdate);
+}
+
+void
 CCefWindow::syncCefBrowserWindow()
 {
   double w = width() * devicePixelRatio();
