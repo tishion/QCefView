@@ -657,6 +657,14 @@ QCefView::onDraggableRegionChanged(const QRegion& region)
 {}
 
 void
+QCefView::onAddressChange(int browserId, int frameId, const QString& url)
+{}
+
+void
+QCefView::onTitleChange(int browserId, const QString& title)
+{}
+
+void
 QCefView::onConsoleMessage(const QString& message, int level, const QString& source, int line)
 {}
 
