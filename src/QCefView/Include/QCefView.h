@@ -65,6 +65,7 @@ class QCEFVIEW_EXPORT QCefView : public QWidget
   ///
   /// </summary>
   Q_OBJECT
+  friend class CCefWindow;
 
 public:
   /// <summary>

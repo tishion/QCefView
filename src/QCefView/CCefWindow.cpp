@@ -4,6 +4,8 @@
 #include <QPaintDevice>
 #include <QPainter>
 #include <QDebug>
+#include <QApplication>
+
 #pragma endregion qt_headers
 
 #include "CCefWindow.h"
@@ -186,6 +188,35 @@ CCefWindow::onInvokeMethodNotify(int browserId, const CefRefPtr<CefListValue>& a
       }
     }
   }
+}
+
+bool
+CCefWindow::OnPreKeyEvent(int browserId,
+                          const CefKeyEvent& event,
+                          CefEventHandle os_event,
+                          bool* is_keyboard_shortcut)
+{
+  if (!view_)
+    return false;
+  // do not handle stuff before js has the chance..
+  return false;
+}
+
+bool
+CCefWindow::OnKeyEvent(int browserId, const CefKeyEvent& event, CefEventHandle os_event)
+{
+  if (!view_)
+    return false;
+
+  // redirect native event to view
+  QWidget* parentWidget = qobject_cast<QWidget*>(view_);
+  if (os_event && parentWidget && parentWidget->effectiveWinId()) {
+  #if defined(Q_OS_WIN)
+    SendMessage((HWND)parentWidget->effectiveWinId(), os_event->message, os_event->wParam, os_event->lParam);
+    return true;
+  #endif
+  }
+  return false;
 }
 
 void

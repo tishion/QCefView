@@ -37,6 +37,10 @@ public:
 
   virtual void onInvokeMethodNotify(int browserId, const CefRefPtr<CefListValue>& arguments) = 0;
 
+  virtual bool OnPreKeyEvent(int browserId,const CefKeyEvent& event,CefEventHandle os_event,bool* is_keyboard_shortcut) = 0;
+
+  virtual bool OnKeyEvent(int browserId, const CefKeyEvent& event, CefEventHandle os_event) = 0;
+
   virtual void OnFindResult(int browserId, int identifier, int count, const CefRect& selectionRect, int activeMatchOrdinal, bool finalUpdate) = 0;
 };
 

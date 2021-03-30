@@ -195,8 +195,20 @@ QCefViewBrowserHandler::OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
                                       CefEventHandle os_event,
                                       bool* is_keyboard_shortcut)
 {
+  int browserId = browser->GetIdentifier();
   CEF_REQUIRE_UI_THREAD();
+  if (pQCefViewDelegate_)
+    return pQCefViewDelegate_->OnPreKeyEvent(browserId, event, os_event, is_keyboard_shortcut);
+  return false;
+}
 
+bool
+QCefViewBrowserHandler::OnKeyEvent(CefRefPtr<CefBrowser> browser, const CefKeyEvent& event, CefEventHandle os_event)
+{
+  int browserId = browser->GetIdentifier();
+  CEF_REQUIRE_UI_THREAD();
+  if (pQCefViewDelegate_)
+    return pQCefViewDelegate_->OnKeyEvent(browserId, event, os_event);
   return false;
 }
 
