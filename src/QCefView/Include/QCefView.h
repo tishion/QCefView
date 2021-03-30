@@ -127,6 +127,17 @@ public:
   /// <summary>
   ///
   /// </summary>
+  qreal getZoomLevel();
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="zoomLevel"></param>
+  void setZoomLevel(qreal zoomLevel);
+
+  /// <summary>
+  ///
+  /// </summary>
   /// <param name="scriptSource"></param>
   void runJavaScript(const QString& scriptSource);
 

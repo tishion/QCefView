@@ -133,6 +133,20 @@ public:
     }
   }
 
+  qreal getZoomLevel()
+  {
+    double zoomLevel = pQCefViewHandler_->GetBrowser()->GetHost()->GetZoomLevel();
+    if (zoomLevel == 0.0) {
+      zoomLevel = 1.0;
+    }
+    return zoomLevel;
+  }
+
+  void setZoomLevel(qreal zoomLevel)
+  {
+    pQCefViewHandler_->GetBrowser()->GetHost()->SetZoomLevel(zoomLevel);
+  }
+
   void runJavaScript(const QString& scriptSource)
   {
     if (pQCefViewHandler_ && pQCefViewHandler_->GetBrowser() && pQCefViewHandler_->GetBrowser()->GetMainFrame()) {
@@ -440,6 +454,24 @@ QCefView::navigateToUrl(const QString& url)
 {
   if (pImpl_)
     pImpl_->navigateToUrl(url);
+}
+
+qreal
+QCefView::getZoomLevel()
+{
+  if (!waitForInit())
+    return 0.0;
+  if (pImpl_)
+    return pImpl_->getZoomLevel();
+}
+
+void
+QCefView::setZoomLevel(qreal zoomLevel)
+{
+  if (!waitForInit())
+    return;
+  if (pImpl_)
+    pImpl_->setZoomLevel(zoomLevel);
 }
 
 void
