@@ -2,6 +2,9 @@
 
 #include <windows.h>
 
+#include "Include/QCefSetting.h"
+#include "customschemehandler.h"
+
 #include <QDir>
 #include <QCoreApplication>
 #include <QHBoxLayout>
@@ -16,6 +19,8 @@ QCefViewTest::QCefViewTest(QWidget* parent)
 
   connect(ui.btn_changeColor, SIGNAL(clicked()), this, SLOT(onBtnChangeColorClicked()));
   layout->addWidget(ui.nativeContainer);
+
+  QCefSetting::addCustomScheme("myscheme");
 
   QDir dir = QCoreApplication::applicationDirPath();
   QString uri = QDir::toNativeSeparators(dir.filePath("QCefViewTestPage.html"));

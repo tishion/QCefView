@@ -23,7 +23,11 @@ public:
 
   virtual void onDraggableRegionChanged(const std::vector<CefDraggableRegion> regions) = 0;
 
-  virtual void onConsoleMessage(const CefString& message, int level) = 0;
+  virtual void onAddressChange(int browserId, int frameId, const CefString& url) = 0;
+
+  virtual void onTitleChange(int browserId, const CefString& title) = 0;
+
+  virtual void onConsoleMessage(const CefString& message, int level, const CefString& source, int line) = 0;
 
   virtual void onTakeFocus(bool next) = 0;
 
@@ -32,6 +36,12 @@ public:
   virtual void onQCefQueryRequest(const CefString& request, int64 query_id) = 0;
 
   virtual void onInvokeMethodNotify(int browserId, const CefRefPtr<CefListValue>& arguments) = 0;
+
+  virtual bool OnPreKeyEvent(int browserId,const CefKeyEvent& event,CefEventHandle os_event,bool* is_keyboard_shortcut) = 0;
+
+  virtual bool OnKeyEvent(int browserId, const CefKeyEvent& event, CefEventHandle os_event) = 0;
+
+  virtual void OnFindResult(int browserId, int identifier, int count, const CefRect& selectionRect, int activeMatchOrdinal, bool finalUpdate) = 0;
 };
 
 #endif

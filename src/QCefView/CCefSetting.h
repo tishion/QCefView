@@ -1,5 +1,9 @@
 #pragma once
 
+#pragma region std_headers
+#include <list>
+#pragma endregion std_headers
+
 #pragma region cef_headers
 #include <include\cef_base.h>
 #pragma endregion cef_headers
@@ -103,4 +107,9 @@ public:
     std::string url;
   } CookieItem;
   static std::list<CookieItem> global_cookie_list;
+
+  /// <summary>
+  ///
+  /// </summary>
+  static std::list<CefString> custom_schemes;
 };

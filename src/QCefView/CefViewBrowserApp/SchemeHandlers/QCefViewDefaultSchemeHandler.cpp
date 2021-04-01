@@ -93,7 +93,7 @@ void
 SchemeHandler::Cancel()
 {}
 
-std::map<void*, QCefViewDelegate*> SchemeHandlerFactory::mapBrowser2Delegate_;
+std::map<int, QCefViewDelegate*> SchemeHandlerFactory::mapBrowser2Delegate_;
 
 std::mutex SchemeHandlerFactory::mtxMap_;
 
@@ -104,15 +104,15 @@ SchemeHandlerFactory::recordBrowserAndDelegate(CefRefPtr<CefBrowser> browser, QC
     return;
 
   std::lock_guard<std::mutex> lock(mtxMap_);
-  mapBrowser2Delegate_[browser.get()] = pDelegate;
+  mapBrowser2Delegate_[browser->GetIdentifier()] = pDelegate;
 }
 
 void
 SchemeHandlerFactory::removeBrowserAndDelegate(CefRefPtr<CefBrowser> browser)
 {
   std::lock_guard<std::mutex> lock(mtxMap_);
-  if (mapBrowser2Delegate_.count(browser.get()))
-    mapBrowser2Delegate_.erase(browser.get());
+  if (mapBrowser2Delegate_.count(browser->GetIdentifier()))
+    mapBrowser2Delegate_.erase(browser->GetIdentifier());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -129,8 +129,8 @@ SchemeHandlerFactory::Create(CefRefPtr<CefBrowser> browser,
 
   {
     std::lock_guard<std::mutex> lock(mtxMap_);
-    if (mapBrowser2Delegate_.count(browser.get()))
-      pDelegate = mapBrowser2Delegate_[browser.get()];
+    if (mapBrowser2Delegate_.count(browser->GetIdentifier()))
+      pDelegate = mapBrowser2Delegate_[browser->GetIdentifier()];
   }
 
   if (pDelegate)

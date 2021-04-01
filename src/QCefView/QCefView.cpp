@@ -22,6 +22,7 @@
 #include "CCefWindow.h"
 #include "CCefSetting.h"
 #include "CefViewBrowserApp/QCefViewBrowserHandler.h"
+#include "CefViewBrowserApp/SchemeHandlers/QCefViewDelegatedSchemeHandler.h"
 
 //////////////////////////////////////////////////////////////////////////
 class QCefView::Implementation
@@ -30,6 +31,7 @@ public:
   explicit Implementation(const QString& url, QCefView* view)
     : pCefWindow_(nullptr)
     , pQCefViewHandler_(nullptr)
+    , nextFindId_(0)
   {
     // Here we must create a QWidget as a wrapper to encapsulate the QWindow
     pCefWindow_ = new CCefWindow(view);
@@ -114,7 +116,7 @@ public:
 
   void navigateToString(const QString& content)
   {
-    if (pQCefViewHandler_) {
+    if (pQCefViewHandler_ && pQCefViewHandler_->GetBrowser() && pQCefViewHandler_->GetBrowser()->GetMainFrame()) {
       std::string data = content.toStdString();
       data = CefURIEncode(CefBase64Encode(data.c_str(), data.size()), false).ToString();
       data = "data:text/html;base64," + data;
@@ -124,11 +126,45 @@ public:
 
   void navigateToUrl(const QString& url)
   {
-    if (pQCefViewHandler_) {
+    if (pQCefViewHandler_ && pQCefViewHandler_->GetBrowser() && pQCefViewHandler_->GetBrowser()->GetMainFrame()) {
       CefString strUrl;
       strUrl.FromString(url.toStdString());
       pQCefViewHandler_->GetBrowser()->GetMainFrame()->LoadURL(strUrl);
     }
+  }
+
+  qreal getZoomLevel()
+  {
+    double zoomLevel = pQCefViewHandler_->GetBrowser()->GetHost()->GetZoomLevel();
+    if (zoomLevel == 0.0) {
+      zoomLevel = 1.0;
+    }
+    return zoomLevel;
+  }
+
+  void setZoomLevel(qreal zoomLevel)
+  {
+    pQCefViewHandler_->GetBrowser()->GetHost()->SetZoomLevel(zoomLevel);
+  }
+
+  void runJavaScript(const QString& scriptSource)
+  {
+    if (pQCefViewHandler_ && pQCefViewHandler_->GetBrowser() && pQCefViewHandler_->GetBrowser()->GetMainFrame()) {
+      CefString strScriptSource;
+      strScriptSource.FromString(scriptSource.toStdString());
+      CefString strScriptSourceFile;
+      strScriptSourceFile.FromASCII("");
+
+      pQCefViewHandler_->GetBrowser()->GetMainFrame()->ExecuteJavaScript(strScriptSource, strScriptSourceFile, 1);
+    }
+  }
+
+  void registerSchemeHandler(const QString& scheme, QCefSchemeHandler::SchemeHandlerCreator creator)
+  {
+    CefString strScheme;
+    strScheme.FromString(scheme.toStdString());
+
+    QCefViewDelegatedSchemeHandler::RegisterSchemeHandlerFactory(strScheme, creator);
   }
 
   bool browserCanGoBack()
@@ -208,6 +244,29 @@ public:
           host->NotifyMoveOrResizeStarted();
       }
     }
+  }
+
+  int findText(QString text, bool forward, bool matchCase, int previousId)
+  {
+    int findId = -1;
+    if (pQCefViewHandler_) {
+      CefRefPtr<CefBrowser> browser = pQCefViewHandler_->GetBrowser();
+      if (browser) {
+        CefRefPtr<CefBrowserHost> host = browser->GetHost();
+        if (host) {
+          if (!text.isEmpty()) {
+            bool followUp = previousId > 0;
+            findId = followUp ? previousId : nextFindId_++;
+            CefString ctext;
+            ctext.FromString(text.toStdString());
+            host->Find(findId, ctext, forward, matchCase, followUp);
+          } else {
+            host->StopFinding(true);
+          }
+        }
+      }
+    }
+    return findId;
   }
 
   bool sendEventNotifyMessage(int frameId, const QString& name, const QCefEvent& event)
@@ -317,6 +376,8 @@ private:
   ///
   /// </summary>
   CefRefPtr<QCefViewBrowserHandler> pQCefViewHandler_;
+
+  QAtomicInt nextFindId_;
 };
 
 QList<QCefView::Implementation::FolderMapping> QCefView::Implementation::folderMappingList_;
@@ -325,6 +386,7 @@ QList<QCefView::Implementation::ArchiveMapping> QCefView::Implementation::archiv
 QCefView::QCefView(const QString url, QWidget* parent /*= 0*/)
   : QWidget(parent)
   , pImpl_(nullptr)
+  , initSemaphore_(new QSemaphore())
 {
   pImpl_ = std::make_unique<Implementation>(url, this);
 
@@ -384,6 +446,8 @@ QCefView::getCefWinId()
 void
 QCefView::navigateToString(const QString& content)
 {
+  if (!waitForInit())
+    return;
   if (pImpl_)
     pImpl_->navigateToString(content);
 }
@@ -391,8 +455,52 @@ QCefView::navigateToString(const QString& content)
 void
 QCefView::navigateToUrl(const QString& url)
 {
+  if (!waitForInit())
+    return;
   if (pImpl_)
     pImpl_->navigateToUrl(url);
+}
+
+qreal
+QCefView::getZoomLevel()
+{
+  if (!waitForInit())
+    return 0.0;
+  if (pImpl_)
+    return pImpl_->getZoomLevel();
+}
+
+void
+QCefView::setZoomLevel(qreal zoomLevel)
+{
+  if (!waitForInit())
+    return;
+  if (pImpl_)
+    pImpl_->setZoomLevel(zoomLevel);
+}
+
+void
+QCefView::runJavaScript(const QString& script)
+{
+  if (!waitForInit())
+    return;
+  if (pImpl_)
+    pImpl_->runJavaScript(script);
+}
+
+void
+QCefView::registerSchemeHandler(const QString& scheme, QCefSchemeHandler::SchemeHandlerCreator handlerCreator)
+{
+  if (pImpl_)
+    pImpl_->registerSchemeHandler(scheme, handlerCreator);
+}
+
+int
+QCefView::findText(const QString& text, bool forward, bool matchCase, int previousId)
+{
+  if (pImpl_)
+    return pImpl_->findText(text, forward, matchCase, previousId);
+  return -1;
 }
 
 bool
@@ -549,11 +657,23 @@ QCefView::onDraggableRegionChanged(const QRegion& region)
 {}
 
 void
-QCefView::onConsoleMessage(const QString& message, int level)
+QCefView::onAddressChange(int browserId, int frameId, const QString& url)
+{}
+
+void
+QCefView::onTitleChange(int browserId, const QString& title)
+{}
+
+void
+QCefView::onConsoleMessage(const QString& message, int level, const QString& source, int line)
 {}
 
 void
 QCefView::onTakeFocus(bool next)
+{}
+
+void
+QCefView::onFindResult(int browserId, int identifier, int count, const QRect& selectionRect, int activeMatchOrdinal, bool finalUpdate)
 {}
 
 void
@@ -567,6 +687,12 @@ QCefView::onQCefQueryRequest(const QCefQuery& query)
 void
 QCefView::onInvokeMethodNotify(int browserId, int frameId, const QString& method, const QVariantList& arguments)
 {}
+
+bool
+QCefView::isInitialized(int timeout)
+{
+  return !initSemaphore_ || waitForInit(timeout);
+}
 
 void
 QCefView::changeEvent(QEvent* event)
@@ -589,4 +715,25 @@ QCefView::eventFilter(QObject* watched, QEvent* event)
       pImpl_->onToplevelWidgetMoveOrResize();
   }
   return QWidget::eventFilter(watched, event);
+}
+
+void
+QCefView::onLoadEndInternal(int httpStatusCode)
+{
+  if (initSemaphore_) {
+    initSemaphore_->release();
+  }
+}
+
+bool
+QCefView::waitForInit(int timeOut)
+{
+  if (initSemaphore_) {
+    if (!initSemaphore_->tryAcquire(1, timeOut)) {
+      return false;
+    }
+    delete initSemaphore_;
+    initSemaphore_ = nullptr;
+  }
+  return true;
 }

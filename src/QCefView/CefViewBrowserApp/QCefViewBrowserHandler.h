@@ -32,6 +32,7 @@ class QCefViewBrowserHandler
   , public CefLoadHandler
   , public CefRequestHandler
   , public CefResourceRequestHandler
+  , public CefFindHandler
 {
 public:
   /// <summary>
@@ -81,6 +82,7 @@ public:
   virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
   virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
   virtual CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
+  virtual CefRefPtr<CefFindHandler> GetFindHandler() override { return this; }
 
   virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                         CefRefPtr<CefFrame> frame,
@@ -168,8 +170,20 @@ public:
                              CefEventHandle os_event,
                              bool* is_keyboard_shortcut) override;
 
+  virtual bool OnKeyEvent(CefRefPtr<CefBrowser> browser, const CefKeyEvent& event, CefEventHandle os_event) override;
+
 #pragma endregion CefKeyboardHandler
 
+#pragma region CefFindHandler
+
+  virtual void OnFindResult(CefRefPtr<CefBrowser> browser,
+                            int identifier,
+                            int count,
+                            const CefRect& selectionRect,
+                            int activeMatchOrdinal,
+                            bool finalUpdate) override;
+
+#pragma endregion CefFindHandler
 #pragma region CefLifeSpanHandler
 
   // CefLifeSpanHandler methods:

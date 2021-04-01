@@ -192,3 +192,10 @@ QCefSetting::setGlobalCookie(const QString& name, const QString& value, const QS
   CCefSetting::global_cookie_list.push_back(
     { name.toStdString(), value.toStdString(), domain.toStdString(), url.toStdString() });
 }
+
+void QCEFVIEW_EXPORT
+QCefSetting::addCustomScheme(const QString& scheme)
+{
+  CCefSetting::initializeInstance();
+  CCefSetting::custom_schemes.push_back(scheme.toStdString());
+}

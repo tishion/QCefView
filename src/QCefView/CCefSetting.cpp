@@ -33,6 +33,8 @@ CefString CCefSetting::accept_language_list;
 
 std::list<CCefSetting::CookieItem> CCefSetting::global_cookie_list;
 
+std::list<CefString> CCefSetting::custom_schemes;
+
 void
 CCefSetting::initializeInstance()
 {

@@ -4,6 +4,8 @@
 #include <QPaintDevice>
 #include <QPainter>
 #include <QDebug>
+#include <QApplication>
+
 #pragma endregion qt_headers
 
 #include "CCefWindow.h"
@@ -51,8 +53,10 @@ CCefWindow::onLoadStart()
 void
 CCefWindow::onLoadEnd(int httpStatusCode)
 {
-  if (view_)
+  if (view_) {
+    view_->onLoadEndInternal(httpStatusCode);
     view_->onLoadEnd(httpStatusCode);
+  }
 }
 
 void
@@ -80,11 +84,30 @@ CCefWindow::onDraggableRegionChanged(const std::vector<CefDraggableRegion> regio
 }
 
 void
-CCefWindow::onConsoleMessage(const CefString& message, int level)
+CCefWindow::onAddressChange(int browserId, int frameId, const CefString& url)
+{
+  if (view_) {
+    auto urlStr = QString::fromStdString(url.ToString());
+    view_->onAddressChange(browserId, frameId, urlStr);
+  }
+}
+
+void
+CCefWindow::onTitleChange(int browserId, const CefString& title)
+{
+  if (view_) {
+    auto titleStr = QString::fromStdString(title.ToString());
+    view_->onTitleChange(browserId, titleStr);
+  }
+}
+
+void
+CCefWindow::onConsoleMessage(const CefString& message, int level, const CefString& source, int line)
 {
   if (view_) {
     auto msg = QString::fromStdString(message.ToString());
-    view_->onConsoleMessage(msg, level);
+    auto src = QString::fromStdString(source.ToString());
+    view_->onConsoleMessage(msg, level, src, line);
   }
 }
 
@@ -167,6 +190,49 @@ CCefWindow::onInvokeMethodNotify(int browserId, const CefRefPtr<CefListValue>& a
       }
     }
   }
+}
+
+bool
+CCefWindow::OnPreKeyEvent(int browserId,
+                          const CefKeyEvent& event,
+                          CefEventHandle os_event,
+                          bool* is_keyboard_shortcut)
+{
+  if (!view_)
+    return false;
+  // do not handle stuff before js has the chance..
+  return false;
+}
+
+bool
+CCefWindow::OnKeyEvent(int browserId, const CefKeyEvent& event, CefEventHandle os_event)
+{
+  if (!view_)
+    return false;
+
+  // redirect native event to view
+  QWidget* parentWidget = qobject_cast<QWidget*>(view_);
+  if (os_event && parentWidget && parentWidget->effectiveWinId()) {
+  #if defined(Q_OS_WIN)
+    SendMessage((HWND)parentWidget->effectiveWinId(), os_event->message, os_event->wParam, os_event->lParam);
+    return true;
+  #endif
+  }
+  return false;
+}
+
+void
+CCefWindow::OnFindResult(int browserId,
+                         int identifier,
+                         int count,
+                         const CefRect& selectionRect,
+                         int activeMatchOrdinal,
+                         bool finalUpdate)
+{
+  if (!view_)
+    return;
+  QRect rect(selectionRect.x, selectionRect.y, selectionRect.width, selectionRect.height);
+  view_->onFindResult(browserId, identifier, count, rect, activeMatchOrdinal, finalUpdate);
 }
 
 void

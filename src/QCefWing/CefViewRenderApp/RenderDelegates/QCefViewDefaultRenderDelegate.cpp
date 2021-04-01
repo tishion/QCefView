@@ -5,7 +5,7 @@
 
 namespace QCefViewDefaultRenderDelegate {
 void
-CreateBrowserDelegate(QCefViewRenderApp::RenderDelegateSet& delegates, const CefString& name)
+CreateRenderDelegate(QCefViewRenderApp::RenderDelegateSet& delegates, const CefString& name)
 {
   delegates.insert(new RenderDelegate(name));
 }

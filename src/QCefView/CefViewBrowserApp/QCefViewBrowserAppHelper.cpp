@@ -10,6 +10,8 @@
 #include "QCefViewBrowserApp.h"
 #include "BrowserDelegates/QCefViewDefaultBrowserDelegate.h"
 #include "SchemeHandlers/QCefViewDefaultSchemeHandler.h"
+#include "SchemeHandlers/QCefViewDelegatedSchemeHandler.h"
+#include "CCefSetting.h"
 
 void
 QCefViewBrowserApp::CreateBrowserDelegates(BrowserDelegateSet& delegates)
@@ -28,4 +30,9 @@ void
 QCefViewBrowserApp::RegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 {
   QCefViewDefaultSchemeHandler::RegisterScheme(registrar);
+  CCefSetting::initializeInstance();
+  for (auto it = CCefSetting::custom_schemes.cbegin(); it != CCefSetting::custom_schemes.cend(); ++it)
+  {
+    QCefViewDelegatedSchemeHandler::RegisterScheme(registrar, *it);
+  }
 }

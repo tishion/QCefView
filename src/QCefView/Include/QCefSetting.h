@@ -180,6 +180,11 @@ acceptLanguageList();
 void QCEFVIEW_EXPORT
 setGlobalCookie(const QString& name, const QString& value, const QString& domain, const QString& url);
 
+/// <summary>
+///
+/// </summary>
+void QCEFVIEW_EXPORT
+addCustomScheme(const QString& scheme);
 };
 
 #endif

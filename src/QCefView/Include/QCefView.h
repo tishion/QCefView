@@ -8,12 +8,14 @@
 
 #pragma region qt_headers
 #include <QtCore/qglobal.h>
+#include <QSemaphore>
 #include <QWidget>
 #include <QVariantList>
 #pragma endregion qt_headers
 
 #include "QCefQuery.h"
 #include "QCefEvent.h"
+#include "QCefSchemeHandler.h"
 
 #ifdef QCEFVIEW_LIB
 #define QCEFVIEW_EXPORT Q_DECL_EXPORT
@@ -64,6 +66,7 @@ class QCEFVIEW_EXPORT QCefView : public QWidget
   ///
   /// </summary>
   Q_OBJECT
+  friend class CCefWindow;
 
 public:
   /// <summary>
@@ -122,6 +125,33 @@ public:
   /// </summary>
   /// <param name="url"></param>
   void navigateToUrl(const QString& url);
+
+  /// <summary>
+  ///
+  /// </summary>
+  qreal getZoomLevel();
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="zoomLevel"></param>
+  void setZoomLevel(qreal zoomLevel);
+
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="scriptSource"></param>
+  void runJavaScript(const QString& scriptSource);
+
+  /// <summary>
+  ///
+  /// </summary>
+  void registerSchemeHandler(const QString& scheme, QCefSchemeHandler::SchemeHandlerCreator handlerCreator);
+
+  /// <summary>
+  ///
+  /// </summary>
+  int findText(const QString& text, bool forward = true, bool matchCase = false, int previousId = 0);
 
   /// <summary>
   ///
@@ -267,15 +297,30 @@ public:
   /// <summary>
   ///
   /// </summary>
+  virtual void onAddressChange(int browserId, int frameId, const QString& url);
+
+  /// <summary>
+  ///
+  /// </summary>
+  virtual void onTitleChange(int browserId, const QString& title);
+
+  /// <summary>
+  ///
+  /// </summary>
   /// <param name="message"></param>
   /// <param name="level"></param>
-  virtual void onConsoleMessage(const QString& message, int level);
+  virtual void onConsoleMessage(const QString& message, int level, const QString& source, int line);
 
   /// <summary>
   ///
   /// </summary>
   /// <param name="next"></param>
   virtual void onTakeFocus(bool next);
+
+  /// <summary>
+  ///
+  /// </summary>
+  virtual void onFindResult(int browserId, int identifier, int count, const QRect& selectionRect, int activeMatchOrdinal, bool finalUpdate);
 
   /// <summary>
   ///
@@ -298,6 +343,11 @@ public:
   /// <param name="arguments"></param>
   virtual void onInvokeMethodNotify(int browserId, int frameId, const QString& method, const QVariantList& arguments);
 
+  /// <summary>
+  ///
+  /// </summary>
+  virtual bool isInitialized(int timeout = 50);
+
 protected:
   /// <summary>
   ///
@@ -313,12 +363,21 @@ protected:
   /// <returns></returns>
   virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="httpStatusCode"></param>
+  virtual void onLoadEndInternal(int httpStatusCode);
+
 private:
+  bool waitForInit(int timeOut = 50);
+
   /// <summary>
   ///
   /// </summary>
   class Implementation;
   std::unique_ptr<Implementation> pImpl_;
+  QSemaphore* initSemaphore_;
 };
 
 #endif // QCEFVIEW_H

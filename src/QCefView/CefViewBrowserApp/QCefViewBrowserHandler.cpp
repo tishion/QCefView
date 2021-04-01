@@ -70,12 +70,20 @@ void
 QCefViewBrowserHandler::OnAddressChange(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& url)
 {
   CEF_REQUIRE_UI_THREAD();
+  int browserId = browser->GetIdentifier();
+  int frameID = frame->GetIdentifier();
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onAddressChange(browserId, frameID, url);
 }
 
 void
 QCefViewBrowserHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
 {
   CEF_REQUIRE_UI_THREAD();
+  int browserId = browser->GetIdentifier();
+
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->onTitleChange(browserId, title);
 }
 
 bool
@@ -88,7 +96,7 @@ QCefViewBrowserHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
   CEF_REQUIRE_UI_THREAD();
 
   if (pQCefViewDelegate_)
-    pQCefViewDelegate_->onConsoleMessage(message, level);
+    pQCefViewDelegate_->onConsoleMessage(message, level, source, line);
 
 #if (defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG))
   return false;
@@ -187,9 +195,35 @@ QCefViewBrowserHandler::OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
                                       CefEventHandle os_event,
                                       bool* is_keyboard_shortcut)
 {
+  int browserId = browser->GetIdentifier();
   CEF_REQUIRE_UI_THREAD();
-
+  if (pQCefViewDelegate_)
+    return pQCefViewDelegate_->OnPreKeyEvent(browserId, event, os_event, is_keyboard_shortcut);
   return false;
+}
+
+bool
+QCefViewBrowserHandler::OnKeyEvent(CefRefPtr<CefBrowser> browser, const CefKeyEvent& event, CefEventHandle os_event)
+{
+  int browserId = browser->GetIdentifier();
+  CEF_REQUIRE_UI_THREAD();
+  if (pQCefViewDelegate_)
+    return pQCefViewDelegate_->OnKeyEvent(browserId, event, os_event);
+  return false;
+}
+
+void
+QCefViewBrowserHandler::OnFindResult(CefRefPtr<CefBrowser> browser,
+                                     int identifier,
+                                     int count,
+                                     const CefRect& selectionRect,
+                                     int activeMatchOrdinal,
+                                     bool finalUpdate)
+{
+  int browserId = browser->GetIdentifier();
+  CEF_REQUIRE_UI_THREAD();
+  if (pQCefViewDelegate_)
+    pQCefViewDelegate_->OnFindResult(browserId, identifier, count, selectionRect, activeMatchOrdinal, finalUpdate);
 }
 
 bool

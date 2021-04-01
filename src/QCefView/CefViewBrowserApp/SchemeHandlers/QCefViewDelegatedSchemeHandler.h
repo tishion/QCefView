@@ -15,24 +15,22 @@
 #include <QCefProtocol.h>
 
 #include "../QCefViewDelegate.h"
+#include "../../Include/QCefSchemeHandler.h"
 
-namespace QCefViewDefaultSchemeHandler {
-static char* scheme_name = QCEF_SCHEMA;
-
-bool
-RegisterSchemeHandlerFactory();
+namespace QCefViewDelegatedSchemeHandler {
 
 bool
-RegisterScheme(CefRawPtr<CefSchemeRegistrar> registrar);
+RegisterSchemeHandlerFactory(const CefString& scheme_name, QCefSchemeHandler::SchemeHandlerCreator delegatedHandlerCreator);
+
+bool
+RegisterScheme(CefRawPtr<CefSchemeRegistrar> registrar, const CefString& scheme_name);
 
 class SchemeHandler : public CefResourceHandler
 {
 public:
-  SchemeHandler(QCefViewDelegate* pDelegate);
+  SchemeHandler(QCefSchemeHandler* handler);
 
   virtual bool Open(CefRefPtr<CefRequest> request, bool& handle_request, CefRefPtr<CefCallback> callback) override;
-
-  virtual bool ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback) override;
 
   virtual void GetResponseHeaders(CefRefPtr<CefResponse> response,
                                   int64& response_length,
@@ -44,18 +42,11 @@ public:
                     int bytes_to_read,
                     int& bytes_read,
                     CefRefPtr<CefResourceReadCallback> callback) override;
-  virtual bool ReadResponse(void* data_out,
-                            int bytes_to_read,
-                            int& bytes_read,
-                            CefRefPtr<CefCallback> callback) override;
 
   virtual void Cancel() override;
 
 private:
-  QCefViewDelegate* pQCefViewDelegate_;
-  std::string data_;
-  std::string mime_type_;
-  int offset_;
+  QCefSchemeHandler* handler_;
 
 private:
   IMPLEMENT_REFCOUNTING(SchemeHandler);
@@ -65,18 +56,7 @@ class SchemeHandlerFactory : public CefSchemeHandlerFactory
 {
 
 public:
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="browser"></param>
-  /// <param name="pDelegate"></param>
-  static void recordBrowserAndDelegate(CefRefPtr<CefBrowser> browser, QCefViewDelegate* pDelegate);
-
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="browser"></param>
-  static void removeBrowserAndDelegate(CefRefPtr<CefBrowser> browser);
+  SchemeHandlerFactory(QCefSchemeHandler::SchemeHandlerCreator delegatedHandlerCreator);
 
   // Return a new scheme handler instance to handle the request.
   virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
@@ -85,8 +65,7 @@ public:
                                                CefRefPtr<CefRequest> request);
 
 private:
-  static std::map<int, QCefViewDelegate*> mapBrowser2Delegate_;
-  static std::mutex mtxMap_;
+  QCefSchemeHandler::SchemeHandlerCreator delegatedHandlerCreator_;
 
 private:
   IMPLEMENT_REFCOUNTING(SchemeHandlerFactory);

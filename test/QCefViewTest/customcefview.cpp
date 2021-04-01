@@ -4,6 +4,13 @@
 #include <QRandomGenerator>
 
 #include "customcefview.h"
+#include "customschemehandler.h"
+
+CustomCefView::CustomCefView(const QString url, QWidget* parent)
+  : QCefView(url, parent)
+{
+  registerSchemeHandler("myscheme", CustomSchemeHandler::Creator);
+}
 
 CustomCefView::~CustomCefView() {}
 
@@ -15,6 +22,18 @@ CustomCefView::changeColor()
   QCefEvent event("colorChange");
   event.setStringProperty("color", color.name());
   broadcastEvent(event);
+}
+
+void
+CustomCefView::onConsoleMessage(const QString& message, int level, const QString& source, int line)
+{
+  QString title("JS Console Message");
+  QString text = QString("Current Thread: QT_UI\r\n"
+                         "Message: %1")
+                   .arg(message);
+
+  QMetaObject::invokeMethod(
+    this, [=]() { QMessageBox::information(this->window(), title, text); }, Qt::QueuedConnection);
 }
 
 void

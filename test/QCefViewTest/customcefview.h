@@ -8,12 +8,14 @@ class CustomCefView : public QCefView
   Q_OBJECT
 
 public:
-  using QCefView::QCefView;
+  CustomCefView(const QString url, QWidget* parent = 0);
   ~CustomCefView();
 
   void changeColor();
 
 protected:
+  virtual void onConsoleMessage(const QString& message, int level, const QString& source, int line) override;
+
   virtual void onDraggableRegionChanged(const QRegion& region) override;
 
   virtual void onQCefUrlRequest(const QString& url) override;
