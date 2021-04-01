@@ -12,6 +12,16 @@ set(QT_SDK_DIR
 )
 
 #
+# For CI system
+#
+if (DEFINED ENV{APPVEYOR})
+  set(QT_SDK_DIR
+    # Change this value to the Qt SDK path of your build environment
+    "C:\\Qt\\5.15.2"
+  )
+endif()
+
+#
 # The link for downloading the CEF binary sdk 
 #
 set(CEF_SDK_URL
