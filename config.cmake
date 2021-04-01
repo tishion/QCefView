@@ -17,7 +17,7 @@ set(QT_SDK_DIR
 if (DEFINED ENV{APPVEYOR})
   set(QT_SDK_DIR
     # Change this value to the Qt SDK path of your build environment
-    "C:\\Qt\\5.15.2"
+    "C:\\Qt\\5.15.2\\msvc2019_64"
   )
 endif()
 
