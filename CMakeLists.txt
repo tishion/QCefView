@@ -109,7 +109,19 @@ add_subdirectory(src/QCefView)
 ###############################################################
 
 
-# Add demo
+# Config the Demo project
 ###############################################################
-add_subdirectory(test/QCefViewTest)
+if ((NOT DEFINED SKIP_BUILD_DEMO) OR (SKIP_BUILD_DEMO STREQUAL "") OR (${SKIP_BUILD_DEMO} MATCHES "(FALSE|false|0|OFF)"))
+    option(SKIP_BUILD_DEMO "Skip building of demo" OFF)
+    message(STATUS "FLAG SKIP_BUILD_DEMO is OFF")
+elseif(${SKIP_BUILD_DEMO} MATCHES "(TRUE|true|1|ON)")
+    option(SKIP_BUILD_DEMO "Skip building of demo" ON)
+    message(STATUS "FLAG SKIP_BUILD_DEMO is ON")
+else()
+    message(FATAL_ERROR "++++++++++ INVALID FLAG SKIP_BUILD_DEMO=" ${SKIP_BUILD_DEMO})
+endif()
+
+if (NOT SKIP_BUILD_DEMO)
+  add_subdirectory(test/QCefViewTest)
+endif()
 ###############################################################
