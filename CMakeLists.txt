@@ -4,7 +4,7 @@
 #   Usually there is no need to change this file.
 #   Change the config.cmake instead.
 #
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.18)
 project(QCefView)
 
 # Determine the platform.
