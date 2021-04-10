@@ -66,10 +66,21 @@ if (MSVC)
   endif()
 endif(MSVC)
 
+if (OS_WINDOWS)
+  find_program(DEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+elseif (OS_MACOS)
+  find_program(DEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
+elseif (OS_LINUX)
+else ()
+endif()
+
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Core> $<TARGET_FILE_DIR:${PROJECT_NAME}>
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui> $<TARGET_FILE_DIR:${PROJECT_NAME}>
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:${PROJECT_NAME}>
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/QCefViewTestPage.html $<TARGET_FILE_DIR:${PROJECT_NAME}>
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${QCEF_VIEW_SDK_BIN_OUT}/$<CONFIGURATION> $<TARGET_FILE_DIR:${PROJECT_NAME}>
+  # Deploy the Qt Application
+  COMMAND ${DEPLOYQT_EXECUTABLE} 
+  --no-svg 
+  --no-translations 
+  --no-compiler-runtime 
+  $<TARGET_FILE:${PROJECT_NAME}>
 )

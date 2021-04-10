@@ -38,13 +38,6 @@ public:
     ///
     /// </summary>
     /// <param name="app"></param>
-    /// <param name="extra_info"></param>
-    virtual void OnRenderThreadCreated(CefRefPtr<QCefViewRenderApp> app, CefRefPtr<CefListValue> extra_info) {}
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="app"></param>
     virtual void OnWebKitInitialized(CefRefPtr<QCefViewRenderApp> app) {}
 
     /// <summary>
@@ -155,13 +148,6 @@ public:
   typedef std::set<CefRefPtr<RenderDelegate>> RenderDelegateSet;
 
 private:
-  // Creates all of the RenderDelegate objects. Implemented in
-  // client_app_delegates.
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="delegates"></param>
-  static void CreateRenderDelegates(RenderDelegateSet& delegates, const CefString& name);
 
 #pragma region CefApp
 
