@@ -1,1 +1,2 @@
-# This repo is deprecated, please move to the new project. https://github.com/CefView
+# https://cefview.github.io/QCefView/
+# This repo has been deprecated, please move to the new project.
